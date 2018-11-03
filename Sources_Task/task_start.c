@@ -88,7 +88,7 @@ void Task_Start (void *p_arg)
         OSTimeDlyHMSM(0u, 0u, 1u, 0u,
                       OS_OPT_TIME_HMSM_STRICT,
                       &os_err);
-        //TRACE_DBG(">>DBG:       开始任务\r\n");
+        TRACE_DBG(">>DBG:       开始任务\r\n");
         BSP_Led1Toggle();
     }
 }
