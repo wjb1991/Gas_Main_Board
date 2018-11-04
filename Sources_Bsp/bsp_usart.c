@@ -720,12 +720,11 @@ void Bsp_UartPrintf(const char * Format,...)
 	vsprintf((char *)auch_PrintfBuff,Format,pArgs);
 	va_end(pArgs);
 
-	/* scia 是 485接口
-	if(p == &COM1)
-		Bsp_Rs485de(eRs485Trans);*/
+	/* scia 是 485接口*/
+	if(p == &COM4)
+		Bsp_Rs485de(eRs485Trans);
 	Bsp_UartSendBlock(p,auch_PrintfBuff,strlen((const char*)auch_PrintfBuff));
 }
-
 
 int fputc(int ch, FILE *f)
 {

@@ -16,7 +16,7 @@
                                     SPI_POLARITY_LOW,\
                                     SPI_PHASE_1EDGE,\
                                     SPI_NSS_SOFT,\
-                                    SPI_BAUDRATEPRESCALER_4,\
+                                    SPI_BAUDRATEPRESCALER_128,\
                                     SPI_FIRSTBIT_MSB,\
                                     SPI_MODE_MASTER
 #define     DEF_SPI_HOOK            0,0,0,0
@@ -114,6 +114,8 @@ BOOL Bsp_SpiInit(Dev_SPI* pst_Dev)
         //_Error_Handler(__FILE__, __LINE__);
     }
     
+    LL_SPI_EnableIT_ERR(SpiHandle->Instance);
+    
     __HAL_SPI_ENABLE(SpiHandle);
 
     return TRUE;
@@ -141,13 +143,14 @@ BOOL Bsp_SpiIsBusy(Dev_SPI* pst_Dev)
 INT8U Bsp_SpiTransByteBlock(Dev_SPI* pst_Dev,INT8U uch_Byte)
 {
     SPI_HandleTypeDef* SpiHandle = pst_Dev->pv_SpiHandle;
-    INT8U RecvByte = 0;
+    INT8U RecvByte = 0xff;
+    /*HAL_SPI_TransmitReceive(SpiHandle,&uch_Byte,&RecvByte,1,100);*/
     
     while( ! __HAL_SPI_GET_FLAG(SpiHandle, SPI_FLAG_TXE)){}
-    SpiHandle->Instance->DR = uch_Byte;
-    while( ! __HAL_SPI_GET_FLAG(SpiHandle, SPI_FLAG_RXNE)){}
-    while( ! __HAL_SPI_GET_FLAG(SpiHandle, SPI_FLAG_TXE)){}
-    RecvByte= SpiHandle->Instance->DR;
+    LL_SPI_TransmitData8(SpiHandle->Instance, uch_Byte);
+    while( __HAL_SPI_GET_FLAG(SpiHandle, SPI_FLAG_BSY)){}
+    //while( !__HAL_SPI_GET_FLAG(SpiHandle, SPI_FLAG_RXNE)){}
+    RecvByte = LL_SPI_ReceiveData8(SpiHandle->Instance);
     return RecvByte;
 }
 
@@ -234,8 +237,8 @@ void SPIx_IRQHandler(Dev_SPI* pst_Dev)
     INT32U itsource = SpiHandle->Instance->CR2;
     INT32U itflag   = SpiHandle->Instance->SR;
 
-    /* SPI in mode Receiver ----------------------------------------------------*/
-    if(((itflag & SPI_FLAG_OVR) == RESET) && ((itflag & SPI_FLAG_RXNE) != RESET) && ((itsource & SPI_IT_RXNE) != RESET))
+    /* Check RXNE flag value in ISR register */
+    if(LL_SPI_IsActiveFlag_RXNE(SpiHandle->Instance))
     {
         if( pst_Dev->uin_RxCount < pst_Dev->uin_RxLen)
         {
@@ -254,9 +257,8 @@ void SPIx_IRQHandler(Dev_SPI* pst_Dev)
         }
         return;
     }
-
-    /* SPI in mode Transmitter -------------------------------------------------*/
-    if(((itflag & SPI_FLAG_TXE) != RESET) && ((itsource & SPI_IT_TXE) != RESET))
+    /* Check RXNE flag value in ISR register */
+    else if(LL_SPI_IsActiveFlag_TXE(SpiHandle->Instance))
     {
         if( pst_Dev->uin_TxCount < pst_Dev->uin_TxLen)
         {
@@ -275,32 +277,23 @@ void SPIx_IRQHandler(Dev_SPI* pst_Dev)
         }
         return;
     }
-
-    /* SPI in Error Treatment --------------------------------------------------*/
-    if(((itflag & (SPI_FLAG_MODF | SPI_FLAG_OVR | SPI_FLAG_FRE)) != RESET) && ((itsource & SPI_IT_ERR) != RESET))
+    /* Check STOP flag value in ISR register */
+    else if(LL_SPI_IsActiveFlag_OVR(SpiHandle->Instance))
     {
-        /* SPI Overrun error interrupt occurred ----------------------------------*/
-        if((itflag & SPI_FLAG_OVR) != RESET)
-        {
-            __HAL_SPI_CLEAR_OVRFLAG(SpiHandle);
-        }
-
-        /* SPI Mode Fault error interrupt occurred -------------------------------*/
-        if((itflag & SPI_FLAG_MODF) != RESET)
-        {
-            __HAL_SPI_CLEAR_MODFFLAG(SpiHandle);
-        }
-
-        /* SPI Frame error interrupt occurred ------------------------------------*/
-        if((itflag & SPI_FLAG_FRE) != RESET)
-        {
-            __HAL_SPI_CLEAR_FREFLAG(SpiHandle);
-        }
-        
-        if(pst_Dev->cb_ErrHandle != NULL)
-        {
-            pst_Dev->cb_ErrHandle(pst_Dev);
-        }
+        /* Call Error function */
+        //SPI1_TransferError_Callback();
+        LL_SPI_ClearFlag_OVR(SpiHandle->Instance);
+        while(1);
+    }
+    else if(LL_SPI_IsActiveFlag_MODF(SpiHandle->Instance))
+    {
+        LL_SPI_ClearFlag_MODF(SpiHandle->Instance);
+        while(1);
+    }
+    else if(LL_SPI_IsActiveFlag_FRE(SpiHandle->Instance))
+    {
+        LL_SPI_ClearFlag_FRE(SpiHandle->Instance);
+        while(1);
     }
 }
 
@@ -345,8 +338,7 @@ void SPIxRxDMA_IRQHandle(Dev_SPI* pst_Dev)
     if(pst_Dev->cb_RecvReady != NULL)
     {
         pst_Dev->cb_RecvReady(pst_Dev,pst_Dev->puch_RxBuff,pst_Dev->uin_RxLen);
-    }  
-
+    }
 }
 
 void DMA2_Stream0_IRQHandler(void)
@@ -382,6 +374,9 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* spiHandle)
         GPIO_InitStruct.Alternate = GPIO_AF5_SPI1;
         HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
+        HAL_NVIC_SetPriority(SPI1_IRQn, 1, 0);
+        HAL_NVIC_EnableIRQ(SPI1_IRQn);
+#if 0   
         /* SPI1 DMA Init */
         /* SPI1_RX Init */
         hdma_spi1_rx.Instance = DMA2_Stream0;
@@ -414,7 +409,30 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* spiHandle)
         {
             //_Error_Handler(__FILE__, __LINE__);
         }
+#endif
     }
+    else if(spiHandle->Instance==SPI2)
+    {
+        /* SPI2 clock enable */
+        __HAL_RCC_SPI2_CLK_ENABLE();
+
+        /**SPI2 GPIO Configuration    
+        PI1     ------> SPI2_SCK
+        PI2     ------> SPI2_MISO
+        PI3     ------> SPI2_MOSI 
+        */
+        GPIO_InitStruct.Pin = GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3;
+        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+        GPIO_InitStruct.Pull = GPIO_NOPULL;
+        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+        GPIO_InitStruct.Alternate = GPIO_AF5_SPI1;
+        HAL_GPIO_Init(GPIOI, &GPIO_InitStruct);
+
+        HAL_NVIC_SetPriority(SPI2_IRQn, 1, 0);
+        HAL_NVIC_EnableIRQ(SPI2_IRQn);
+    }
+
+
 }
 
 void HAL_SPI_MspDeInit(SPI_HandleTypeDef* spiHandle)
@@ -434,6 +452,40 @@ void HAL_SPI_MspDeInit(SPI_HandleTypeDef* spiHandle)
         /* SPI1 DMA DeInit */
         HAL_DMA_DeInit(&hdma_spi1_rx);
         HAL_DMA_DeInit(&hdma_spi1_tx);
+        
+        /*##-3- Disable the NVIC for SPI ###########################################*/
+        HAL_NVIC_DisableIRQ(SPI1_IRQn);
+        
+    }
+    else if(spiHandle->Instance==SPI2)
+    {
+        /* Peripheral clock disable */
+        __HAL_RCC_SPI2_CLK_DISABLE();
+
+        /**SPI1 GPIO Configuration    
+        PB3     ------> SPI1_SCK
+        PB4     ------> SPI1_MISO
+        PB5     ------> SPI1_MOSI 
+        */
+        HAL_GPIO_DeInit(GPIOI,  GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3);
+
+        /* SPI1 DMA DeInit */
+        HAL_DMA_DeInit(&hdma_spi2_rx);
+        HAL_DMA_DeInit(&hdma_spi2_tx);
+        
+        /*##-3- Disable the NVIC for SPI ###########################################*/
+        HAL_NVIC_DisableIRQ(SPI2_IRQn);
+        
     }
 } 
+
+/**
+  * @brief  This function handles SPI1 interrupt request.
+  * @param  None
+  * @retval None
+  */
+void SPI1_IRQHandler(void)
+{
+    SPIx_IRQHandler(&st_SPI1);
+}
 

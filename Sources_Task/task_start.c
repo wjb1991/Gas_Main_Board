@@ -5,15 +5,18 @@
 //==================================================================================
 OS_TCB       TaskStartTCB;                                      /*  开始任务    */
 OS_TCB       TaskGasProcTCB;                                    /*  紫外光处理任务    */
+OS_TCB       TaskGreyProcTCB;                                   /*  灰度处理任务    */
 OS_TCB       TaskCmlSendTCB;                                    /*  命令行调试任务    */
 OS_TCB       TaskCmlRecvTCB;                                    /*  命令行调试任务    */
 OS_TCB       TaskUsbHostTCB;                                    /*  Usb光谱仪通讯任务    */
 OS_TCB       TaskStdBusTCB;                                     /*  STDBUS任务    */
+
 //==================================================================================
 //                                   任务堆栈定义
 //==================================================================================
 CPU_STK      TaskStartStk   [TASK_START_STK_SIZE];              /*  开始任务    */
 CPU_STK      TaskGasProcStk [TASK_GASPROC_STK_SIZE];            /*  紫外光处理任务    */
+CPU_STK      TaskGreyProcStk[TASK_GREYPROC_STK_SIZE];           /*  灰度处理任务    */
 CPU_STK      TaskCmlSendStk [TASK_CML_SEND_STK_SIZE];           /*  命令行调试任务    */
 CPU_STK      TaskCmlRecvStk [TASK_CML_RECV_STK_SIZE];           /*  命令行调试任务    */
 CPU_STK      TaskUsbHostStk [TASK_USB_HOST_STK_SIZE];           /*  光谱仪任务    */
@@ -23,6 +26,7 @@ CPU_STK      TaskStdBusStk  [TASK_STDBUS_STK_SIZE];             /*  STDBUS任务  
 //==================================================================================
 void Task_Start (void *p_arg);                                  /*  开始任务    */
 void Task_GasProc (void  *p_arg);                               /*  紫外光处理任务    */
+void Task_GreyProc (void  *p_arg);                              /*  灰度处理任务    */
 void Task_CmlSend (void  *p_arg);                               /*  命令行调试任务    */
 void Task_CmlRecv (void  *p_arg);                               /*  命令行调试任务    */
 void Task_Host (void  *p_arg);                                  /*  Usb光谱仪通讯任务 */
@@ -150,12 +154,28 @@ void AppTaskCreate (void)
                  (CPU_STK      *)&TaskGasProcStk[0u],                           /* 任务堆载地址 */    
                  (CPU_STK_SIZE  )TASK_GASPROC_STK_SIZE / 10u,                   /* 任务栈深限制 */        
                  (CPU_STK_SIZE  )TASK_GASPROC_STK_SIZE,                         /* 任务堆栈大小 */ 
-                 (OS_MSG_QTY    )10u,                                            /* 内部消息队列的最大消息数目 */
+                 (OS_MSG_QTY    )10u,                                           /* 内部消息队列的最大消息数目 */
                  (OS_TICK       )0u,                                            /* 时间片轮询的时间片数 */
                  (void         *)0u,                                            /* 用户补充存储区 */
                  (OS_OPT        )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_SAVE_FP),
                  (OS_ERR       *)&os_err);                                      /* 存放错误值 */
 
+    /* 灰度处理 */
+    OSTaskCreate((OS_TCB       *)&TaskGreyProcTCB,                              /* 创建任务控制块 */
+                 (CPU_CHAR     *)"Grey Process",                                /* 任务名称 */
+                 (OS_TASK_PTR   )Task_GreyProc,                                 /* 任务函数 */    
+                 (void         *)0u,                                            /* 任务入参 */
+                 (OS_PRIO       )TASK_GREYPROC_PRIO,                            /* 任务优先级 */
+                 (CPU_STK      *)&TaskGreyProcStk[0u],                          /* 任务堆载地址 */    
+                 (CPU_STK_SIZE  )TASK_GREYPROC_STK_SIZE / 10u,                  /* 任务栈深限制 */        
+                 (CPU_STK_SIZE  )TASK_GREYPROC_STK_SIZE,                        /* 任务堆栈大小 */ 
+                 (OS_MSG_QTY    )10u,                                           /* 内部消息队列的最大消息数目 */
+                 (OS_TICK       )0u,                                            /* 时间片轮询的时间片数 */
+                 (void         *)0u,                                            /* 用户补充存储区 */
+                 (OS_OPT        )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_SAVE_FP),
+                 (OS_ERR       *)&os_err);                                      /* 存放错误值 */
+    
+    
     /* 光谱仪通信 */
     OSTaskCreate((OS_TCB       *)&TaskUsbHostTCB,                               /* 创建任务控制块 */
                  (CPU_CHAR     *)"USB HOST",                                    /* 任务名称 */

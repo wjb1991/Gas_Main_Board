@@ -23,9 +23,11 @@
 //==================================================================================
 //                                   任务优先级    
 //==================================================================================
-#define  TASK_START_PRIO                OS_CFG_PRIO_MAX-4u      
-#define  TASK_GASPROC_PRIO              5u
+#define  TASK_START_PRIO                OS_CFG_PRIO_MAX-4u   
 #define  TASK_USB_HOST_PRIO             4u
+#define  TASK_GASPROC_PRIO              5u
+#define  TASK_GREYPROC_PRIO             6u
+
 #define  TASK_STDBUS_PRIO               10u
 
 #define  TASK_CML_RECV_PRIO             20u
@@ -37,6 +39,7 @@
 //==================================================================================
 #define  TASK_START_STK_SIZE            256u
 #define  TASK_GASPROC_STK_SIZE          512u
+#define  TASK_GREYPROC_STK_SIZE         512u
 #define  TASK_CML_SEND_STK_SIZE         256u
 #define  TASK_CML_RECV_STK_SIZE         256u
 #define  TASK_USB_HOST_STK_SIZE         1024u

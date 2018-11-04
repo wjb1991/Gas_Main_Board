@@ -27,7 +27,7 @@ void Bsp_LTC1867Init(void* pv_Dev);
 
 INT16U Bsp_LTC1867SampleOne(void* pv_Dev,INT16U uin_CH);
 
-INT16U Bsp_Ltc1867SampleAvg(void* pv_Dev,INT16U uin_CH);
+INT16U Bsp_LTC1867SampleAvg(void* pv_Dev,INT16U uin_CH,INT16U uin_Avg);
 
 FP64   Bsp_LTC1867HexToVolt(INT16U uin_Hex);
 

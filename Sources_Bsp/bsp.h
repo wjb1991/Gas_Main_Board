@@ -25,6 +25,7 @@ extern  "C" {                                  /* See Note #1.                  
 #include  <math.h>
 #include  <stm32f7xx_hal.h>
 #include  "stm32f7xx_ll_usart.h"
+#include  "stm32f7xx_ll_spi.h"
   
 #include  "bsp_datatype.h"
 #include  "bsp_converter.h"
@@ -37,6 +38,7 @@ extern  "C" {                                  /* See Note #1.                  
 #include  "bsp_at24c512.h"
   
 #include  "Bsp_W25Qxx.h"
+#include  "Bsp_LTC1867.h"
 
 #ifdef      OS_SUPPROT
 #include  "bsp_os.h"
@@ -51,8 +53,8 @@ void Bsp_Init(void);
 void Bsp_Init(void);
 
 __STATIC_INLINE void Bsp_Nop(void){;}
-__STATIC_INLINE void Bsp_IntDis(void){ __disable_irq; }
-__STATIC_INLINE void Bsp_IntEn(void){ __enable_irq; }
+__STATIC_INLINE void Bsp_IntDis(void){ __disable_irq(); }
+__STATIC_INLINE void Bsp_IntEn(void){ __enable_irq(); }
 
 void Bsp_DelayUS(INT32U us);
 void Bsp_DelayMs(INT32U ms);

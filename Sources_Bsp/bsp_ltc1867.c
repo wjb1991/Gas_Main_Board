@@ -24,12 +24,12 @@ typedef enum {
 
 DEV_LTC1867 st_LTC1867A = {
    &st_SPI1,
-   NULL,
+   Bsp_Ltc1867CS0,
 };
 
 DEV_LTC1867 st_LTC1867B = {
-   &st_SPI1,
-   NULL,
+   &st_SPI2,
+   Bsp_Ltc1867CS1,
 };
 
 LTC1867CH_TYPE Bsp_Ltc1866Chnnel(INT16U uin_CH)
@@ -72,17 +72,23 @@ INT16U Bsp_LTC1867SampleOne(void* pv_Dev,INT16U uin_CH)
     INT16U uin_Lsb = 0;
     LTC1867CH_TYPE Channel = Bsp_Ltc1866Chnnel(uin_CH);
     
+    Bsp_IntDis(); 
+    
     if(pst_Ltc1867->CS != NULL)
         pst_Ltc1867->CS(0);
+    
     Bsp_DelayUS(1);
-    Bsp_IntDis();
     uin_Msb = Bsp_SpiTransByteBlock(pst_Ltc1867->pv_SpiHandle, Channel>>8);
     uin_Lsb = Bsp_SpiTransByteBlock(pst_Ltc1867->pv_SpiHandle, Channel&0xff);
     Bsp_DelayUS(1);
+    
     if(pst_Ltc1867->CS != NULL)
         pst_Ltc1867->CS(1);
     
+    Bsp_IntEn();
+    
     Bsp_DelayUS(4);
+    
     return ((uin_Msb << 8) | uin_Lsb);
 }
 

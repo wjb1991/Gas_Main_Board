@@ -104,6 +104,7 @@
 
 void  BSP_SystemClkCfg (void)
 {
+#if 0
     RCC_ClkInitTypeDef RCC_ClkInitStruct;
     RCC_OscInitTypeDef RCC_OscInitStruct;
     HAL_StatusTypeDef   hal_status;   
@@ -159,8 +160,8 @@ void  BSP_SystemClkCfg (void)
     /* Enable the Flash prefetch */
     __HAL_FLASH_PREFETCH_BUFFER_ENABLE();
     }
-    
-#if 0
+#endif
+
     RCC_OscInitTypeDef  RCC_OscInit;
     RCC_ClkInitTypeDef  RCC_ClkInit;
     HAL_StatusTypeDef   hal_status;                                                            
@@ -211,7 +212,7 @@ void  BSP_SystemClkCfg (void)
     /* Output SYSCLK  / 2 on MCO2 pin(PC.09) */
     //HAL_RCC_MCOConfig(RCC_MCO2, RCC_MCO2SOURCE_SYSCLK, RCC_MCODIV_2);
     
-#endif
+
 }
 
 
