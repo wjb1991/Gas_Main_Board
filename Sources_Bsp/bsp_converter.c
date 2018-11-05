@@ -1,3 +1,17 @@
+//==================================================================================================
+//| 文件名称 | bsp_converter.c
+//|--------- |--------------------------------------------------------------------------------------
+//| 文件描述 | 版级数据类型转换
+//|--------- |--------------------------------------------------------------------------------------
+//| 运行环境 |
+//|--------- |--------------------------------------------------------------------------------------
+//| 版权声明 |
+//|----------|--------------------------------------------------------------------------------------
+//|  版本    |  时间       |  作者     | 描述
+//|--------- |-------------|-----------|------------------------------------------------------------
+//|  V1.0    | 2018.10.23  |  wjb      | 初版 TI28377D平台 应该是适用于所有平台的
+//==================================================================================================
+
 #include "bsp_converter.h"
 
 
@@ -18,75 +32,154 @@
 
 */
 
-
-
-void Bsp_Uint8ToUint32(INT8U *puc_src,INT32U* puin_dst,eEndianOps_t e_ops)
+INT16U Bsp_CnvArrToINT16U(INT8U *puc_Arr,BOOL b_Rev)
 {
-    INT32U t = *(INT32U*)puc_src;
-    if(e_ops == eBeToLe || e_ops == eLeToBe)
+    INT16U i = 0;
+    if(b_Rev == FALSE)
     {
-        t = __REV(t);
+        i = (((INT32U)puc_Arr[1]<<8) + ((INT32U)puc_Arr[0]));
     }
-    *puin_dst = t;
+    else
+    {
+        i = (((INT32U)puc_Arr[0]<<8) + ((INT32U)puc_Arr[1]));
+    }
+    return i;
 }
 
-void Bsp_Uint32ToUint8( INT32U *puc_src, INT8U * puin_dst, eEndianOps_t e_ops)
+void Bsp_CnvINT16UToArr(INT8U *puc_Arr,INT16U uin_Data,BOOL b_Rev)
 {
-    INT32U t = *puc_src;
-    if(e_ops == eBeToLe || e_ops == eLeToBe)
+    INT16U i = uin_Data;
+    if(b_Rev == FALSE)
     {
-        t = __REVSH(t);
+        puc_Arr[1] = (INT8U)(i>>8);
+        puc_Arr[0] = (INT8U)(i&0xff);
     }
-    memcpy((void*)puin_dst,(const void*)&t,4);
-}
-
-void Bsp_FP32ToINT8U(FP32 f_src, INT8U* puc_dst)
-{
-    INT8U*  p = (INT8U*)&f_src;
-    int i = 0;
-    for(i = 0; i<4; i++)
+    else
     {
-        puc_dst[i] = p[i];
+    	puc_Arr[0] = (INT8U)(i>>8);
+        puc_Arr[1] = (INT8U)(i&0xff);
     }
 }
 
-void Bsp_INT8UToFP32(INT8U* puc_src,FP32* pf_dst)
+INT32U Bsp_CnvArrToINT32U(INT8U *puc_Arr,BOOL b_Rev)
 {
-    INT8U* p = (INT8U*)pf_dst;
-    int i = 0;
-    for(i = 0; i<4; i++)
+    INT32U i = 0;
+    if(b_Rev == FALSE)
     {
-       p[i] = puc_src[i];
+    	i = (((INT32U)puc_Arr[3]<<24) + ((INT32U)puc_Arr[2]<<16) +
+            ((INT32U)puc_Arr[1]<<8) + ((INT32U)puc_Arr[0]));
+    }
+    else
+    {
+        i = (((INT32U)puc_Arr[0]<<24) + ((INT32U)puc_Arr[1]<<16) +
+            ((INT32U)puc_Arr[2]<<8) + ((INT32U)puc_Arr[3]));
+    }
+    return i;
+}
+
+void Bsp_CnvINT32UToArr(INT8U *puc_Arr,INT32U ul_Data,BOOL b_Rev)
+{
+    INT32U i = ul_Data;
+    if(b_Rev == FALSE)
+    {
+        puc_Arr[3] = (INT8U)(i>>24);
+        puc_Arr[2] = (INT8U)(i>>16);
+        puc_Arr[1] = (INT8U)(i>>8);
+        puc_Arr[0] = (INT8U)(i&0xff);
+    }
+    else
+    {
+        puc_Arr[0] = (INT8U)(i>>24);
+        puc_Arr[1] = (INT8U)(i>>16);
+        puc_Arr[2] = (INT8U)(i>>8);
+        puc_Arr[3] = (INT8U)(i&0xff);
     }
 }
 
-//fp64转换到int8数组
-void Bsp_FP64ToINT8U(FP64 lf_src, INT8U* puc_dst)
+FP32 Bsp_CnvArrToFP32(INT8U* puc_Arr,BOOL b_Rev)
 {
-    INT8U*  p = (INT8U*)&lf_src;
-    int i = 0;
-    for(i = 0; i<8; i++)
+    FP32 f_Temp;
+    INT32U i;
+    if(b_Rev == FALSE)
     {
-        puc_dst[i] = p[i];
+        i = (((INT32U)puc_Arr[3]<<24) + ((INT32U)puc_Arr[2]<<16) +
+            ((INT32U)puc_Arr[1]<<8) + ((INT32U)puc_Arr[0]));
+    }
+    else
+    {
+        i = (((INT32U)puc_Arr[0]<<24) + ((INT32U)puc_Arr[1]<<16) +
+            ((INT32U)puc_Arr[2]<<8) + ((INT32U)puc_Arr[3]));
+    }
+    f_Temp = *((FP32*)&i);
+    return f_Temp;
+}
+
+void Bsp_CnvFP32ToArr(INT8U* puc_Arr, FP32 f_Data,BOOL b_Rev)
+{
+    INT32U i = *((INT32U*)&f_Data);
+    if(b_Rev == FALSE)
+    {
+        puc_Arr[3] = (INT8U)(i>>24);
+        puc_Arr[2] = (INT8U)(i>>16);
+        puc_Arr[1] = (INT8U)(i>>8);
+        puc_Arr[0] = (INT8U)(i&0xff);
+    }
+    else
+    {
+        puc_Arr[0] = (INT8U)(i>>24);
+        puc_Arr[1] = (INT8U)(i>>16);
+        puc_Arr[2] = (INT8U)(i>>8);
+        puc_Arr[3] = (INT8U)(i&0xff);   
     }
 }
 
-void Bsp_INT8UToFP64(INT8U* puc_src,FP64* pf_dst)
+FP64 Bsp_CnvArrToFP64(INT8U* puc_Arr,BOOL b_Rev)
 {
-    INT8U* p = (INT8U*)pf_dst;
-    int i = 0;
-    for(i = 0; i<8; i++)
+    FP64 lf_Temp;
+    INT64U i;
+    if(b_Rev == FALSE)
     {
-       p[i] = puc_src[i];
+		i = (((INT64U)puc_Arr[7]<<56) + ((INT64U)puc_Arr[7]<<48) +
+			((INT64U)puc_Arr[5]<<40) + ((INT64U)puc_Arr[4]<<32) +
+			((INT64U)puc_Arr[3]<<24) + ((INT64U)puc_Arr[2]<<16) +
+			((INT64U)puc_Arr[1]<<8) + ((INT64U)puc_Arr[0]));
+    }
+    else
+    {
+		i = (((INT64U)puc_Arr[0]<<56) + ((INT64U)puc_Arr[1]<<48) +
+			((INT64U)puc_Arr[2]<<40) + ((INT64U)puc_Arr[3]<<32) +
+			((INT64U)puc_Arr[4]<<24) + ((INT64U)puc_Arr[5]<<16) +
+			((INT64U)puc_Arr[6]<<8) + ((INT64U)puc_Arr[7]));
+    }
+    lf_Temp = *((FP64*)&i);
+    return lf_Temp;
+}
+
+void Bsp_CnvFP64ToArr(INT8U* puc_Arr, FP64 lf_Data,BOOL b_Rev)
+{
+    INT64U i = *((INT64U*)&lf_Data);
+    if(b_Rev == FALSE)
+    {
+        puc_Arr[7] = (INT8U)(i>>56);
+        puc_Arr[6] = (INT8U)(i>>48);
+        puc_Arr[5] = (INT8U)(i>>40);
+        puc_Arr[4] = (INT8U)(i>>32);
+        puc_Arr[3] = (INT8U)(i>>24);
+        puc_Arr[2] = (INT8U)(i>>16);
+        puc_Arr[1] = (INT8U)(i>>8);
+        puc_Arr[0] = (INT8U)(i&0xff);
+    }
+    else
+    {
+        puc_Arr[0] = (INT8U)(i>>56);
+        puc_Arr[1] = (INT8U)(i>>48);
+        puc_Arr[2] = (INT8U)(i>>40);
+        puc_Arr[3] = (INT8U)(i>>32);
+        puc_Arr[4] = (INT8U)(i>>24);
+        puc_Arr[5] = (INT8U)(i>>16);
+        puc_Arr[6] = (INT8U)(i>>8);
+        puc_Arr[7] = (INT8U)(i&0xff);
     }
 }
 
-void Bsp_INT16UToINT8U(INT16U uin_src, INT8U* puc_dst)
-{
-    INT16U*  p = &uin_src;
-    int i = 0;
-    for(i = 0; i<2; i++)
-    {
-        puc_dst[i] = p[i];
-    }
-}
+

@@ -442,7 +442,7 @@ static USBH_StatusTypeDef USBH_USB4000_GetStatus(USBH_HandleTypeDef *phost)
     /* 接收成功 */
 
     INT32U t;
-    Bsp_Uint8ToUint32(&buff[2],&t,eLeToLe);
+    //Bsp_Uint8ToUint32(&buff[2],&t,eLeToLe);Bsp_Cnv
     USB4000_Handle->ul_IntegralTime = t;
     
     if( buff[14] !=0 )
@@ -476,7 +476,7 @@ static USBH_StatusTypeDef USBH_USB4000_SetIntegralTime(USBH_HandleTypeDef *phost
         
         uint8_t buff[64] = {0};
         buff[0] = 0x02;
-        Bsp_Uint32ToUint8(&ul_IntegTime,&buff[1],eLeToLe);
+        //Bsp_Uint32ToUint8(&ul_IntegTime,&buff[1],eLeToLe);Bsp_Cnv
         buff[4] = 0x00;
         USBH_BulkSendData(phost,buff,5,USB4000_Handle->OutPipe1,0);
         

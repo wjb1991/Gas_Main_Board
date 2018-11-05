@@ -25,7 +25,9 @@ typedef int8_t          INT8S;
 typedef uint16_t        INT16U;                   
 typedef int16_t         INT16S;                  
 typedef uint32_t        INT32U;                   
-typedef int32_t         INT32S;                   
+typedef int32_t         INT32S; 
+typedef uint64_t        INT64U;                   
+typedef int64_t         INT64S;  
 typedef float           FP32;                     
 typedef double          FP64; 
 

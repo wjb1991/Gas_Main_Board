@@ -149,7 +149,7 @@ INT8U Bsp_SpiTransByteBlock(Dev_SPI* pst_Dev,INT8U uch_Byte)
     while( ! __HAL_SPI_GET_FLAG(SpiHandle, SPI_FLAG_TXE)){}
     LL_SPI_TransmitData8(SpiHandle->Instance, uch_Byte);
     while( __HAL_SPI_GET_FLAG(SpiHandle, SPI_FLAG_BSY)){}
-    //while( !__HAL_SPI_GET_FLAG(SpiHandle, SPI_FLAG_RXNE)){}
+    while( !__HAL_SPI_GET_FLAG(SpiHandle, SPI_FLAG_RXNE)){}
     RecvByte = LL_SPI_ReceiveData8(SpiHandle->Instance);
     return RecvByte;
 }
@@ -343,12 +343,36 @@ void SPIxRxDMA_IRQHandle(Dev_SPI* pst_Dev)
 
 void DMA2_Stream0_IRQHandler(void)
 {
+#ifdef  OS_SUPPORT
+    CPU_SR_ALLOC();
+
+    CPU_CRITICAL_ENTER();
+    OSIntEnter();
+    CPU_CRITICAL_EXIT();
+#endif
     SPIxRxDMA_IRQHandle(&st_SPI1);
+    
+#ifdef  OS_SUPPORT
+    OSIntExit();
+#endif
+
 }
 
 void DMA2_Stream3_IRQHandler(void)
 {
+#ifdef  OS_SUPPORT
+    CPU_SR_ALLOC();
+
+    CPU_CRITICAL_ENTER();
+    OSIntEnter();
+    CPU_CRITICAL_EXIT();
+#endif
     SPIxTxDMA_IRQHandle(&st_SPI1);
+    
+#ifdef  OS_SUPPORT
+    OSIntExit();
+#endif
+
 }
 
 void HAL_SPI_MspInit(SPI_HandleTypeDef* spiHandle)
@@ -486,6 +510,18 @@ void HAL_SPI_MspDeInit(SPI_HandleTypeDef* spiHandle)
   */
 void SPI1_IRQHandler(void)
 {
+#ifdef  OS_SUPPORT
+    CPU_SR_ALLOC();
+
+    CPU_CRITICAL_ENTER();
+    OSIntEnter();
+    CPU_CRITICAL_EXIT();
+#endif
     SPIx_IRQHandler(&st_SPI1);
+    
+#ifdef  OS_SUPPORT
+    OSIntExit();
+#endif
+
 }
 

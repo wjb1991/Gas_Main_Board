@@ -15,6 +15,7 @@
 #include  "usb_host.h"
 
 #include  "mod_gasanalysis.h"
+#include  "mod_greyanalysis.h"
 
 #include  "task_cml.h"
 

@@ -22,6 +22,8 @@ extern Dev_SerialPort COM1;
 extern Dev_SerialPort COM2;
 extern Dev_SerialPort COM3;
 extern Dev_SerialPort COM4;
+extern Dev_SerialPort COM5;
+extern Dev_SerialPort COM6;
 
 struct _DEV_SERIALPORT{
     /*  ≈‰÷√≤Œ ˝  */

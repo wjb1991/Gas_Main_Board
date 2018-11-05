@@ -2498,6 +2498,9 @@
             <name>$PROJ_DIR$\..\..\Sources_Mod\mod_gasanalysis.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\Sources_Mod\mod_greyanalysis.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\Sources_Mod\mod_stdbus.c</name>
         </file>
     </group>

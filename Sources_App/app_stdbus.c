@@ -41,7 +41,7 @@ uint8_t Deal_SlavePack(StdBus_t* pst_Fram)
         }
         else if(pst_Fram->uch_SubCmd == DEF_SUBCMD_READ)
         {
-            //读命令是返回是否在调零
+            //读命令
             pst_Fram->uin_PayLoadLenth = 1;
             pst_Fram->puc_PayLoad[0] = USB4000.b_IsConnect;
             res = 1;    //应答
@@ -60,7 +60,7 @@ uint8_t Deal_SlavePack(StdBus_t* pst_Fram)
                 
                 TRACE_DBG(">>DBG>>      设置光谱仪积分时间\n\r");
                 
-                Bsp_Uint8ToUint32(&pst_Fram->puc_PayLoad[0], &i,eLeToLe);
+                i = Bsp_CnvArrToINT32U(&pst_Fram->puc_PayLoad[0],FALSE);
                 
                 if( i > 65000000)
                     i = 65000000;
@@ -77,7 +77,7 @@ uint8_t Deal_SlavePack(StdBus_t* pst_Fram)
             //读命令是返回是否在调零
             pst_Fram->uin_PayLoadLenth = 4;
             
-            Bsp_Uint32ToUint8(&USB4000.ul_IntegralTime,pst_Fram->puc_PayLoad,eLeToLe);
+            Bsp_CnvINT32UToArr(&pst_Fram->puc_PayLoad[0],USB4000.ul_IntegralTime,FALSE);
             res = 1;    //应答
         }
         break;
@@ -193,7 +193,7 @@ uint8_t Deal_SlavePack(StdBus_t* pst_Fram)
                 {
                     TRACE_DBG(">>DBG>>      接收到标定命令\n\r");
                     
-                    Bsp_INT8UToFP32(&pst_Fram->puc_PayLoad[1], &f);
+                    f = Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[1],FALSE);
                     GasAnalysis.f_RefConcentration = f;            //给定浓度
                     Mod_GasAnalysisGoCalibration(&GasAnalysis);
                     res = 1;    //应答                
@@ -223,7 +223,7 @@ uint8_t Deal_SlavePack(StdBus_t* pst_Fram)
                 INT8U i = pst_Fram->puc_PayLoad[0];
                 INT8U uch_ParamType = pst_Fram->puc_PayLoad[1];
                 FP32  f_Param = 0;
-                Bsp_INT8UToFP32(&pst_Fram->puc_PayLoad[2], &f_Param);
+                f_Param = Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[2],FALSE);
                 
                 if(i < DEF_MAX_POINT_NUM)
                 {
@@ -277,10 +277,11 @@ uint8_t Deal_SlavePack(StdBus_t* pst_Fram)
                 if(i < DEF_MAX_POINT_NUM)
                 {
                     pst_Fram->puc_PayLoad[1] = p[i].b_Use;
-                    Bsp_FP32ToINT8U(p[i].f_Concentration, &pst_Fram->puc_PayLoad[2]);
-                    Bsp_FP32ToINT8U(p[i].f_Hi204_4,  &pst_Fram->puc_PayLoad[6]);     
-                    Bsp_FP32ToINT8U(p[i].f_Hi214_8,  &pst_Fram->puc_PayLoad[10]);
-                    Bsp_FP32ToINT8U(p[i].f_Hi226_0,  &pst_Fram->puc_PayLoad[14]);
+                    
+                    Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[2], p[i].f_Concentration, FALSE);
+                    Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[6], p[i].f_Hi204_4, FALSE);              
+                    Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[10], p[i].f_Hi214_8, FALSE);
+                    Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[14], p[i].f_Hi226_0, FALSE);
 
                     pst_Fram->uin_PayLoadLenth = 18;                
                 }
@@ -371,13 +372,33 @@ uint8_t Deal_SlavePack(StdBus_t* pst_Fram)
                     break;
                 }
                 //前两个索引不修改直接返回
-                Bsp_FP32ToINT8U(p[i],  &pst_Fram->puc_PayLoad[2]);
+                Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[2],p[i],FALSE);
                 pst_Fram->uin_PayLoadLenth = 6;
                 res = 1;    //应答
             }
         }
         break;
-
+        
+//==================================================================================
+//                                   读取10路绿光电压    
+//==================================================================================
+    case 0x30:
+        if(pst_Fram->uch_SubCmd == DEF_SUBCMD_READ)
+        {
+            if(pst_Fram->uin_PayLoadLenth == 0)
+            {
+                uint16_t i = 0;
+                pst_Fram->uin_PayLoadLenth = 40;
+                
+                for(i = 0; i < 10; i++)
+                {
+                    Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[i*4],ast_GreyChannle[i].f_Volt,FALSE);
+                }
+            }
+            res = 1;    //应答
+        }
+        break;
+        
 //==================================================================================
 //                                   读取光谱    
 //==================================================================================
@@ -447,7 +468,7 @@ uint8_t Deal_SlavePack(StdBus_t* pst_Fram)
                     double data = GasAnalysis.plf_BkSpectrum[i] * 100;
                     al_Buff[i] = (INT32U)data;
                 }
-                CPU_IntEn();OSSchedUnlock(&os_err);
+                CPU_IntEn();//OSSchedUnlock(&os_err);
             }
             else if(pst_Fram->uin_PayLoadLenth == 4)     
             {
@@ -493,7 +514,7 @@ uint8_t Deal_SlavePack(StdBus_t* pst_Fram)
                     double data = GasAnalysis.plf_AbsSpectrum[i] * 100;
                     al_Buff[i] = (INT32U)data;
                 }
-                CPU_IntEn();OSSchedUnlock(&os_err);
+                CPU_IntEn();//OSSchedUnlock(&os_err);
                 
                 pst_Fram->puc_PayLoad[0] = (uint8_t)(i>>8);
                 pst_Fram->puc_PayLoad[1] = (uint8_t)(i&0x00ff);
@@ -531,9 +552,9 @@ uint8_t Deal_SlavePack(StdBus_t* pst_Fram)
             {
                 //返回三个吸收峰的高度
                 pst_Fram->puc_PayLoad[0] = 3;
-                Bsp_FP32ToINT8U(GasAnalysis.f_Hi204_4,  &pst_Fram->puc_PayLoad[1]);     
-                Bsp_FP32ToINT8U(GasAnalysis.f_Hi214_8,  &pst_Fram->puc_PayLoad[5]);
-                Bsp_FP32ToINT8U(GasAnalysis.f_Hi226_0,  &pst_Fram->puc_PayLoad[9]);
+                Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[1],GasAnalysis.f_Hi204_4,FALSE);
+                Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[5],GasAnalysis.f_Hi214_8,FALSE);
+                Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[9],GasAnalysis.f_Hi226_0,FALSE);
                 pst_Fram->uin_PayLoadLenth = 13;
                 res = 1;    //应答
             }
@@ -554,9 +575,9 @@ uint8_t Deal_SlavePack(StdBus_t* pst_Fram)
             {
                 //返回三个吸收峰的高度
                 pst_Fram->puc_PayLoad[0] = 3;
-                Bsp_FP32ToINT8U(GasAnalysis.f_Concentration_204,  &pst_Fram->puc_PayLoad[1]);     
-                Bsp_FP32ToINT8U(GasAnalysis.f_Concentration_214,  &pst_Fram->puc_PayLoad[5]);
-                Bsp_FP32ToINT8U(GasAnalysis.f_Concentration_226,  &pst_Fram->puc_PayLoad[9]);
+                Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[1],GasAnalysis.f_Concentration_204,FALSE);
+                Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[5],GasAnalysis.f_Concentration_214,FALSE);
+                Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[9],GasAnalysis.f_Concentration_226,FALSE);
                 pst_Fram->uin_PayLoadLenth = 13;
                 res = 1;    //应答
             }
