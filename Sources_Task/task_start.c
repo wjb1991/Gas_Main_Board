@@ -113,7 +113,7 @@ void AppTaskCreate (void)
     OS_ERR  os_err;
     
     /* 按优先级从低倒高开始创建 */
-  
+#if 0  
     /* 命令行调试 */
     OSTaskCreate((OS_TCB       *)&TaskCmlSendTCB,                               /* 创建任务控制块 */
                  (CPU_CHAR     *)"Debug Task",                                  /* 任务名称 */
@@ -128,69 +128,8 @@ void AppTaskCreate (void)
                  (void         *)0u,                                            /* 用户补充存储区 */
                  (OS_OPT        )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_SAVE_FP),
                  (OS_ERR       *)&os_err);                                      /* 存放错误值 */ 
- 
-    /* STDBUS */
-    OSTaskCreate((OS_TCB       *)&TaskStdBusTCB,                                /* 创建任务控制块 */
-                 (CPU_CHAR     *)"StdBus Task",                                 /* 任务名称 */
-                 (OS_TASK_PTR   )Task_StdBus,                                   /* 任务函数 */    
-                 (void         *)0u,                                            /* 任务入参 */
-                 (OS_PRIO       )TASK_STDBUS_PRIO,                              /* 任务优先级 */
-                 (CPU_STK      *)&TaskStdBusStk[0u],                            /* 任务堆载地址 */    
-                 (CPU_STK_SIZE  )TASK_STDBUS_STK_SIZE / 10u,                    /* 任务栈深限制 */        
-                 (CPU_STK_SIZE  )TASK_STDBUS_STK_SIZE,                          /* 任务堆栈大小 */ 
-                 (OS_MSG_QTY    )100u,                                           /* 内部消息队列的最大消息数目 */
-                 (OS_TICK       )0u,                                            /* 时间片轮询的时间片数 */
-                 (void         *)0u,                                            /* 用户补充存储区 */
-                 (OS_OPT        )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_SAVE_FP),
-                 (OS_ERR       *)&os_err);                                      /* 存放错误值 */
+#endif
     
-
-    /* 紫外处理光谱仪 */
-    OSTaskCreate((OS_TCB       *)&TaskGasProcTCB,                               /* 创建任务控制块 */
-                 (CPU_CHAR     *)"Gas Process",                                 /* 任务名称 */
-                 (OS_TASK_PTR   )Task_GasProc,                                  /* 任务函数 */    
-                 (void         *)0u,                                            /* 任务入参 */
-                 (OS_PRIO       )TASK_GASPROC_PRIO,                             /* 任务优先级 */
-                 (CPU_STK      *)&TaskGasProcStk[0u],                           /* 任务堆载地址 */    
-                 (CPU_STK_SIZE  )TASK_GASPROC_STK_SIZE / 10u,                   /* 任务栈深限制 */        
-                 (CPU_STK_SIZE  )TASK_GASPROC_STK_SIZE,                         /* 任务堆栈大小 */ 
-                 (OS_MSG_QTY    )10u,                                           /* 内部消息队列的最大消息数目 */
-                 (OS_TICK       )0u,                                            /* 时间片轮询的时间片数 */
-                 (void         *)0u,                                            /* 用户补充存储区 */
-                 (OS_OPT        )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_SAVE_FP),
-                 (OS_ERR       *)&os_err);                                      /* 存放错误值 */
-
-    /* 灰度处理 */
-    OSTaskCreate((OS_TCB       *)&TaskGreyProcTCB,                              /* 创建任务控制块 */
-                 (CPU_CHAR     *)"Grey Process",                                /* 任务名称 */
-                 (OS_TASK_PTR   )Task_GreyProc,                                 /* 任务函数 */    
-                 (void         *)0u,                                            /* 任务入参 */
-                 (OS_PRIO       )TASK_GREYPROC_PRIO,                            /* 任务优先级 */
-                 (CPU_STK      *)&TaskGreyProcStk[0u],                          /* 任务堆载地址 */    
-                 (CPU_STK_SIZE  )TASK_GREYPROC_STK_SIZE / 10u,                  /* 任务栈深限制 */        
-                 (CPU_STK_SIZE  )TASK_GREYPROC_STK_SIZE,                        /* 任务堆栈大小 */ 
-                 (OS_MSG_QTY    )10u,                                           /* 内部消息队列的最大消息数目 */
-                 (OS_TICK       )0u,                                            /* 时间片轮询的时间片数 */
-                 (void         *)0u,                                            /* 用户补充存储区 */
-                 (OS_OPT        )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_SAVE_FP),
-                 (OS_ERR       *)&os_err);                                      /* 存放错误值 */
-    
-    
-    /* 光谱仪通信 */
-    OSTaskCreate((OS_TCB       *)&TaskUsbHostTCB,                               /* 创建任务控制块 */
-                 (CPU_CHAR     *)"USB HOST",                                    /* 任务名称 */
-                 (OS_TASK_PTR   )Task_UsbHost,                                  /* 任务函数 */    
-                 (void         *)0u,                                            /* 任务入参 */
-                 (OS_PRIO       )TASK_USB_HOST_PRIO,                            /* 任务优先级 */
-                 (CPU_STK      *)&TaskUsbHostStk[0u],                           /* 任务堆载地址 */    
-                 (CPU_STK_SIZE  )TASK_USB_HOST_STK_SIZE / 10u,                  /* 任务栈深限制 */        
-                 (CPU_STK_SIZE  )TASK_USB_HOST_STK_SIZE,                        /* 任务堆栈大小 */ 
-                 (OS_MSG_QTY    )10u,                                           /* 内部消息队列的最大消息数目 */
-                 (OS_TICK       )0u,                                            /* 时间片轮询的时间片数 */
-                 (void         *)0u,                                            /* 用户补充存储区 */
-                 (OS_OPT        )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_SAVE_FP),
-                 (OS_ERR       *)&os_err);                                      /* 存放错误值 */ 
-
 #if 0
     /* 命令行调试 */
     OSTaskCreate((OS_TCB       *)&AppTaskCmlRecvTCB,                           /* 创建任务控制块 */
@@ -206,8 +145,73 @@ void AppTaskCreate (void)
                  (void         *)0u,                                            /* 用户补充存储区 */
                  (OS_OPT        )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_SAVE_FP),
                  (OS_ERR       *)&os_err);                                      /* 存放错误值 */ 
+#endif 
+    
+    
+#if 0
+    /* STDBUS */
+    OSTaskCreate((OS_TCB       *)&TaskStdBusTCB,                                /* 创建任务控制块 */
+                 (CPU_CHAR     *)"StdBus Task",                                 /* 任务名称 */
+                 (OS_TASK_PTR   )Task_StdBus,                                   /* 任务函数 */    
+                 (void         *)0u,                                            /* 任务入参 */
+                 (OS_PRIO       )TASK_STDBUS_PRIO,                              /* 任务优先级 */
+                 (CPU_STK      *)&TaskStdBusStk[0u],                            /* 任务堆载地址 */    
+                 (CPU_STK_SIZE  )TASK_STDBUS_STK_SIZE / 10u,                    /* 任务栈深限制 */        
+                 (CPU_STK_SIZE  )TASK_STDBUS_STK_SIZE,                          /* 任务堆栈大小 */ 
+                 (OS_MSG_QTY    )100u,                                           /* 内部消息队列的最大消息数目 */
+                 (OS_TICK       )0u,                                            /* 时间片轮询的时间片数 */
+                 (void         *)0u,                                            /* 用户补充存储区 */
+                 (OS_OPT        )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_SAVE_FP),
+                 (OS_ERR       *)&os_err);                                      /* 存放错误值 */
+    
 #endif
-
+#if 0
+    /* 紫外处理光谱仪 */
+    OSTaskCreate((OS_TCB       *)&TaskGasProcTCB,                               /* 创建任务控制块 */
+                 (CPU_CHAR     *)"Gas Process",                                 /* 任务名称 */
+                 (OS_TASK_PTR   )Task_GasProc,                                  /* 任务函数 */    
+                 (void         *)0u,                                            /* 任务入参 */
+                 (OS_PRIO       )TASK_GASPROC_PRIO,                             /* 任务优先级 */
+                 (CPU_STK      *)&TaskGasProcStk[0u],                           /* 任务堆载地址 */    
+                 (CPU_STK_SIZE  )TASK_GASPROC_STK_SIZE / 10u,                   /* 任务栈深限制 */        
+                 (CPU_STK_SIZE  )TASK_GASPROC_STK_SIZE,                         /* 任务堆栈大小 */ 
+                 (OS_MSG_QTY    )10u,                                           /* 内部消息队列的最大消息数目 */
+                 (OS_TICK       )0u,                                            /* 时间片轮询的时间片数 */
+                 (void         *)0u,                                            /* 用户补充存储区 */
+                 (OS_OPT        )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_SAVE_FP),
+                 (OS_ERR       *)&os_err);                                      /* 存放错误值 */
+#endif
+#if 0
+    /* 灰度处理 */
+    OSTaskCreate((OS_TCB       *)&TaskGreyProcTCB,                              /* 创建任务控制块 */
+                 (CPU_CHAR     *)"Grey Process",                                /* 任务名称 */
+                 (OS_TASK_PTR   )Task_GreyProc,                                 /* 任务函数 */    
+                 (void         *)0u,                                            /* 任务入参 */
+                 (OS_PRIO       )TASK_GREYPROC_PRIO,                            /* 任务优先级 */
+                 (CPU_STK      *)&TaskGreyProcStk[0u],                          /* 任务堆载地址 */    
+                 (CPU_STK_SIZE  )TASK_GREYPROC_STK_SIZE / 10u,                  /* 任务栈深限制 */        
+                 (CPU_STK_SIZE  )TASK_GREYPROC_STK_SIZE,                        /* 任务堆栈大小 */ 
+                 (OS_MSG_QTY    )10u,                                           /* 内部消息队列的最大消息数目 */
+                 (OS_TICK       )0u,                                            /* 时间片轮询的时间片数 */
+                 (void         *)0u,                                            /* 用户补充存储区 */
+                 (OS_OPT        )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_SAVE_FP),
+                 (OS_ERR       *)&os_err);                                      /* 存放错误值 */
+    
+#endif
+    /* 光谱仪通信 */
+    OSTaskCreate((OS_TCB       *)&TaskUsbHostTCB,                               /* 创建任务控制块 */
+                 (CPU_CHAR     *)"USB HOST",                                    /* 任务名称 */
+                 (OS_TASK_PTR   )Task_UsbHost,                                  /* 任务函数 */    
+                 (void         *)0u,                                            /* 任务入参 */
+                 (OS_PRIO       )TASK_USB_HOST_PRIO,                            /* 任务优先级 */
+                 (CPU_STK      *)&TaskUsbHostStk[0u],                           /* 任务堆载地址 */    
+                 (CPU_STK_SIZE  )TASK_USB_HOST_STK_SIZE / 10u,                  /* 任务栈深限制 */        
+                 (CPU_STK_SIZE  )TASK_USB_HOST_STK_SIZE,                        /* 任务堆栈大小 */ 
+                 (OS_MSG_QTY    )100u,                                           /* 内部消息队列的最大消息数目 */
+                 (OS_TICK       )0u,                                            /* 时间片轮询的时间片数 */
+                 (void         *)0u,                                            /* 用户补充存储区 */
+                 (OS_OPT        )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_SAVE_FP),
+                 (OS_ERR       *)&os_err);                                      /* 存放错误值 */ 
 }
 
 //==================================================================================================

@@ -20,9 +20,10 @@ void  Bsp_Init (void)
     HAL_SetTickFreq(HAL_TICK_FREQ_1KHZ);                        /* 1ms */
 #endif    
     
-    HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
+    HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_2);         /* 2Bit抢占优先级 2Bit响应优先级 数字越小响应级越高 */
     
     BSP_LedInit(); 
+    Bsp_I2cInit(&Bsp_At24c512);
     
     Bsp_DMAInit();
     //Bsp_SramInit();
@@ -36,14 +37,14 @@ void  Bsp_Init (void)
     COM1.ul_Mode       = UART_MODE_TX_RX;
     Bsp_UartOpen(&COM1); 
     
-    /*
+    /**/
     COM2.ul_BaudRate   = 230400;
     COM2.ul_WordLength = UART_WORDLENGTH_8B;
     COM2.ul_StopBits   = UART_STOPBITS_1;
     COM2.ul_Parity     = UART_PARITY_NONE;
     COM2.ul_HwFlowCtl  = UART_HWCONTROL_NONE;
     COM2.ul_Mode       = UART_MODE_TX_RX;
-    Bsp_UartOpen(&COM2);*/
+    Bsp_UartOpen(&COM2);
     
     /* Usb4000 
     COM3.ul_BaudRate   = 115200;

@@ -50,15 +50,16 @@
 /* Includes ------------------------------------------------------------------*/
 
 #include "usb_host.h"
-#include "usbh_core.h"
+//#include "usbh_core.h"
 //#include "usbh_audio.h"
 //#include "usbh_cdc.h"
 //#include "usbh_msc.h"
 //#include "usbh_hid.h"
 //#include "usbh_mtp.h"
+#include "usbh_template.h"
 
 /* USER CODE BEGIN Includes */
-#include "usbh_template.h"
+
 /* USER CODE END Includes */
 
 /* USER CODE BEGIN PV */
@@ -75,6 +76,7 @@
 USBH_HandleTypeDef hUsbHostFS;
 ApplicationTypeDef Appli_state = APPLICATION_IDLE;
 
+extern HCD_HandleTypeDef hhcd_USB_OTG_FS;
 /*
  * -- Insert your variables declaration here --
  */
@@ -105,20 +107,20 @@ void USB_HOST_Init(void)
   /* USER CODE END USB_HOST_Init_PreTreatment */
   
   /* Init host Library, add supported class and start the library. */
-  USBH_Init(&hUsbHostFS, USBH_UserProcess, 0);
+  USBH_Init(&hUsbHostFS, USBH_UserProcess, HOST_FS);
 
-  //USBH_RegisterClass(&hUsbHostFS, USBH_AUDIO_CLASS);
+//  USBH_RegisterClass(&hUsbHostFS, USBH_AUDIO_CLASS);
 
-  //USBH_RegisterClass(&hUsbHostFS, USBH_CDC_CLASS);
+//  USBH_RegisterClass(&hUsbHostFS, USBH_CDC_CLASS);
 
-  //USBH_RegisterClass(&hUsbHostFS, USBH_MSC_CLASS);
+//  USBH_RegisterClass(&hUsbHostFS, USBH_MSC_CLASS);
 
-  //USBH_RegisterClass(&hUsbHostFS, USBH_HID_CLASS);
+//  USBH_RegisterClass(&hUsbHostFS, USBH_HID_CLASS);
 
-  //USBH_RegisterClass(&hUsbHostFS, USBH_MTP_CLASS);
-  
+//  USBH_RegisterClass(&hUsbHostFS, USBH_MTP_CLASS);
+    
   USBH_RegisterClass(&hUsbHostFS, USBH_USB4000_CLASS);
-
+    
   USBH_Start(&hUsbHostFS);
 
   /* USER CODE BEGIN USB_HOST_Init_PostTreatment */
@@ -140,35 +142,31 @@ void USB_HOST_Process(void)
 static void USBH_UserProcess  (USBH_HandleTypeDef *phost, uint8_t id)
 {
   /* USER CODE BEGIN CALL_BACK_1 */
-  switch(id)
-  {
-  case HOST_USER_SELECT_CONFIGURATION:
-  break;
+    switch(id)
+    {
+    case HOST_USER_SELECT_CONFIGURATION:
+        break;
 
-  case HOST_USER_DISCONNECTION:
-  Appli_state = APPLICATION_DISCONNECT;
-  break;
+    case HOST_USER_DISCONNECTION:
+        Appli_state = APPLICATION_DISCONNECT;
+        break;
 
-  case HOST_USER_CLASS_ACTIVE:
-  Appli_state = APPLICATION_READY;
-  break;
+    case HOST_USER_CLASS_ACTIVE:
+        Appli_state = APPLICATION_READY;
+        break;
 
-  case HOST_USER_CONNECTION:
-  Appli_state = APPLICATION_START;
-  HAL_Delay(3000);
-  break;
+    case HOST_USER_CONNECTION:
+        HAL_Delay(3000);
+        printf("HOST_USER_CONNECTION\r\n");
+        Appli_state = APPLICATION_START;
+        break;
 
-  default:
-  break;
-  }
+    default:
+        break;
+    }
   /* USER CODE END CALL_BACK_1 */
 }
 
-/**
-  * @brief  This function handles USB-On-The-Go FS global interrupt request.
-  * @param  None
-  * @retval None
-  */
 void OTG_FS_IRQHandler(void)
 {
 #ifdef  OS_SUPPORT
@@ -179,29 +177,7 @@ void OTG_FS_IRQHandler(void)
     CPU_CRITICAL_EXIT();
 #endif
     
-    HAL_HCD_IRQHandler(&hhcd);
-    
-#ifdef  OS_SUPPORT
-    OSIntExit();
-#endif
-}
-
-/**
-  * @brief  This function handles USB-On-The-Go FS/HS global interrupt request.
-  * @param  None
-  * @retval None
-  */
-void OTG_HS_IRQHandler(void)
-{
-#ifdef  OS_SUPPORT
-    CPU_SR_ALLOC();
-
-    CPU_CRITICAL_ENTER();
-    OSIntEnter();
-    CPU_CRITICAL_EXIT();
-#endif
-
-    HAL_HCD_IRQHandler(&hhcd);
+    HAL_HCD_IRQHandler(&hhcd_USB_OTG_FS);
     
 #ifdef  OS_SUPPORT
     OSIntExit();

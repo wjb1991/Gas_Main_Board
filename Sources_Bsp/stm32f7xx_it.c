@@ -106,17 +106,17 @@ void HardFault_Handler(void)
 void HardFault_Handler_C(unsigned long * hardfault_args, unsigned int lr_value)
 {
 #if 1
-  unsigned long stacked_r0;
-  unsigned long stacked_r1;
-  unsigned long stacked_r2;
-  unsigned long stacked_r3;
-  unsigned long stacked_r12;
-  unsigned long stacked_lr;
-  unsigned long stacked_pc;
-  unsigned long stacked_psr;
-  unsigned long cfsr;
-  unsigned long bus_fault_address;
-  unsigned long memmanage_fault_address;
+  static unsigned long stacked_r0;
+  static unsigned long stacked_r1;
+  static unsigned long stacked_r2;
+  static unsigned long stacked_r3;
+  static unsigned long stacked_r12;
+  static unsigned long stacked_lr;
+  static unsigned long stacked_pc;
+  static unsigned long stacked_psr;
+  static unsigned long cfsr;
+  static unsigned long bus_fault_address;
+  static unsigned long memmanage_fault_address;
   
   bus_fault_address       = SCB->BFAR;
   memmanage_fault_address = SCB->MMFAR;

@@ -10,6 +10,7 @@
 //|  V1.0    | 2018.10.31  |  wjb      | 初版
 //|  V1.01   | 2018.10.31  |  wjb      | 添加串口打印函数和串口打印缓冲区
 //|  V1.02   | 2018.10.31  |  wjb      | 修正数据接收到没有处理函数后一直进中断的问题
+//|  V1.03   | 2018.11.06  |  wjb      | 添加DEF_USE_COMx宏定义可以取消不用的端口
 //==================================================================================================
 #include "bsp_usart.h"
 
@@ -18,17 +19,28 @@
 #define     DEF_UART_BUFF_SIZE      100
 
 
-
-UART_HandleTypeDef stm32f7xx_usart1 = {USART1};
-UART_HandleTypeDef stm32f7xx_usart2 = {USART2};
-UART_HandleTypeDef stm32f7xx_usart3 = {USART3};
-UART_HandleTypeDef stm32f7xx_uart4  = {UART4};
-UART_HandleTypeDef stm32f7xx_uart5  = {UART5};
-UART_HandleTypeDef stm32f7xx_usart6 = {USART6};
-
 static INT8U    auch_RxBuff[6][DEF_UART_BUFF_SIZE] = {0};
 
-/**/
+#if (DEF_USE_COM1 == TRUE)
+    UART_HandleTypeDef stm32f7xx_usart1 = {USART1};
+#endif
+#if (DEF_USE_COM2 == TRUE)
+    UART_HandleTypeDef stm32f7xx_usart2 = {USART2};
+#endif
+#if (DEF_USE_COM3 == TRUE)
+    UART_HandleTypeDef stm32f7xx_usart3 = {USART3};
+#endif
+#if (DEF_USE_COM4 == TRUE)
+    UART_HandleTypeDef stm32f7xx_uart4  = {UART4};
+#endif
+#if (DEF_USE_COM5 == TRUE)
+    UART_HandleTypeDef stm32f7xx_uart5  = {UART5};
+#endif
+#if (DEF_USE_COM6 == TRUE)
+    UART_HandleTypeDef stm32f7xx_usart6 = {USART6};
+#endif
+
+#if (DEF_USE_COM1 == TRUE)
 Dev_SerialPort COM1 = {"COM1",                              //端口名
                         DEF_UART_CONFIG,                    //默认配置
                         
@@ -42,7 +54,8 @@ Dev_SerialPort COM1 = {"COM1",                              //端口名
                         
                         DEF_UART_HOOK,                      //回调函数
                         &stm32f7xx_usart1};                 //底层句柄
-
+#endif
+#if (DEF_USE_COM2 == TRUE)
 Dev_SerialPort COM2 = {"COM2",                              //端口名
                         DEF_UART_CONFIG,                    //默认配置
                         
@@ -56,7 +69,8 @@ Dev_SerialPort COM2 = {"COM2",                              //端口名
                         
                         DEF_UART_HOOK,                      //回调函数
                         &stm32f7xx_usart2};                 //底层句柄
-
+#endif
+#if (DEF_USE_COM3 == TRUE)
 Dev_SerialPort COM3 = {"COM3",                              //端口名
                         DEF_UART_CONFIG,                    //默认配置
                         
@@ -70,7 +84,8 @@ Dev_SerialPort COM3 = {"COM3",                              //端口名
                         
                         DEF_UART_HOOK,                      //回调函数
                         &stm32f7xx_usart3};                 //底层句柄
-
+#endif
+#if (DEF_USE_COM4 == TRUE)
 Dev_SerialPort COM4 = {"COM4",                              //端口名
                         DEF_UART_CONFIG,                    //默认配置
                         
@@ -84,7 +99,8 @@ Dev_SerialPort COM4 = {"COM4",                              //端口名
                         
                         DEF_UART_HOOK,                      //回调函数
                         &stm32f7xx_uart4};                  //底层句柄
-
+#endif
+#if (DEF_USE_COM5 == TRUE)
 Dev_SerialPort COM5 = {"COM5",                              //端口名
                         DEF_UART_CONFIG,                    //默认配置
                         
@@ -98,7 +114,8 @@ Dev_SerialPort COM5 = {"COM5",                              //端口名
                         
                         DEF_UART_HOOK,                      //回调函数
                         &stm32f7xx_uart5};                  //底层句柄
-
+#endif
+#if (DEF_USE_COM6 == TRUE)
 Dev_SerialPort COM6 = {"COM6",                              //端口名
                         DEF_UART_CONFIG,                    //默认配置
                         
@@ -112,6 +129,7 @@ Dev_SerialPort COM6 = {"COM6",                              //端口名
                         
                         DEF_UART_HOOK,                      //回调函数
                         &stm32f7xx_usart6};                 //底层句柄
+#endif
 
 void Bsp_UsartRxEnable(Dev_SerialPort* pst_Dev)
 {
@@ -202,69 +220,9 @@ void Bsp_UsartTxDisable(Dev_SerialPort* pst_Dev)
         LL_USART_ClearFlag_FE(USARTx);
     }
 }
-#if 0
- __STATIC_INLINE void UARTx_IRQHandler(Dev_SerialPort* pst_Dev)
-{
-    USART_TypeDef *UARTx = ((UART_HandleTypeDef*)pst_Dev->pv_UartHandle)->Instance; 
-    
-    /* 接受完成中断 */
-    if(LL_USART_IsActiveFlag_RXNE(UARTx) && LL_USART_IsEnabledIT_RXNE(UARTx))
-    {
-        if(pst_Dev->cb_RecvReady != NULL)
-        {
-            uint8_t tmp = LL_USART_ReceiveData8(UARTx);
-            pst_Dev->cb_RecvReady(pst_Dev, &tmp, 1);
-        }
-    }
-    
-    /* 发送为空中断 */
-    if(LL_USART_IsEnabledIT_TXE(UARTx) && LL_USART_IsActiveFlag_TXE(UARTx))
-    {
 
-    }
 
-    /* 发送完成中断 */
-    if(LL_USART_IsEnabledIT_TC(UARTx) && LL_USART_IsActiveFlag_TC(UARTx))
-    {
-        LL_USART_ClearFlag_TC(UARTx);       
-        if( pst_Dev->uin_TxCount < pst_Dev->uin_TxLen)
-        {
-            LL_USART_TransmitData8(UARTx, pst_Dev->puch_TxBuff[pst_Dev->uin_TxCount++]);
-        }
-        else
-        {
-            pst_Dev->uin_TxCount = 0;
-            pst_Dev->uin_TxLen = 0;
-            if(pst_Dev->cb_SendComplete != NULL)
-            {
-                pst_Dev->cb_SendComplete(pst_Dev);
-            }        
-        }      
-    }
-
-    /* 错误中断 */
-    if(LL_USART_IsEnabledIT_ERROR(UARTx) && LL_USART_IsActiveFlag_NE(UARTx))
-    {
-        //NVIC_DisableIRQ(UART4_IRQn);
-    
-        if(pst_Dev->cb_ErrHandle != NULL)
-        {
-            pst_Dev->cb_ErrHandle(pst_Dev);
-        }
-    }
-    
-    if(LL_USART_IsActiveFlag_ORE(UARTx))
-    {
-        LL_USART_ClearFlag_ORE(UARTx);
-    }
-    
-    if(LL_USART_IsActiveFlag_FE(UARTx))
-    {
-        LL_USART_ClearFlag_FE(UARTx);
-    }
-}
-#endif 
-
+#if (DEF_USE_COM1 == TRUE)
 //==================================================================================
 //| 函数名称 | USART1_IRQHandler
 //|----------|----------------------------------------------------------------------
@@ -291,7 +249,8 @@ void USART1_IRQHandler(void)
     OSIntExit();
 #endif
 }
-
+#endif
+#if (DEF_USE_COM2 == TRUE)
 //==================================================================================
 //| 函数名称 | USART2_IRQHandler
 //|----------|----------------------------------------------------------------------
@@ -319,7 +278,8 @@ void USART2_IRQHandler(void)
     OSIntExit();
 #endif
 }
-
+#endif
+#if (DEF_USE_COM3 == TRUE)
 //==================================================================================
 //| 函数名称 | USART3_IRQHandler
 //|----------|----------------------------------------------------------------------
@@ -347,7 +307,8 @@ void USART3_IRQHandler(void)
     OSIntExit();
 #endif
 }
-
+#endif
+#if (DEF_USE_COM4 == TRUE)
 //==================================================================================
 //| 函数名称 | UART4_IRQHandler
 //|----------|----------------------------------------------------------------------
@@ -374,7 +335,10 @@ void UART4_IRQHandler(void)
     OSIntExit();
 #endif
 }
-
+#endif
+#if (DEF_USE_COM5 == TRUE)
+#endif
+#if (DEF_USE_COM6 == TRUE)
 //==================================================================================
 //| 函数名称 | USART6_IRQHandler
 //|----------|----------------------------------------------------------------------
@@ -402,7 +366,7 @@ void USART6_IRQHandler(void)
     OSIntExit();
 #endif
 }
-
+#endif
 //==================================================================================
 //| 函数名称 | Bsp_UartOpen
 //|----------|----------------------------------------------------------------------
@@ -438,8 +402,8 @@ BOOL Bsp_UartOpen(Dev_SerialPort* pst_Dev)
     
     if(UartHandle->Init.Mode  == UART_MODE_TX_RX)
     {
-        Bsp_UsartTxEnable(pst_Dev);
-        Bsp_UsartRxEnable(pst_Dev);
+        //Bsp_UsartTxEnable(pst_Dev);
+        //Bsp_UsartRxEnable(pst_Dev);
     }
     else if(UartHandle->Init.Mode  == UART_MODE_TX)
     {
@@ -551,6 +515,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 {
     GPIO_InitTypeDef  GPIO_InitStruct;
 
+#if (DEF_USE_COM1 == TRUE)
     if(huart->Instance == USART1)
     {
         /*##-1- Enable peripherals and GPIO Clocks #################################*/
@@ -579,11 +544,13 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 
         /*##-3- Configure the NVIC for UART ########################################*/   
         /* NVIC for USARTx */
-        HAL_NVIC_SetPriority(USART1_IRQn, 0, 1);
+        HAL_NVIC_SetPriority(USART1_IRQn, 3, 1);
         HAL_NVIC_EnableIRQ(USART1_IRQn); 
 
     }
-    else if(huart->Instance == USART2)
+#endif
+#if (DEF_USE_COM2 == TRUE)
+    if(huart->Instance == USART2)
     {
         /*##-1- Enable peripherals and GPIO Clocks #################################*/
         /* Enable GPIO TX/RX clock */
@@ -611,11 +578,13 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 
         /*##-3- Configure the NVIC for UART ########################################*/   
         /* NVIC for USARTx */
-        HAL_NVIC_SetPriority(USART2_IRQn, 0, 1);
+        HAL_NVIC_SetPriority(USART2_IRQn, 3, 1);
         HAL_NVIC_EnableIRQ(USART2_IRQn); 
 
     }
-    else if(huart->Instance == USART3)
+#endif
+#if (DEF_USE_COM3 == TRUE)
+    if(huart->Instance == USART3)
     {
         /*##-1- Enable peripherals and GPIO Clocks #################################*/
         /* Enable GPIO TX/RX clock */
@@ -643,11 +612,13 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 
         /*##-3- Configure the NVIC for UART ########################################*/   
         /* NVIC for USARTx */
-        HAL_NVIC_SetPriority(USART3_IRQn, 0, 1);
+        HAL_NVIC_SetPriority(USART3_IRQn, 3, 1);
         HAL_NVIC_EnableIRQ(USART3_IRQn); 
 
     }
-    else if(huart->Instance == UART4)
+#endif
+#if (DEF_USE_COM4 == TRUE)
+    if(huart->Instance == UART4)
     {
         /*##-1- Enable peripherals and GPIO Clocks #################################*/
         /* Enable GPIO TX/RX clock */
@@ -675,11 +646,13 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 
         /*##-3- Configure the NVIC for UART ########################################*/   
         /* NVIC for USARTx */
-        HAL_NVIC_SetPriority(UART4_IRQn, 0, 1);
+        HAL_NVIC_SetPriority(UART4_IRQn, 3, 1);
         HAL_NVIC_EnableIRQ(UART4_IRQn); 
 
     }
-    else if(huart->Instance == UART5)
+#endif
+#if (DEF_USE_COM5 == TRUE)
+    if(huart->Instance == UART5)
     {
         /*##-1- Enable peripherals and GPIO Clocks #################################*/
         /* Enable GPIO TX/RX clock */
@@ -707,11 +680,13 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 
         /*##-3- Configure the NVIC for UART ########################################*/   
         /* NVIC for USARTx */
-        HAL_NVIC_SetPriority(UART5_IRQn, 0, 1);
+        HAL_NVIC_SetPriority(UART5_IRQn, 3, 1);
         HAL_NVIC_EnableIRQ(UART5_IRQn); 
 
     }
-    else if(huart->Instance == USART6)
+#endif
+#if (DEF_USE_COM6 == TRUE)
+    if(huart->Instance == USART6)
     {
         /*##-1- Enable peripherals and GPIO Clocks #################################*/
         /* Enable GPIO TX/RX clock */
@@ -738,10 +713,11 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 
         /*##-3- Configure the NVIC for UART ########################################*/   
         /* NVIC for USARTx */
-        HAL_NVIC_SetPriority(USART6_IRQn, 0, 1);
+        HAL_NVIC_SetPriority(USART6_IRQn, 3, 1);
         HAL_NVIC_EnableIRQ(USART6_IRQn); 
 
     }
+#endif
 }
 
 /**
@@ -754,6 +730,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
   */
 void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
 {
+#if (DEF_USE_COM1 == TRUE)
     if(huart->Instance == USART1)
     {
         /*##-1- Reset peripherals ##################################################*/
@@ -769,7 +746,9 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
         /*##-3- Disable the NVIC for UART ##########################################*/
         HAL_NVIC_DisableIRQ(USART1_IRQn);
     }
-    else if(huart->Instance == USART2)
+#endif
+#if (DEF_USE_COM2 == TRUE)
+    if(huart->Instance == USART2)
     {
         /*##-1- Reset peripherals ##################################################*/
         __HAL_RCC_USART2_FORCE_RESET();
@@ -784,7 +763,9 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
         /*##-3- Disable the NVIC for UART ##########################################*/
         HAL_NVIC_DisableIRQ(USART2_IRQn);
     }
-    else if(huart->Instance == USART3)
+#endif
+#if (DEF_USE_COM3 == TRUE)
+    if(huart->Instance == USART3)
     {
         /*##-1- Reset peripherals ##################################################*/
         __HAL_RCC_USART3_FORCE_RESET();
@@ -799,7 +780,9 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
         /*##-3- Disable the NVIC for UART ##########################################*/
         HAL_NVIC_DisableIRQ(USART3_IRQn);
     }
-    else if(huart->Instance == UART4)
+#endif
+#if (DEF_USE_COM4 == TRUE)
+    if(huart->Instance == UART4)
     {
         /*##-1- Reset peripherals ##################################################*/
         __HAL_RCC_UART4_FORCE_RESET();
@@ -814,7 +797,9 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
         /*##-3- Disable the NVIC for UART ##########################################*/
         HAL_NVIC_DisableIRQ(UART4_IRQn);
     }
-    else if(huart->Instance == UART5)
+#endif
+#if (DEF_USE_COM5 == TRUE)
+    if(huart->Instance == UART5)
     {
         /*##-1- Reset peripherals ##################################################*/
         __HAL_RCC_UART5_FORCE_RESET();
@@ -829,7 +814,9 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
         /*##-3- Disable the NVIC for UART ##########################################*/
         HAL_NVIC_DisableIRQ(UART5_IRQn);
     }
-    else if(huart->Instance == USART6)
+#endif
+#if (DEF_USE_COM6 == TRUE)
+    if(huart->Instance == USART6)
     {
         /*##-1- Reset peripherals ##################################################*/
         __HAL_RCC_USART6_FORCE_RESET();
@@ -844,6 +831,7 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
         /*##-3- Disable the NVIC for UART ##########################################*/
         HAL_NVIC_DisableIRQ(USART6_IRQn);
     }
+#endif
 }
 
 //==================================================================================
@@ -876,8 +864,8 @@ void Bsp_UartPrintf(const char * Format,...)
 
 int fputc(int ch, FILE *f)
 {
-    //while (!LL_USART_IsActiveFlag_TXE(USART1)){}
-    //LL_USART_TransmitData8(USART1, ch); 
+    while (!LL_USART_IsActiveFlag_TXE(USART1)){}
+    LL_USART_TransmitData8(USART1, ch); 
     
     //while (!LL_USART_IsActiveFlag_TC(USART2)){}
     //LL_USART_ClearFlag_TC(USART2);

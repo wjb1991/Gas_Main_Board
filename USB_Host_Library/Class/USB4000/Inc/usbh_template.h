@@ -44,7 +44,8 @@ typedef enum
   USB4000_IDLE,
   USB4000_SEND_DATA,
   USB4000_WAIT_SEND,
-  USB4000_GET_DATA,   
+  USB4000_GET_DATA,  
+  USB4000_WAIT_GET,
   USB4000_SYNC,     
   USB4000_POLL,
   USB4000_ERROR,
@@ -103,7 +104,7 @@ typedef struct _USB4000_Process
     uint8_t              b_Open;
     uint8_t              b_IsConnect;
     uint8_t              b_HighSpeed;               
-    
+    USB4000_StateTypeDef e_State;   
 }
 USB4000_HandleTypeDef;
 

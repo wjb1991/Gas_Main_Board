@@ -25,6 +25,19 @@
 #define  BSP_LTC1867CS1_GPIO_PORT               GPIOI
 #define  BSP_LTC1867CS1_GPIO_CLK_ENABLE()       __HAL_RCC_GPIOI_CLK_ENABLE(); 
 
+#define  BSP_IIC0SDA_GPIO_PIN                   GPIO_PIN_0
+#define  BSP_IIC0SDA_GPIO_PORT                  GPIOF
+#define  BSP_IIC0SDA_GPIO_CLK_ENABLE()          __HAL_RCC_GPIOF_CLK_ENABLE(); 
+
+#define  BSP_IIC0SCL_GPIO_PIN                   GPIO_PIN_1
+#define  BSP_IIC0SCL_GPIO_PORT                  GPIOF
+#define  BSP_IIC0SCL_GPIO_CLK_ENABLE()          __HAL_RCC_GPIOF_CLK_ENABLE(); 
+
+#define  BSP_EPROMWP_GPIO_PIN                   GPIO_PIN_2
+#define  BSP_EPROMWP_GPIO_PORT                  GPIOF
+#define  BSP_EPROMWP_GPIO_CLK_ENABLE()          __HAL_RCC_GPIOF_CLK_ENABLE(); 
+
+
 void  BSP_LedInit (void)
 {
     GPIO_InitTypeDef  gpio_init;
@@ -34,7 +47,9 @@ void  BSP_LedInit (void)
     BSP_LED2_GPIO_CLK_ENABLE();
     BSP_LTC1867CS0_GPIO_CLK_ENABLE();
     BSP_LTC1867CS1_GPIO_CLK_ENABLE();
-    
+    BSP_IIC0SCL_GPIO_CLK_ENABLE();
+    BSP_EPROMWP_GPIO_CLK_ENABLE();
+    BSP_IIC0SDA_GPIO_CLK_ENABLE();
                                                                 /* Configure the GPIOF for LED1(PF10)                   */
     gpio_init.Pin   = BSP_LED1_GPIO_PIN;
     gpio_init.Mode  = GPIO_MODE_OUTPUT_PP;
@@ -59,13 +74,37 @@ void  BSP_LedInit (void)
     gpio_init.Pull  = GPIO_PULLUP;
     gpio_init.Speed = GPIO_SPEED_HIGH;
     HAL_GPIO_Init(BSP_LTC1867CS1_GPIO_PORT, &gpio_init); 
+
+    gpio_init.Pin   = BSP_EPROMWP_GPIO_PIN;
+    gpio_init.Mode  = GPIO_MODE_OUTPUT_PP;
+    gpio_init.Pull  = GPIO_PULLUP;
+    gpio_init.Speed = GPIO_SPEED_HIGH;
+    HAL_GPIO_Init(BSP_EPROMWP_GPIO_PORT, &gpio_init);     
     
+    /* IIC¿ªÂ©ÉÏÀ­ */
+    gpio_init.Pin   = BSP_IIC0SDA_GPIO_PIN;
+    gpio_init.Mode  = GPIO_MODE_OUTPUT_OD;
+    gpio_init.Pull  = GPIO_PULLUP;
+    gpio_init.Speed = GPIO_SPEED_HIGH;
+    HAL_GPIO_Init(BSP_IIC0SDA_GPIO_PORT, &gpio_init); 
+    
+    gpio_init.Pin   = BSP_IIC0SCL_GPIO_PIN;
+    gpio_init.Mode  = GPIO_MODE_OUTPUT_OD;
+    gpio_init.Pull  = GPIO_PULLUP;
+    gpio_init.Speed = GPIO_SPEED_HIGH;
+    HAL_GPIO_Init(BSP_IIC0SCL_GPIO_PORT, &gpio_init); 
     
     BSP_Led1Set(eLedOff);
     BSP_Led2Set(eLedOff);
     Bsp_Rs485de(eRs485Recv);
     Bsp_Ltc1867CS0(1);
     Bsp_Ltc1867CS1(1);
+    Bsp_EepromWP(FALSE);
+}
+
+void Bsp_EepromWP(BOOL status)
+{
+    HAL_GPIO_WritePin(BSP_EPROMWP_GPIO_PORT, BSP_EPROMWP_GPIO_PIN, (GPIO_PinState)status);
 }
 
 void Bsp_Ltc1867CS0(BOOL status)

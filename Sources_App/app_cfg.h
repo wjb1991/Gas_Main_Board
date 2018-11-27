@@ -43,7 +43,7 @@
 #define  TASK_GREYPROC_STK_SIZE         512u
 #define  TASK_CML_SEND_STK_SIZE         256u
 #define  TASK_CML_RECV_STK_SIZE         256u
-#define  TASK_USB_HOST_STK_SIZE         1024u
+#define  TASK_USB_HOST_STK_SIZE         2048u
 #define  TASK_STDBUS_STK_SIZE           512u
 
 
@@ -133,7 +133,7 @@ static  OS_FLAG_GRP  AppTaskObjFlag;
 #endif
 
 #define  TRACE_LEVEL                            TRACE_LEVEL_DBG
-#define  TRACE(x)                               Task_CmlSendMsg(x,strlen(x))   //printf(x)                       
+#define  TRACE(x)                               printf(x)//Task_CmlSendMsg(x,strlen(x))  printf(x)                       
 
 #define  TRACE_INFO(x)                          ((TRACE_LEVEL >= TRACE_LEVEL_INFO)  ? (void)(TRACE(x)) : (void)0)
 #define  TRACE_DBG(x)                           ((TRACE_LEVEL >= TRACE_LEVEL_DBG)   ? (void)(TRACE(x)) : (void)0)

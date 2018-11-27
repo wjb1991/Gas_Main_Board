@@ -97,9 +97,9 @@ typedef enum {
 /* Exported functions -------------------------------------------------------*/
 
 /** @brief USB Host initialization function. */
-void USB_HOST_Init(void);
+void MX_USB_HOST_Init(void);
 
-void USB_HOST_Process(void);
+void MX_USB_HOST_Process(void);
 
 /**
   * @}

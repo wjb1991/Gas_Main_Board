@@ -55,7 +55,7 @@ START_ADD+0x9000 + 0x00, (uint32_t)(&USB4000.uch_ScansToAverage),   KIND_INT8U, 
 START_ADD+0x9000 + 0x04, (uint32_t)(&USB4000.uch_Boxcar),           KIND_INT8U,   1,     LIMIT_RANGE,       1,          99,        32,
 START_ADD+0x9000 + 0x08, (uint32_t)(&USB4000.b_EdcEnable),          KIND_INT8U,   1,     LIMIT_RANGE,       0,          1,          1,
 START_ADD+0x9000 + 0x0C, (uint32_t)(&USB4000.b_NlcEnable),          KIND_INT8U,   1,     LIMIT_RANGE,       0,          1,          0,
-START_ADD+0x9000 + 0x10, (uint32_t)(&USB4000.ul_SetIntegralTime),   KIND_INT32U,  1,     LIMIT_RANGE,       1,      65000000,    100000,
+START_ADD+0x9000 + 0x10, (uint32_t)(&USB4000.ul_SetIntegralTime),   KIND_INT32U,  1,     LIMIT_RANGE,       1,      65000000,    50000,
 
 }; 
  

@@ -130,7 +130,7 @@ void  BSP_OSTickInit (void)
 
 HAL_StatusTypeDef  HAL_InitTick (uint32_t  TickPriority)
 {
-    HAL_NVIC_SetPriorityGrouping(0);
+    //HAL_NVIC_SetPriorityGrouping(0);
 
     return (HAL_OK);
 }

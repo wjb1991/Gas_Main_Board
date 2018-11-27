@@ -21,7 +21,7 @@ typedef struct __GreenCalibPoint {
 */
 
 
-GreyChannel ast_GreyChannle[10] = {
+GreyChannel_t ast_GreyChannle[10] = {
     0,DEF_GREYCHANNEL_DEFAULT,
     1,DEF_GREYCHANNEL_DEFAULT,
     2,DEF_GREYCHANNEL_DEFAULT,
@@ -34,9 +34,18 @@ GreyChannel ast_GreyChannle[10] = {
     9,DEF_GREYCHANNEL_DEFAULT,
 };
 
-void Mod_GreyAnalysisPoll(void* pv_Grey)
+GreyAnalysis_t st_GreyMoudle = {
+    e_GreyIdle,             //状态
+    10,                     //通道数量
+    ast_GreyChannle,        //10个测量通道
+    0.0,                    //透过率    
+    0.0,                    //灰度
+};
+
+
+
+void Mod_GreySample(GreyChannel_t* pst_Grye)
 {
-    GreyChannel* pst_Grye = (GreyChannel*)pv_Grey;
     INT16U i = 0;
     switch(pst_Grye->uch_Num)
     {
@@ -55,7 +64,51 @@ void Mod_GreyAnalysisPoll(void* pv_Grey)
         i = Bsp_LTC1867SampleAvg(&st_LTC1867A,pst_Grye->uch_Num-8,50);
         break;
     }
-    
 
-    pst_Grye->f_Volt = (FP32)Bsp_LTC1867HexToVolt(i);
+    pst_Grye->f_Volt = (FP32)Bsp_LTC1867HexToVolt(i);                       //更新当前电压
+    pst_Grye->f_Trans = pst_Grye->f_Volt / pst_Grye->f_AbsTransVolt * 100;  //更新当前单路的透过率
+    
+}
+
+void Mod_GreyProce(GreyAnalysis_t* pst_Grye)
+{
+    INT8U   i;
+    /* 采样10个通道的AD电压值 */
+    for( i = 0; i < pst_Grye->uch_ChannelNum ; i++)
+    {
+        Mod_GreySample(&pst_Grye->pst_Channel[i]);
+    }
+    
+    for( i = 0; i < pst_Grye->uch_ChannelNum ; i++)
+    {
+        if(pst_Grye->pst_Channel[i].f_Trans >= pst_Grye->f_TransThreshold)      //透过率大于10%时才
+        {
+            if(pst_Grye->e_Status == e_GreyIdle)
+            {
+                //一阶滤波 空闲时的电压是背景
+                pst_Grye->pst_Channel[i].f_BkVolt = pst_Grye->pst_Channel[i].f_Volt * 0.5 + \
+                                                    pst_Grye->pst_Channel[i].f_BkVolt * 0.5;
+            }
+            else
+            {
+                //计算灰度
+                //Frecv = Fsend * e^-kL
+                //-1/L * log(e)(Fr/Fs) = -2.303/L * log(e)(1- N/100)
+                //log(e)(Fr/Fs) = 2.303 * log(e)(1- N/100)
+                //
+                FP32 FrPerFs =  pst_Grye->pst_Channel[i].f_Volt / pst_Grye->pst_Channel[i].f_BkVolt;
+     
+                FP64 t = log(FrPerFs)/2.303;        //t = log(e)(1- N/100)
+                
+                FP64 n = 0.0;
+                
+                t = exp(t);                         //t = 1 - N/100
+                
+                n = (1-t)*100;
+                
+                pst_Grye->pst_Channel[i].f_Grey = n;
+            }
+        }
+    }  
+
 }

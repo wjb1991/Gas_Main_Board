@@ -97,6 +97,7 @@ void  BSP_Led2Set (LedStatus_t status);
 void  BSP_Led1Toggle(void);
 void  BSP_Led2Toggle(void);
 void  Bsp_Rs485de(Rs485de_t status);
+void  Bsp_EepromWP(BOOL status);
 
 void Bsp_Ltc1867CS0(BOOL status);
 void Bsp_Ltc1867CS1(BOOL status);

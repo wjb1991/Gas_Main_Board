@@ -6,23 +6,43 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT 2015 STMicroelectronics</center></h2>
+  * <h2><center>&copy; Copyright (c) 2017 STMicroelectronics International N.V.
+  * All rights reserved.</center></h2>
   *
-  * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
-  * You may not use this file except in compliance with the License.
-  * You may obtain a copy of the License at:
+  * Redistribution and use in source and binary forms, with or without
+  * modification, are permitted, provided that the following conditions are met:
   *
-  *        http://www.st.com/software_license_agreement_liberty_v2
+  * 1. Redistribution of source code must retain the above copyright notice,
+  *    this list of conditions and the following disclaimer.
+  * 2. Redistributions in binary form must reproduce the above copyright notice,
+  *    this list of conditions and the following disclaimer in the documentation
+  *    and/or other materials provided with the distribution.
+  * 3. Neither the name of STMicroelectronics nor the names of other
+  *    contributors to this software may be used to endorse or promote products
+  *    derived from this software without specific written permission.
+  * 4. This software, including modifications and/or derivative works of this
+  *    software, must execute solely and exclusively on microcontroller or
+  *    microprocessor devices manufactured by or for STMicroelectronics.
+  * 5. Redistribution and use of this software other than as permitted under
+  *    this license is void and will automatically terminate your rights under
+  *    this license.
   *
-  * Unless required by applicable law or agreed to in writing, software 
-  * distributed under the License is distributed on an "AS IS" BASIS, 
-  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * See the License for the specific language governing permissions and
-  * limitations under the License.
+  * THIS SOFTWARE IS PROVIDED BY STMICROELECTRONICS AND CONTRIBUTORS "AS IS"
+  * AND ANY EXPRESS, IMPLIED OR STATUTORY WARRANTIES, INCLUDING, BUT NOT
+  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+  * PARTICULAR PURPOSE AND NON-INFRINGEMENT OF THIRD PARTY INTELLECTUAL PROPERTY
+  * RIGHTS ARE DISCLAIMED TO THE FULLEST EXTENT PERMITTED BY LAW. IN NO EVENT
+  * SHALL STMICROELECTRONICS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+  * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+  * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   *
   ******************************************************************************
   */
-  
+
   /* BSPDependencies
   - "stm32xxxxx_{eval}{discovery}{nucleo_144}.c"
   - "stm32xxxxx_{eval}{discovery}_io.c"
@@ -45,42 +65,42 @@
 /** @addtogroup USBH_HID_CLASS
   * @{
   */
-  
-/** @defgroup USBH_HID_PARSER 
+
+/** @defgroup USBH_HID_PARSER
   * @brief    This file includes HID parsers for USB Host HID class.
   * @{
-  */ 
+  */
 
 /** @defgroup USBH_HID_PARSER_Private_TypesDefinitions
   * @{
-  */ 
+  */
 /**
   * @}
-  */ 
+  */
 
 
 /** @defgroup USBH_HID_PARSER_Private_Defines
   * @{
-  */ 
+  */
 /**
   * @}
-  */ 
+  */
 
 
 /** @defgroup USBH_HID_PARSER_Private_Macros
   * @{
-  */ 
+  */
 /**
   * @}
-  */ 
+  */
 
 /** @defgroup USBH_HID_PARSER_Private_FunctionPrototypes
   * @{
-  */ 
+  */
 
 /**
   * @}
-  */ 
+  */
 
 
 /** @defgroup USBH_HID_PARSER_Private_Variables
@@ -89,15 +109,15 @@
 
 /**
   * @}
-  */ 
+  */
 
 
 /** @defgroup USBH_HID_PARSER_Private_Functions
   * @{
-  */ 
+  */
 
 /**
-  * @brief  HID_ReadItem 
+  * @brief  HID_ReadItem
   *         The function read a report item.
   * @param  ri: report item
   * @param  ndx: report index
@@ -105,67 +125,67 @@
   */
 uint32_t HID_ReadItem(HID_Report_ItemTypedef *ri, uint8_t ndx)
 {
-  uint32_t val=0;
-  uint32_t x=0;
+  uint32_t val = 0U;
+  uint32_t x = 0U;
   uint32_t bofs;
   uint8_t *data=ri->data;
   uint8_t shift=ri->shift;
-  
+
   /* get the logical value of the item */
-  
+
   /* if this is an array, wee may need to offset ri->data.*/
-  if (ri->count > 0)
-  { 
+  if (ri->count > 0U)
+  {
     /* If app tries to read outside of the array. */
     if (ri->count <= ndx)
     {
-      return(0);
+      return(0U);
     }
-    
+
     /* calculate bit offset */
     bofs = ndx*ri->size;
     bofs += shift;
-    /* calculate byte offset + shift pair from bit offset. */    
-    data+=bofs/8;
-    shift=(uint8_t)(bofs%8);
+    /* calculate byte offset + shift pair from bit offset. */
+    data+=bofs / 8U;
+    shift=(uint8_t)(bofs % 8U);
   }
   /* read data bytes in little endian order */
-  for(x=0; x < ((ri->size & 0x7) ? (ri->size/8)+1 : (ri->size/8)); x++)
+  for(x = 0U; x < ((ri->size & 0x7U) ? (ri->size / 8U) + 1U : (ri->size / 8U)); x++)
   {
-    val=(uint32_t)(*data << (x*8));
-  }    
-  val=(val >> shift) & ((1<<ri->size)-1);
-  
+    val=(uint32_t)((uint32_t)(*data) << (x * 8U));
+  }
+  val=(val >> shift) & ((1U << ri->size) - 1U);
+
   if (val < ri->logical_min || val > ri->logical_max)
   {
-    return(0);
+    return(0U);
   }
-  
+
   /* convert logical value to physical value */
   /* See if the number is negative or not. */
-  if ((ri->sign) && (val & (1<<(ri->size-1))))
+  if ((ri->sign) && (val & (1U << (ri->size - 1U))))
   {
     /* yes, so sign extend value to 32 bits. */
-    int vs=(int)((-1 & ~((1<<(ri->size))-1)) | val);
-    
-    if(ri->resolution == 1)
+    uint32_t vs=(uint32_t)((0xffffffffU & ~((1U << (ri->size)) - 1U)) | val);
+
+    if(ri->resolution == 1U)
     {
       return((uint32_t)vs);
     }
-    return((uint32_t)(vs*ri->resolution));
+    return((uint32_t)(vs * ri->resolution));
   }
   else
   {
-    if(ri->resolution == 1)
+    if(ri->resolution == 1U)
     {
       return(val);
     }
-    return(val*ri->resolution);    
-  }  
+    return(val*ri->resolution);
+  }
 }
 
 /**
-  * @brief  HID_WriteItem 
+  * @brief  HID_WriteItem
   *         The function write a report item.
   * @param  ri: report item
   * @param  ndx: report index
@@ -178,53 +198,55 @@ uint32_t HID_WriteItem(HID_Report_ItemTypedef *ri, uint32_t value, uint8_t ndx)
   uint32_t bofs;
   uint8_t *data=ri->data;
   uint8_t shift=ri->shift;
-  
-  if (value < ri->physical_min || value > ri->physical_max)  
+
+  if (value < ri->physical_min || value > ri->physical_max)
   {
-    return(1);
+    return(1U);
   }
-  
+
     /* if this is an array, wee may need to offset ri->data.*/
-  if (ri->count > 0)
-  { 
+  if (ri->count > 0U)
+  {
     /* If app tries to read outside of the array. */
     if (ri->count >= ndx)
     {
-      return(0);
+      return(0U);
     }
     /* calculate bit offset */
-    bofs = ndx*ri->size;
+    bofs = ndx * ri->size;
     bofs += shift;
-    /* calculate byte offset + shift pair from bit offset. */    
-    data+=bofs/8;
-    shift=(uint8_t)(bofs%8);
+    /* calculate byte offset + shift pair from bit offset. */
+    data += bofs / 8U;
+    shift = (uint8_t)(bofs % 8U);
 
   }
 
-  /* Convert physical value to logical value. */  
-  if (ri->resolution != 1)
+  /* Convert physical value to logical value. */
+  if (ri->resolution != 1U)
   {
-    value=value/ri->resolution;
+    value = value / ri->resolution;
   }
 
   /* Write logical value to report in little endian order. */
-  mask=(uint32_t)((1<<ri->size)-1);
+  mask = (1U << ri->size) - 1U;
   value = (value & mask) << shift;
-  
-  for(x=0; x < ((ri->size & 0x7) ? (ri->size/8)+1 : (ri->size/8)); x++)
+
+  for(x = 0U; x < ((ri->size & 0x7U) ? (ri->size / 8U) + 1U : (ri->size / 8U)); x++)
   {
-    *(ri->data+x)=(uint8_t)((*(ri->data+x) & ~(mask>>(x*8))) | ((value>>(x*8)) & (mask>>(x*8))));
+    *(ri->data + x)=(uint8_t)((*(ri->data+x) & ~(mask>>(x* 8U))) |
+                            ((value >> (x * 8U)) & (mask >> (x * 8U))));
   }
-  return(0);
+
+  return 0U;
 }
 
 /**
   * @}
-  */ 
+  */
 
 /**
   * @}
-  */ 
+  */
 
 /**
   * @}

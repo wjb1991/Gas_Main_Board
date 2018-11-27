@@ -1,6 +1,6 @@
 #include "task_cml.h"
 
-static Dev_SerialPort *pst_Dev = &COM1;
+static Dev_SerialPort *pst_Dev = &COM2;
 
 static void Send_Complete(void* pst_Dev);
 

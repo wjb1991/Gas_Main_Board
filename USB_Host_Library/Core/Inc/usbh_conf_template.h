@@ -6,19 +6,39 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT 2015 STMicroelectronics</center></h2>
+  * <h2><center>&copy; Copyright (c) 2017 STMicroelectronics International N.V.
+  * All rights reserved.</center></h2>
   *
-  * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
-  * You may not use this file except in compliance with the License.
-  * You may obtain a copy of the License at:
+  * Redistribution and use in source and binary forms, with or without
+  * modification, are permitted, provided that the following conditions are met:
   *
-  *        http://www.st.com/software_license_agreement_liberty_v2
+  * 1. Redistribution of source code must retain the above copyright notice,
+  *    this list of conditions and the following disclaimer.
+  * 2. Redistributions in binary form must reproduce the above copyright notice,
+  *    this list of conditions and the following disclaimer in the documentation
+  *    and/or other materials provided with the distribution.
+  * 3. Neither the name of STMicroelectronics nor the names of other
+  *    contributors to this software may be used to endorse or promote products
+  *    derived from this software without specific written permission.
+  * 4. This software, including modifications and/or derivative works of this
+  *    software, must execute solely and exclusively on microcontroller or
+  *    microprocessor devices manufactured by or for STMicroelectronics.
+  * 5. Redistribution and use of this software other than as permitted under
+  *    this license is void and will automatically terminate your rights under
+  *    this license.
   *
-  * Unless required by applicable law or agreed to in writing, software 
-  * distributed under the License is distributed on an "AS IS" BASIS, 
-  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * See the License for the specific language governing permissions and
-  * limitations under the License.
+  * THIS SOFTWARE IS PROVIDED BY STMICROELECTRONICS AND CONTRIBUTORS "AS IS"
+  * AND ANY EXPRESS, IMPLIED OR STATUTORY WARRANTIES, INCLUDING, BUT NOT
+  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+  * PARTICULAR PURPOSE AND NON-INFRINGEMENT OF THIRD PARTY INTELLECTUAL PROPERTY
+  * RIGHTS ARE DISCLAIMED TO THE FULLEST EXTENT PERMITTED BY LAW. IN NO EVENT
+  * SHALL STMICROELECTRONICS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+  * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+  * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   *
   ******************************************************************************
   */
@@ -32,110 +52,114 @@
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f4xx.h"
+#include "stm32fxxx.h"  /* replace 'stm32xxx' with your HAL driver header filename, ex: stm32f4xx.h */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-/** @addtogroup USBH_OTG_DRIVER
+/** @addtogroup STM32_USB_HOST_LIBRARY
   * @{
   */
-  
+
 /** @defgroup USBH_CONF
-  * @brief usb otg low level driver configuration file
+  * @brief usb host low level driver configuration file
   * @{
-  */ 
+  */
 
 /** @defgroup USBH_CONF_Exported_Defines
   * @{
-  */ 
+  */
 
-#define USBH_MAX_NUM_ENDPOINTS                2
-#define USBH_MAX_NUM_INTERFACES               2
-#define USBH_MAX_NUM_CONFIGURATION            1
-#define USBH_KEEP_CFG_DESCRIPTOR              1
-#define USBH_MAX_NUM_SUPPORTED_CLASS          1
-#define USBH_MAX_SIZE_CONFIGURATION           0x200
-#define USBH_MAX_DATA_BUFFER                  0x200
-#define USBH_DEBUG_LEVEL                      2
-#define USBH_USE_OS                           1
-    
+#define USBH_MAX_NUM_ENDPOINTS                2U
+#define USBH_MAX_NUM_INTERFACES               2U
+#define USBH_MAX_NUM_CONFIGURATION            1U
+#define USBH_KEEP_CFG_DESCRIPTOR              1U
+#define USBH_MAX_NUM_SUPPORTED_CLASS          1U
+#define USBH_MAX_SIZE_CONFIGURATION           0x200U
+#define USBH_MAX_DATA_BUFFER                  0x200U
+#define USBH_DEBUG_LEVEL                      2U
+#define USBH_USE_OS                           1U
+
 /** @defgroup USBH_Exported_Macros
   * @{
-  */ 
+  */
 
- /* Memory management macros */   
-#define USBH_malloc               malloc
-#define USBH_free                 free
-#define USBH_memset               memset
-#define USBH_memcpy               memcpy
-    
- /* DEBUG macros */  
+ /* Memory management macros */
+#define USBD_malloc               malloc
+#define USBD_free                 free
+#define USBD_memset               memset
+#define USBD_memcpy               memcpy
 
-  
-#if (USBH_DEBUG_LEVEL > 0)
-#define  USBH_UsrLog(...)   printf(__VA_ARGS__);\
-                            printf("\n");
+/* DEBUG macros */
+#if (USBD_DEBUG_LEVEL > 0U)
+#define  USBD_UsrLog(...)   do { \
+                            printf(__VA_ARGS__); \
+                            printf("\n"); \
+} while (0)
 #else
-#define USBH_UsrLog(...)   
-#endif 
-                            
-                            
-#if (USBH_DEBUG_LEVEL > 1)
-
-#define  USBH_ErrLog(...)   printf("ERROR: ") ;\
-                            printf(__VA_ARGS__);\
-                            printf("\n");
-#else
-#define USBH_ErrLog(...)   
-#endif 
-                            
-                            
-#if (USBH_DEBUG_LEVEL > 2)                         
-#define  USBH_DbgLog(...)   printf("DEBUG : ") ;\
-                            printf(__VA_ARGS__);\
-                            printf("\n");
-#else
-#define USBH_DbgLog(...)                         
+#define USBD_UsrLog(...) do {} while (0)
 #endif
-                            
+
+#if (USBD_DEBUG_LEVEL > 1U)
+
+#define  USBD_ErrLog(...) do { \
+                            printf("ERROR: ") ; \
+                            printf(__VA_ARGS__); \
+                            printf("\n"); \
+} while (0)
+#else
+#define USBD_ErrLog(...) do {} while (0)
+#endif
+
+#if (USBD_DEBUG_LEVEL > 2U)
+#define  USBD_DbgLog(...)   do { \
+                            printf("DEBUG : ") ; \
+                            printf(__VA_ARGS__); \
+                            printf("\n"); \
+} while (0)
+#else
+#define USBD_DbgLog(...) do {} while (0)
+#endif
+
 /**
   * @}
-  */ 
-   
+  */
+
+
+
 /**
   * @}
-  */ 
+  */
 
 
 /** @defgroup USBH_CONF_Exported_Types
   * @{
-  */ 
+  */
 /**
   * @}
-  */ 
+  */
 
 
 /** @defgroup USBH_CONF_Exported_Macros
   * @{
-  */ 
+  */
 /**
   * @}
-  */ 
+  */
 
 /** @defgroup USBH_CONF_Exported_Variables
   * @{
-  */ 
+  */
 /**
   * @}
-  */ 
+  */
 
 /** @defgroup USBH_CONF_Exported_FunctionsPrototype
   * @{
-  */ 
+  */
 /**
   * @}
-  */ 
+  */
 
 #ifdef __cplusplus
 }
@@ -146,10 +170,9 @@
 
 /**
   * @}
-  */ 
+  */
 
 /**
   * @}
-  */ 
+  */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
-

@@ -10,11 +10,19 @@
 //|  V1.0    | 2018.10.31  |  wjb      | 初版
 //|  V1.01   | 2018.10.31  |  wjb      | 添加串口打印函数和串口打印缓冲区
 //|  V1.02   | 2018.10.31  |  wjb      | 修正数据接收到没有处理函数后一直进中断的问题
+//|  V1.03   | 2018.11.06  |  wjb      | 添加DEF_USE_COMx宏定义可以取消不用的端口
 //==================================================================================================
 #ifndef __BSP_USART_H__
 #define __BSP_USART_H__
 
 #include "bsp.h"
+
+#define DEF_USE_COM1   (TRUE)
+#define DEF_USE_COM2   (TRUE)
+#define DEF_USE_COM3   (TRUE)
+#define DEF_USE_COM4   (TRUE)
+#define DEF_USE_COM5   (TRUE)
+#define DEF_USE_COM6   (TRUE)
 
 typedef struct _DEV_SERIALPORT  Dev_SerialPort;
 

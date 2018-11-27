@@ -18,24 +18,15 @@ void Task_GreyProc(void  *p_arg)
     while(TRUE)
     {
         INT8U i = 0;
-        for(i = 0; i < 10; i++)
-        {
-            Mod_GreyAnalysisPoll(&ast_GreyChannle[i]);        
-        }
-        
-        for(i = 0; i < 10; i++)
-        {   
-            static INT8U buff[100] = {0};
-            sprintf(buff,"CH%u = %f\r\n",i,ast_GreyChannle[i].f_Volt);
-            TRACE_DBG(buff);    
-            OSTimeDlyHMSM(0u, 0u, 0u, 100,
-                  OS_OPT_TIME_HMSM_STRICT | OS_OPT_TIME_PERIODIC,/* 周期模式 */
-                  &os_err);  
-        }
-        
+
+        //每100Ms测试一次灰度  1S 10个结果
         OSTimeDlyHMSM(0u, 0u, 0u, 100,
               OS_OPT_TIME_HMSM_STRICT | OS_OPT_TIME_PERIODIC,/* 周期模式 */
               &os_err);
+        
+        
+        
+        
         TRACE_DBG(">>DBG:       灰度处理\r\n");
         
         BSP_Led2Toggle();

@@ -67,7 +67,7 @@ uint8_t Deal_SlavePack(StdBus_t* pst_Fram)
                 
                 USB4000.b_SetFlag = TRUE;
                 USB4000.ul_SetIntegralTime = i;
-                
+                SaveToEeprom((INT32U)&USB4000.ul_SetIntegralTime);
                 res = 1;    //应答                
             }
             
@@ -77,7 +77,7 @@ uint8_t Deal_SlavePack(StdBus_t* pst_Fram)
             //读命令是返回是否在调零
             pst_Fram->uin_PayLoadLenth = 4;
             
-            Bsp_CnvINT32UToArr(&pst_Fram->puc_PayLoad[0],USB4000.ul_IntegralTime,FALSE);
+            Bsp_CnvINT32UToArr(&pst_Fram->puc_PayLoad[0],USB4000.ul_SetIntegralTime,FALSE);
             res = 1;    //应答
         }
         break;
@@ -90,6 +90,7 @@ uint8_t Deal_SlavePack(StdBus_t* pst_Fram)
             if(pst_Fram->uin_PayLoadLenth == 1)
             {
                 USB4000.uch_ScansToAverage = pst_Fram->puc_PayLoad[0];
+                SaveToEeprom((INT32U)&USB4000.uch_ScansToAverage);
                 res = 1;    //应答
             }
         }
@@ -110,6 +111,7 @@ uint8_t Deal_SlavePack(StdBus_t* pst_Fram)
             if(pst_Fram->uin_PayLoadLenth == 1)
             {
                 USB4000.uch_Boxcar = pst_Fram->puc_PayLoad[0];
+                SaveToEeprom((INT32U)&USB4000.uch_Boxcar);
                 res = 1;    //应答
             }
         }
@@ -122,7 +124,7 @@ uint8_t Deal_SlavePack(StdBus_t* pst_Fram)
         }
         break;    
 //==================================================================================
-//                              设置光谱仪是否开启EDC
+//                              设置光谱仪是否开启EDC(电子暗电流补偿)
 //==================================================================================
     case 0x14:
         if(pst_Fram->uch_SubCmd == DEF_SUBCMD_WRITE) 
@@ -130,6 +132,7 @@ uint8_t Deal_SlavePack(StdBus_t* pst_Fram)
             if(pst_Fram->uin_PayLoadLenth == 1)
             {
                 USB4000.b_EdcEnable = pst_Fram->puc_PayLoad[0];
+                SaveToEeprom((INT32U)&USB4000.b_EdcEnable);
                 res = 1;    //应答
             }
         }
@@ -142,7 +145,7 @@ uint8_t Deal_SlavePack(StdBus_t* pst_Fram)
         }
         break;      
 //==================================================================================
-//                              设置光谱仪是否开启NLC
+//                              设置光谱仪是否开启NLC(非线性补偿)
 //==================================================================================
     case 0x15:
         if(pst_Fram->uch_SubCmd == DEF_SUBCMD_WRITE) 
@@ -150,6 +153,7 @@ uint8_t Deal_SlavePack(StdBus_t* pst_Fram)
             if(pst_Fram->uin_PayLoadLenth == 1)
             {
                 USB4000.b_NlcEnable = pst_Fram->puc_PayLoad[0];
+                SaveToEeprom((INT32U)&USB4000.b_NlcEnable);
                 res = 1;    //应答
             }
         }
@@ -392,7 +396,7 @@ uint8_t Deal_SlavePack(StdBus_t* pst_Fram)
                 
                 for(i = 0; i < 10; i++)
                 {
-                    Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[i*4],ast_GreyChannle[i].f_Volt,FALSE);
+                //    Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[i*4],ast_GreyChannle[i].f_Volt,FALSE);
                 }
             }
             res = 1;    //应答
