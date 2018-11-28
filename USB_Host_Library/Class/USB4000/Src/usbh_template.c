@@ -292,37 +292,24 @@ static USBH_StatusTypeDef USBH_USB4000_Process (USBH_HandleTypeDef *phost)
     OS_ERR os_err;
   
     USB4000_HandleTypeDef *USB4000_Handle =  (USB4000_HandleTypeDef *) phost->pActiveClass->pData; 
-    uint16_t i = 0;   
+    uint16_t i = 0;
     
-    USB4000_Handle->rx_count = 0;
-/*
-    USB4000_Handle->pin_Spectrum = spa_buff;
-    USB4000_Handle->pl_SumSpectrum = sum_spa;
-    USB4000_Handle->plf_ProcessSpectrum = process_spa;
-    USB4000_Handle->plf_WaveLenth = wavelenth_buff;
-    
-    
-      EEPROM 初始化
-    USB4000_Handle->uch_ScansToAverage = 5;
-    USB4000_Handle->uch_ScansConut = 0;
-    USB4000_Handle->uch_Boxcar = 32;
-    USB4000_Handle->ul_IntegralTime = 100000;
-    
-    USB4000_Handle->b_EdcEnable = TRUE;
-    USB4000_Handle->b_NlcEnable = FALSE; 
-    */
-    
-    USB4000_Handle->b_Open = TRUE;
-    
-    USBH_UsrLog ("ClassProcess");
+    /* 读取信息 F4正常 F7读取后会一直收到 端点0来的控制信息 会影响速度 F7需要重新枚举 */
+    if(USB4000_Handle->b_Open != TRUE )
+    {
+        USBH_USB4000_QueryInformation(phost);
+        
+        USBH_USB4000_GetStatus(phost);          
+        
+        USBH_ReEnumerate(phost);
+        
+        USB4000_Handle->b_Open = TRUE;    
+    }
 
+    /* 设置积分时间 */
     USBH_USB4000_SetIntegralTime(phost,USB4000_Handle->ul_SetIntegralTime);
     
-    USBH_USB4000_QueryInformation(phost);
-    
-    USBH_USB4000_GetStatus(phost);          
-        
-    
+
     USB4000_Handle->uin_Pixels = 3648;     /* USB接口3648个像素 实际传输 3840个像素*/
     /* 拟合计算波长 */
     for(i = 0;i < USB4000_Handle->uin_Pixels; i++)
@@ -341,22 +328,21 @@ static USBH_StatusTypeDef USBH_USB4000_Process (USBH_HandleTypeDef *phost)
         
     while(phost->gState == HOST_CLASS)
     {
-        //USBH_ReEnumerate(phost);
         uint32_t delay_time = USB4000_Handle->ul_IntegralTime / 1000;
         
         /* 读取光谱需要20ms左右 最快50ms获取一张光谱 其余的20+ms 留作其他任务 */
-        if(delay_time < 200)
+        if(delay_time < 50)
         {
-            delay_time = 200;
+            delay_time = 50;
         }
         
-        OSTimeDlyHMSM(0u, 0u, 0u, 200,
+        OSTimeDlyHMSM(0u, 0u, 0u, delay_time,
                       OS_OPT_TIME_HMSM_STRICT | OS_OPT_TIME_PERIODIC,/* 周期模式 */
                       &os_err);
 
         if(USB4000_Handle->b_SetFlag == TRUE)
         {
-            //USBH_USB4000_SetIntegralTime(phost,USB4000_Handle->ul_SetIntegralTime);
+            USBH_USB4000_SetIntegralTime(phost,USB4000_Handle->ul_SetIntegralTime);
             USB4000_Handle->b_SetFlag = FALSE;
         }
         else
@@ -517,7 +503,7 @@ static USBH_StatusTypeDef USBH_USB4000_SetIntegralTime(USBH_HandleTypeDef *phost
             switch (URB_Status)
             {
             case USBH_URB_DONE:
-                USBH_UsrLog ("USBH_URB_DONE");
+                USBH_UsrLog ("设置积分时间完成");
                 USB4000_Handle->e_State = USB4000_IDLE;
                 return USBH_OK;
                 break;
@@ -525,7 +511,7 @@ static USBH_StatusTypeDef USBH_USB4000_SetIntegralTime(USBH_HandleTypeDef *phost
                 USB4000_Handle->e_State = USB4000_SEND_DATA;
                 break;
             case USBH_URB_STALL:
-                USBH_UsrLog ("USBH_URB_NOTREADY");
+                USBH_UsrLog ("设置积分时间失败");
                 return USBH_FAIL;
                 break;
             default:
@@ -1175,6 +1161,66 @@ void USB4000_SetIntegTime(USB4000_HandleTypeDef *USB4000_Handle, INT32U IntegTim
     USB4000_Handle->b_SetFlag = TRUE;
     USB4000_Handle->ul_SetIntegralTime = IntegTime;
 }
+
+/* 调试用 获取各个通道的状态  */
+/**
+while(phost->gState == HOST_CLASS)
+{
+    USBH_URBStateTypeDef URB_Status = USBH_URB_IDLE;
+    void* pv_Msg = 0;
+    INT16U uin_Len = 0;
+    
+    pv_Msg = OSTaskQPend(100,OS_OPT_PEND_BLOCKING,&uin_Len,NULL,&os_err);
+    if(os_err != OS_ERR_NONE)
+    {
+        USBH_UsrLog ("超时");
+        continue;
+    }
+
+    switch((INT32U)pv_Msg)
+    {
+    case USBH_PORT_EVENT:
+        USBH_UsrLog ("USBH_PORT_EVENT");
+        break;  
+    case USBH_URB_EVENT:
+        USBH_UsrLog ("USBH_URB_EVENT");
+        break;
+    case USBH_CONTROL_EVENT:
+        USBH_UsrLog ("USBH_CONTROL_EVENT");        
+        break;
+    case USBH_CLASS_EVENT:
+        USBH_UsrLog ("USBH_CLASS_EVENT");
+        break;
+    case USBH_STATE_CHANGED_EVENT:
+        USBH_UsrLog ("USBH_STATE_CHANGED_EVENT");
+        break;
+    }
+    
+    URB_Status = USBH_LL_GetURBState(phost, 0);
+
+    USBH_UsrLog ("0 = %u",URB_Status);
+    
+    URB_Status = USBH_LL_GetURBState(phost, 1);
+
+    USBH_UsrLog ("1 = %u",URB_Status);
+    
+    URB_Status = USBH_LL_GetURBState(phost, USB4000_Handle->OutPipe1);
+
+    USBH_UsrLog ("OutPipe1 = %u",URB_Status);
+    
+    URB_Status = USBH_LL_GetURBState(phost, USB4000_Handle->InPipe1);
+    USBH_UsrLog ("InPipe1 = %u",URB_Status);
+    
+    URB_Status = USBH_LL_GetURBState(phost, USB4000_Handle->InPipe2);
+    USBH_UsrLog ("InPipe2 = %u",URB_Status);
+    
+    URB_Status = USBH_LL_GetURBState(phost, USB4000_Handle->InPipe6);
+    USBH_UsrLog ("InPipe6 = %u",URB_Status);
+    
+}
+return USBH_OK;
+*/
+    
 
 /**
 * @}
