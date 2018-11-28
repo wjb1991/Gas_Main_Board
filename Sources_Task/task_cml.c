@@ -94,7 +94,7 @@ void Task_CmlSendMsg(INT8U* puch_Msg, INT16U uin_Len)
 //==================================================================================================
 void Task_CmlRecv (void *p_arg)
 {
-    OS_ERR  os_err;
+    //OS_ERR  os_err;
     (void)p_arg;
 
     while(1)

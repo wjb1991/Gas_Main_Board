@@ -46,6 +46,8 @@ USBH_ClassTypeDef  USB4000_Class =
   USBH_USB4000_SOFProcess,
 };
 
+static uint8_t auc_SerialNumber[30]={0};
+
 //#pragma location = (0x68000000)        
 static int16_t spa_buff[4096]={0};
 
@@ -72,6 +74,7 @@ USB4000_HandleTypeDef   USB4000 = {
     0,//              rx_count;
     FALSE,//          b_SetFlag;
     0,//              ul_SetIntegralTime;
+    auc_SerialNumber,
     {0,0,0,0,0,0,0,0,0,0,0},//auin_EdcIndexs[11];             
     {0,0,0,0},              //alf_WlcCoeff[4];
     {0,0,0,0,0,0,0,0},      //alf_NlcCoeff[8];  
@@ -275,7 +278,6 @@ static USBH_StatusTypeDef USBH_USB4000_ClassRequest (USBH_HandleTypeDef *phost)
     return USBH_OK; 
 }
 
-
 //==================================================================================
 //| 函数名称 | USBH_USB4000_Process
 //|----------|----------------------------------------------------------------------
@@ -297,9 +299,9 @@ static USBH_StatusTypeDef USBH_USB4000_Process (USBH_HandleTypeDef *phost)
     /* 读取信息 F4正常 F7读取后会一直收到 端点0来的控制信息 会影响速度 F7需要重新枚举 */
     if(USB4000_Handle->b_Open != TRUE )
     {
-        USBH_USB4000_QueryInformation(phost);
+        USBH_USB4000_GetStatus(phost);   
         
-        USBH_USB4000_GetStatus(phost);          
+        USBH_USB4000_QueryInformation(phost); 
         
         USBH_ReEnumerate(phost);
         
@@ -400,7 +402,6 @@ static USBH_StatusTypeDef USBH_USB4000_Init(USBH_HandleTypeDef *phost)
     USBH_URBStateTypeDef URB_Status = USBH_URB_IDLE;
     OS_ERR os_err;
     INT8U uc_SendBuff[1];
-    INT8U uc_ErrCnt = 0; 
     void* pv_Msg = 0;
     INT16U uin_Len = 0;
     USB4000_Handle->e_State = USB4000_SEND_DATA;
@@ -468,8 +469,7 @@ static USBH_StatusTypeDef USBH_USB4000_SetIntegralTime(USBH_HandleTypeDef *phost
     USB4000_HandleTypeDef *USB4000_Handle =  (USB4000_HandleTypeDef *) phost->pActiveClass->pData; 
     USBH_URBStateTypeDef URB_Status = USBH_URB_IDLE;
     OS_ERR os_err;
-    INT8U uc_SendBuff[5];
-    INT8U uc_ErrCnt = 0; 
+    INT8U uc_SendBuff[5]; 
     void* pv_Msg = 0;
     INT16U uin_Len = 0;
     USB4000_Handle->e_State = USB4000_SEND_DATA;
@@ -829,30 +829,60 @@ static USBH_StatusTypeDef USBH_USB4000_GetInformation(USBH_HandleTypeDef *phost,
 static USBH_StatusTypeDef USBH_USB4000_QueryInformation(USBH_HandleTypeDef *phost)
 {
     USB4000_HandleTypeDef *USB4000_Handle =  (USB4000_HandleTypeDef *) phost->pActiveClass->pData; 
-    INT8U   aauc_Str[31][64] = {0};
+    static INT8U   aauc_Str[64] = {0};
       
     for(int i = 0; i <= 18; )
     {
-        if(USBH_OK == USBH_USB4000_GetInformation(phost,i,&aauc_Str[i][0]))
+        if(USBH_OK == USBH_USB4000_GetInformation(phost,i,&aauc_Str[0]))
         {
+            switch (i)
+            {
+            case 0: //字符串序列号
+                memcpy(USB4000_Handle->puc_SerialNumber,(char const*)&aauc_Str[2],20);
+                break;
+            case 1: //波长校正因子 Wavelength Calibration Coefficient
+            case 2:
+            case 3:
+            case 4:
+                USB4000_Handle->alf_WlcCoeff[i-1] = atof((char const*)&aauc_Str[2]);
+                break;
+            case 5: //杂散光常数 Stray light constant
+                break;
+            case 6: //非线性补偿因子 non-linearity correction coefficient
+            case 7:
+            case 8:
+            case 9:
+            case 10:
+            case 11:              
+            case 12:                
+            case 13: 
+                  USB4000_Handle->alf_NlcCoeff[i-6] = atof((char const*)&aauc_Str[2]);
+                  break;  
+                  
+            case 14: //非线性补阶数 Polynomial order of non-linearity calibration
+                  USB4000_Handle->uch_NlcOrder = atoi((char const*)&aauc_Str[2]);
+                  break;          
+            }
+          
             printf("信息%u = ",i);
-            printf((const char*)&aauc_Str[i][2]);
+            //printf((const char*)&aauc_Str[2]);
             printf("\r\n");
             i++;
         }
         else
         {
+            /*
             OS_ERR os_err;
             OSTimeDlyHMSM(0u, 0u, 0u, 100,
-                        OS_OPT_TIME_HMSM_STRICT ,/* 周期模式 */
+                        OS_OPT_TIME_HMSM_STRICT , 
                         &os_err);
-            //USBH_ClrFeature(phost,USB4000_Handle->OutEp1);
-            //USBH_ClrFeature(phost,USB4000_Handle->InEp1);
+            */
         }
         
         if(phost->gState != HOST_CLASS)
             break;
-    } 
+    }
+    return USBH_OK;
 }
 
 //==================================================================================
@@ -871,7 +901,7 @@ static USBH_StatusTypeDef USBH_USB4000_GetSpectrum(USBH_HandleTypeDef *phost)
     USB4000_HandleTypeDef *USB4000_Handle =  (USB4000_HandleTypeDef *) phost->pActiveClass->pData; 
     USBH_URBStateTypeDef URB_Status = USBH_URB_IDLE;
     OS_ERR os_err;
-    
+    void* pv_Msg;
     INT8U auc_Buff[64] = {0};
     INT8U uc_ErrCnt = 0;  
     INT16U uin_Len = 0;
@@ -890,7 +920,7 @@ static USBH_StatusTypeDef USBH_USB4000_GetSpectrum(USBH_HandleTypeDef *phost)
                 
         case USB4000_WAIT_SEND:     //等待发送完成
           
-            void* pv_Msg = OSTaskQPend(100,OS_OPT_PEND_BLOCKING,&uin_Len,NULL,&os_err);
+            pv_Msg = OSTaskQPend(100,OS_OPT_PEND_BLOCKING,&uin_Len,NULL,&os_err);
             if(os_err != OS_ERR_NONE)
             {
                 USBH_ClrFeature(phost,USB4000_Handle->OutEp1);

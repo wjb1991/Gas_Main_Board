@@ -50,7 +50,7 @@ void  BSP_LedInit (void)
     gpio_init.Speed = GPIO_SPEED_HIGH;
     HAL_GPIO_Init(GPIOG, &gpio_init);
     
-    HAL_GPIO_WritePin(GPIOG, GPIO_PIN_6, 1);
+    HAL_GPIO_WritePin(GPIOG, GPIO_PIN_6, (GPIO_PinState)1);
 
     
 

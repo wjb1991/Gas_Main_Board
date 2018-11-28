@@ -17,7 +17,7 @@ void Task_GreyProc(void  *p_arg)
     
     while(TRUE)
     {
-        INT8U i = 0;
+        //INT8U i = 0;
 
         //每100Ms测试一次灰度  1S 10个结果
         OSTimeDlyHMSM(0u, 0u, 0u, 100,

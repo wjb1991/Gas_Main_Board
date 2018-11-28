@@ -75,6 +75,9 @@ typedef struct _USB4000_Process
     uint8_t              b_SetFlag;
     uint32_t             ul_SetIntegralTime;
     
+    
+    /* ÐòÁÐºÅ */
+    uint8_t*             puc_SerialNumber;
     /* 5-15ÏñËØ*/
     uint16_t             auin_EdcIndexs[11];        
     /* Wavelength Calibration Coefficient */

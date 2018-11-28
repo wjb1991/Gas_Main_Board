@@ -48,6 +48,7 @@ BOOL Bsp_W25QxxInit(void* pv_Dev)
     Bsp_SpiInit(pst_Dev->pv_DevSpiHandle);
     
     Bsp_W25QxxReadID(pv_Dev);
+    return TRUE;
 }
 
 
