@@ -96,7 +96,7 @@
 	MiddleWare version : 
 */
 /*----------   -----------*/
-#define USBH_MAX_NUM_ENDPOINTS      8
+#define USBH_MAX_NUM_ENDPOINTS      5
  
 /*----------   -----------*/
 #define USBH_MAX_NUM_INTERFACES      10
