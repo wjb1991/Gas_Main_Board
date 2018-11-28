@@ -200,7 +200,7 @@
 #define USBH_DEVICE_ADDRESS_DEFAULT                        0x00U
 #define USBH_DEVICE_ADDRESS                                0x01U
 
-#define USBH_MAX_ERROR_COUNT                               0x02U
+#define USBH_MAX_ERROR_COUNT                               0x80U
 
 
 /**

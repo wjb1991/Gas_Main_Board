@@ -1,11 +1,11 @@
 #include "mod_gasanalysis.h"
 #include "Pub_Nihe.h"
 
-#pragma location = (0x68020000)
+//#pragma location = (0x68020000)
 FP64        alf_BkSpectrum[DEF_WAVE_BUFF_SIZE] = {0};
-#pragma location = (0x68028000)
+//#pragma location = (0x68028000)
 FP64        alf_Spectrum[DEF_WAVE_BUFF_SIZE] = {0};
-#pragma location = (0x68030000)
+//#pragma location = (0x68030000)
 FP64        alf_AbsSpectrum[DEF_WAVE_BUFF_SIZE] = {0};
 
 FP32            alf_WorkLine[3][4]  = { 0.0 };
