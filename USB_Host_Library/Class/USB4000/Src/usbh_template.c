@@ -21,11 +21,15 @@ static USBH_StatusTypeDef USBH_USB4000_ClassRequest (USBH_HandleTypeDef *phost);
 
 static USBH_StatusTypeDef USBH_USB4000_SOFProcess(USBH_HandleTypeDef *phost);
 
+static USBH_StatusTypeDef USBH_USB4000_Init(USBH_HandleTypeDef *phost);
+
+static USBH_StatusTypeDef USBH_USB4000_SetIntegralTime(USBH_HandleTypeDef *phost,INT32U ITime);
+
 static USBH_StatusTypeDef USBH_USB4000_GetStatus(USBH_HandleTypeDef *phost);
 
 static USBH_StatusTypeDef USBH_USB4000_GetSpectrum(USBH_HandleTypeDef *phost);
 
-static USBH_StatusTypeDef USBH_USB4000_SetIntegralTime(USBH_HandleTypeDef *phost,INT32U ITime);
+static USBH_StatusTypeDef USBH_USB4000_GetInformation(USBH_HandleTypeDef *phost,INT8U Cmd,INT8U* auc_Buff);
 
 static USBH_StatusTypeDef USBH_USB4000_QueryInformation(USBH_HandleTypeDef *phost);
 
@@ -291,14 +295,14 @@ static USBH_StatusTypeDef USBH_USB4000_Process (USBH_HandleTypeDef *phost)
     uint16_t i = 0;   
     
     USB4000_Handle->rx_count = 0;
-
+/*
     USB4000_Handle->pin_Spectrum = spa_buff;
     USB4000_Handle->pl_SumSpectrum = sum_spa;
     USB4000_Handle->plf_ProcessSpectrum = process_spa;
     USB4000_Handle->plf_WaveLenth = wavelenth_buff;
-    USB4000_Handle->uin_Pixels = 3648;     /* USB接口3648个像素 实际传输 3840个像素*/
-  
-    /*  EEPROM 初始化
+    
+    
+      EEPROM 初始化
     USB4000_Handle->uch_ScansToAverage = 5;
     USB4000_Handle->uch_ScansConut = 0;
     USB4000_Handle->uch_Boxcar = 32;
@@ -312,11 +316,14 @@ static USBH_StatusTypeDef USBH_USB4000_Process (USBH_HandleTypeDef *phost)
     
     USBH_UsrLog ("ClassProcess");
 
-    //USBH_USB4000_SetIntegralTime(phost,USB4000_Handle->ul_SetIntegralTime);
+    USBH_USB4000_SetIntegralTime(phost,USB4000_Handle->ul_SetIntegralTime);
     
-    //USBH_USB4000_QueryInformation(phost);
-    //USBH_USB4000_GetStatus(phost);    //容易死
+    USBH_USB4000_QueryInformation(phost);
+    
+    USBH_USB4000_GetStatus(phost);          
         
+    
+    USB4000_Handle->uin_Pixels = 3648;     /* USB接口3648个像素 实际传输 3840个像素*/
     /* 拟合计算波长 */
     for(i = 0;i < USB4000_Handle->uin_Pixels; i++)
     {
@@ -332,12 +339,9 @@ static USBH_StatusTypeDef USBH_USB4000_Process (USBH_HandleTypeDef *phost)
     
     USB4000_Handle->b_IsConnect = TRUE;
         
-    OSTimeDlyHMSM(0u, 0u, 1u, 0u,
-                  OS_OPT_TIME_HMSM_STRICT,
-                  &os_err);
-    
     while(phost->gState == HOST_CLASS)
     {
+        //USBH_ReEnumerate(phost);
         uint32_t delay_time = USB4000_Handle->ul_IntegralTime / 1000;
         
         /* 读取光谱需要20ms左右 最快50ms获取一张光谱 其余的20+ms 留作其他任务 */
@@ -346,8 +350,7 @@ static USBH_StatusTypeDef USBH_USB4000_Process (USBH_HandleTypeDef *phost)
             delay_time = 200;
         }
         
-        OSTimeDlyHMSM(0u, 0u, 0u, 10,
-                      //OS_OPT_TIME_HMSM_STRICT,
+        OSTimeDlyHMSM(0u, 0u, 0u, 200,
                       OS_OPT_TIME_HMSM_STRICT | OS_OPT_TIME_PERIODIC,/* 周期模式 */
                       &os_err);
 
@@ -358,7 +361,7 @@ static USBH_StatusTypeDef USBH_USB4000_Process (USBH_HandleTypeDef *phost)
         }
         else
         {
-            if( USBH_USB4000_GetSpectrum(phost)==USBH_FAIL );
+            if( USBH_USB4000_GetSpectrum(phost)==USBH_FAIL )
             {
 
             }
@@ -395,9 +398,9 @@ static USBH_StatusTypeDef USBH_USB4000_SOFProcess(USBH_HandleTypeDef *phost)
 }
 
 //==================================================================================
-//| 函数名称 | USBH_USB4000_GetStatus
+//| 函数名称 | USBH_USB4000_Init
 //|----------|----------------------------------------------------------------------
-//| 函数功能 | USB4000 更新状态
+//| 函数功能 | USB4000 初始化
 //|----------|----------------------------------------------------------------------
 //| 输入参数 | phost： 主机句柄
 //|----------|----------------------------------------------------------------------
@@ -405,64 +408,64 @@ static USBH_StatusTypeDef USBH_USB4000_SOFProcess(USBH_HandleTypeDef *phost)
 //|----------|----------------------------------------------------------------------
 //| 函数设计 | wjb
 //==================================================================================
-static USBH_StatusTypeDef USBH_USB4000_GetStatus(USBH_HandleTypeDef *phost)
+static USBH_StatusTypeDef USBH_USB4000_Init(USBH_HandleTypeDef *phost)
 {
-    INT16U uin_Len;
-    OS_ERR os_err;
-
     USB4000_HandleTypeDef *USB4000_Handle =  (USB4000_HandleTypeDef *) phost->pActiveClass->pData; 
-    uint8_t buff[64] = {0};
-    
-    /* 延时1ms 等到下个sof 在操作 */
-    //USB4000_Handle->sof_signal = FALSE;
-    //while(USB4000_Handle->sof_signal == FALSE){}
-    HAL_Delay(1);
-    
-    /* 发送查询命令并等待 */
-    buff[0] = 0xFE;
-    USBH_BulkSendData(phost,buff,1,USB4000_Handle->OutPipe1,0);
-    OSTaskQPend(100,OS_OPT_PEND_BLOCKING,&uin_Len,NULL,&os_err);
-    if(os_err != OS_ERR_NONE)
+    USBH_URBStateTypeDef URB_Status = USBH_URB_IDLE;
+    OS_ERR os_err;
+    INT8U uc_SendBuff[1];
+    INT8U uc_ErrCnt = 0; 
+    void* pv_Msg = 0;
+    INT16U uin_Len = 0;
+    USB4000_Handle->e_State = USB4000_SEND_DATA;
+    HAL_Delay(1);  
+    while(phost->gState == HOST_CLASS)
     {
-        USBH_ClrFeature(phost,USB4000_Handle->OutEp1);
-        USBH_UsrLog ("发送失败");
-        return USBH_FAIL;
-    }
-
-    /* 延时1ms 等到下个sof 在读取 */
-    //USB4000_Handle->sof_signal = FALSE;
-    //while(USB4000_Handle->sof_signal == FALSE){}
-    HAL_Delay(1);
-    
-    
-    /* 请求接受数据 */ 
-    USBH_BulkReceiveData(phost, buff, 64, USB4000_Handle->InPipe1); 
-    OSTaskQPend(100,OS_OPT_PEND_BLOCKING,&uin_Len,NULL,&os_err);    
-    
-    if(os_err != OS_ERR_NONE)
-    {
-        USBH_ClrFeature(phost,USB4000_Handle->InEp1);
-        USBH_UsrLog ("接收超时");
-        return USBH_FAIL;
-    }
-    
-    /* 接收成功 */
-
-    INT32U t = Bsp_CnvArrToINT32U(&buff[2],FALSE);
-
-    USB4000_Handle->ul_IntegralTime = t;
-    
-    if( buff[14] !=0 )
-    {
-        USB4000_Handle->b_HighSpeed = TRUE;
-    }
-    else
-    {
-        USB4000_Handle->b_HighSpeed = FALSE;        //FullSpeed
-    }    
-
-    return USBH_OK;
+        switch(USB4000_Handle->e_State)
+        {
+        case USB4000_SEND_DATA:     
+            uc_SendBuff[0] = 0x01;
+            USBH_BulkSendData(phost,uc_SendBuff,1,USB4000_Handle->OutPipe1,0);
+            USB4000_Handle->e_State = USB4000_WAIT_SEND;
+            break;
+                
+        case USB4000_WAIT_SEND:    
+          
+            pv_Msg = OSTaskQPend(100,OS_OPT_PEND_BLOCKING,&uin_Len,NULL,&os_err);
+            if(os_err != OS_ERR_NONE)
+            {
+                USBH_ClrFeature(phost,USB4000_Handle->OutEp1);
+                USBH_UsrLog ("超时");
+                return USBH_FAIL;
+            }
+            
+            if((INT32U)pv_Msg != USBH_URB_EVENT)
+                continue;
+          
+            URB_Status = USBH_LL_GetURBState(phost, USB4000_Handle->OutPipe1);
+            switch (URB_Status)
+            {
+            case USBH_URB_DONE:
+                USBH_UsrLog ("USBH_URB_DONE");
+                USB4000_Handle->e_State = USB4000_IDLE;
+                return USBH_OK;
+                break;
+            case USBH_URB_NOTREADY:
+                USB4000_Handle->e_State = USB4000_SEND_DATA;
+                break;
+            case USBH_URB_STALL:
+                USBH_UsrLog ("USBH_URB_STALL");
+                break;
+            default:
+                break;
+            }
+        default:
+            break;
+        }
+   }
+   return USBH_OK;   
 }
+
 //==================================================================================
 //| 函数名称 | USBH_USB4000_SetIntegralTime
 //|----------|----------------------------------------------------------------------
@@ -476,41 +479,394 @@ static USBH_StatusTypeDef USBH_USB4000_GetStatus(USBH_HandleTypeDef *phost)
 //==================================================================================
 static USBH_StatusTypeDef USBH_USB4000_SetIntegralTime(USBH_HandleTypeDef *phost,INT32U IntegTime)
 {
-    INT16U uin_Len;
-    //INT32U ul_IntegTime;
-    OS_ERR os_err;
-    
     USB4000_HandleTypeDef *USB4000_Handle =  (USB4000_HandleTypeDef *) phost->pActiveClass->pData; 
-
-    /* 延时1ms 等到下个sof 在操作 */
-    //USB4000_Handle->sof_signal = FALSE;
-    //while(USB4000_Handle->sof_signal == FALSE){}
-    HAL_Delay(1);
-    
-    do
-    {   
-        uint8_t buff[64] = {0};
-        buff[0] = 0x02;
-        Bsp_CnvINT32UToArr(&buff[1],IntegTime,FALSE);
-        buff[4] = 0x00;
-        USBH_BulkSendData(phost,buff,5,USB4000_Handle->OutPipe1,0);
-        
-        OSTaskQPend(0,OS_OPT_PEND_BLOCKING,&uin_Len,NULL,&os_err);
-        if(os_err != OS_ERR_NONE)
+    USBH_URBStateTypeDef URB_Status = USBH_URB_IDLE;
+    OS_ERR os_err;
+    INT8U uc_SendBuff[5];
+    INT8U uc_ErrCnt = 0; 
+    void* pv_Msg = 0;
+    INT16U uin_Len = 0;
+    USB4000_Handle->e_State = USB4000_SEND_DATA;
+    HAL_Delay(1);  
+    while(phost->gState == HOST_CLASS)
+    {
+        switch(USB4000_Handle->e_State)
         {
-            USBH_ClrFeature(phost,USB4000_Handle->OutEp1);
-            USBH_UsrLog ("发送失败");
-            //return USBH_FAIL;
-        }
-        HAL_Delay(1);
+        case USB4000_SEND_DATA:     
+            uc_SendBuff[0] = 0x02;
+            Bsp_CnvINT32UToArr(&uc_SendBuff[1],IntegTime,FALSE);
+            
+            USBH_BulkSendData(phost,uc_SendBuff,5,USB4000_Handle->OutPipe1,0);
+            USB4000_Handle->e_State = USB4000_WAIT_SEND;
+            break;
+                
+        case USB4000_WAIT_SEND:     
           
-        USBH_USB4000_GetStatus(phost);
-        
-        HAL_Delay(1);
-        
-    }while(USB4000_Handle->ul_IntegralTime != IntegTime);
-    
+            pv_Msg = OSTaskQPend(100,OS_OPT_PEND_BLOCKING,&uin_Len,NULL,&os_err);
+            if(os_err != OS_ERR_NONE)
+            {
+                USBH_ClrFeature(phost,USB4000_Handle->OutEp1);
+                USBH_UsrLog ("超时");
+                return USBH_FAIL;
+            }
+            
+            if((INT32U)pv_Msg != USBH_URB_EVENT)
+                continue;
+          
+            URB_Status = USBH_LL_GetURBState(phost, USB4000_Handle->OutPipe1);
+            switch (URB_Status)
+            {
+            case USBH_URB_DONE:
+                USBH_UsrLog ("USBH_URB_DONE");
+                USB4000_Handle->e_State = USB4000_IDLE;
+                return USBH_OK;
+                break;
+            case USBH_URB_NOTREADY:
+                USB4000_Handle->e_State = USB4000_SEND_DATA;
+                break;
+            case USBH_URB_STALL:
+                USBH_UsrLog ("USBH_URB_NOTREADY");
+                return USBH_FAIL;
+                break;
+            default:
+                break;
+            }
+        default:
+            break;
+        }
+    }
     return USBH_OK;
+}
+
+//==================================================================================
+//| 函数名称 | USBH_USB4000_GetStatus
+//|----------|----------------------------------------------------------------------
+//| 函数功能 | USB4000 更新状态
+//|----------|----------------------------------------------------------------------
+//| 输入参数 | phost： 主机句柄
+//|----------|----------------------------------------------------------------------
+//| 返回参数 | 无
+//|----------|----------------------------------------------------------------------
+//| 函数设计 | wjb
+//==================================================================================
+static USBH_StatusTypeDef USBH_USB4000_GetStatus(USBH_HandleTypeDef *phost)
+{
+    USB4000_HandleTypeDef *USB4000_Handle =  (USB4000_HandleTypeDef *) phost->pActiveClass->pData; 
+    USBH_URBStateTypeDef URB_Status = USBH_URB_IDLE;
+    OS_ERR os_err;
+    INT8U uc_SendBuff[1];
+    INT8U auc_Buff[64]={0};
+    INT16U uc_ErrCnt = 0; 
+    void* pv_Msg = 0;
+    INT16U uin_Len = 0;
+    USB4000_Handle->e_State = USB4000_SEND_DATA;
+    HAL_Delay(1);  
+    
+    while(phost->gState == HOST_CLASS)
+    {
+        switch(USB4000_Handle->e_State)
+        {
+        case USB4000_SEND_DATA:
+            uc_SendBuff[0] = 0xFE;
+            USBH_ClrFeature(phost,USB4000_Handle->OutEp1);
+            if(USBH_BulkSendData(phost,uc_SendBuff,1,USB4000_Handle->OutPipe1,0)==USBH_OK)
+                USB4000_Handle->e_State = USB4000_WAIT_SEND;
+            break;
+                
+        case USB4000_WAIT_SEND:
+          
+            pv_Msg = OSTaskQPend(100,OS_OPT_PEND_BLOCKING,&uin_Len,NULL,&os_err);
+            if(os_err != OS_ERR_NONE)
+            {
+                USBH_ClrFeature(phost,USB4000_Handle->OutEp1);
+                USBH_ClrFeature(phost,USB4000_Handle->InEp1);
+                USBH_UsrLog ("超时");
+                return USBH_FAIL;
+            }
+            
+            if((INT32U)pv_Msg != USBH_URB_EVENT)
+                continue;
+          
+            URB_Status = USBH_LL_GetURBState(phost, USB4000_Handle->OutPipe1);
+            switch (URB_Status)
+            {
+            case USBH_URB_DONE:
+                USB4000_Handle->e_State = USB4000_GET_DATA;
+                break;
+            case USBH_URB_NOTREADY:
+                USB4000_Handle->e_State = USB4000_SEND_DATA;
+                break;
+            case USBH_URB_STALL:
+                return USBH_FAIL;
+                break;
+            default:
+                break;
+            }
+        case USB4000_GET_DATA:
+            HAL_Delay(1);
+            USBH_ClrFeature(phost,USB4000_Handle->InEp1);
+            OSTaskQFlush(&TaskUsbHostTCB,&os_err);  /*看情况*/
+            if(USBH_BulkReceiveData(phost, auc_Buff, 64, USB4000_Handle->InPipe1)==USBH_OK)
+                USB4000_Handle->e_State = USB4000_WAIT_GET;
+            break;
+        case USB4000_WAIT_GET:
+            pv_Msg = OSTaskQPend(100,OS_OPT_PEND_BLOCKING,&uin_Len,NULL,&os_err);
+            if(os_err != OS_ERR_NONE)
+            {                USBH_ClrFeature(phost,USB4000_Handle->OutEp1);
+                USBH_ClrFeature(phost,USB4000_Handle->OutEp1);
+                USBH_ClrFeature(phost,USB4000_Handle->InEp1);
+                USBH_UsrLog("超时");
+                USB4000_Handle->e_State = USB4000_SEND_DATA;
+                //return USBH_FAIL;
+            }
+            
+            if((INT32U)pv_Msg != USBH_URB_EVENT)
+                continue;
+            
+            URB_Status = USBH_LL_GetURBState(phost, USB4000_Handle->InPipe1);
+            
+            //if(auc_Buff[0] == 0 && auc_Buff[1] == 0x0f )
+            //    return USBH_OK;
+            if(URB_Status == USBH_URB_DONE)
+            {
+                USBH_UsrLog ("\r\nUSBH_URB_DONE");
+  
+                INT32U t = Bsp_CnvArrToINT32U(&auc_Buff[2],FALSE);
+
+                USB4000_Handle->ul_IntegralTime = t;
+                
+                if( auc_Buff[14] !=0 )
+                {
+                    USB4000_Handle->b_HighSpeed = TRUE;
+                }
+                else
+                {
+                    USB4000_Handle->b_HighSpeed = FALSE;        //FullSpeed
+                }
+              
+                USBH_UsrLog ("更新状态完成");
+                USB4000_Handle->e_State = USB4000_IDLE;  
+                return USBH_OK;
+
+            }
+            else if(URB_Status == USBH_URB_IDLE)
+            {
+                if(++uc_ErrCnt>=100)
+                {
+                    uc_ErrCnt = 0;
+                    USBH_UsrLog ("\r\nUSBH_URB_IDLE");
+                
+                    USBH_UsrLog ("更新状态失败");
+                    USBH_ClrFeature(phost,USB4000_Handle->OutEp1);
+                    USBH_ClrFeature(phost,USB4000_Handle->InEp1);
+                    USB4000_Handle->e_State = USB4000_SEND_DATA;
+                    //return USBH_FAIL;                
+                }
+            }
+            else if(URB_Status == USBH_URB_NOTREADY)
+            {
+                if(++uc_ErrCnt>=100)
+                {
+                    uc_ErrCnt = 0;
+                    USBH_UsrLog ("\r\nUSBH_URB_NOTREADY");
+                
+                    USBH_UsrLog ("更新状态失败");
+                    USBH_ClrFeature(phost,USB4000_Handle->OutEp1);
+                    USBH_ClrFeature(phost,USB4000_Handle->InEp1);
+                    USB4000_Handle->e_State = USB4000_SEND_DATA;
+                    //return USBH_FAIL;                
+                }
+            }
+            else
+                return USBH_FAIL;
+
+            break;  
+
+            
+        default:
+            break;
+        }
+    }
+    return USBH_OK;
+
+}
+//==================================================================================
+//| 函数名称 | USBH_USB4000_GetInformation
+//|----------|----------------------------------------------------------------------
+//| 函数功能 | USB4000 获取一条消息
+//|----------|----------------------------------------------------------------------
+//| 输入参数 | phost： 主机句柄
+//|----------|----------------------------------------------------------------------
+//| 返回参数 | 无
+//|----------|----------------------------------------------------------------------
+//| 函数设计 | wjb
+//==================================================================================
+static USBH_StatusTypeDef USBH_USB4000_GetInformation(USBH_HandleTypeDef *phost,INT8U Cmd,INT8U* auc_Buff)
+{
+    USB4000_HandleTypeDef *USB4000_Handle =  (USB4000_HandleTypeDef *) phost->pActiveClass->pData; 
+    USBH_URBStateTypeDef URB_Status = USBH_URB_IDLE;
+    OS_ERR os_err;
+    INT8U uc_SendBuff[2];
+    INT8U uc_ErrCnt = 0; 
+    void* pv_Msg = 0;
+    INT16U uin_Len = 0;
+    USB4000_Handle->e_State = USB4000_SEND_DATA;
+    HAL_Delay(1);  
+    while(phost->gState == HOST_CLASS)
+    {
+        switch(USB4000_Handle->e_State)
+        {
+        case USB4000_SEND_DATA:     //发送命令
+            uc_SendBuff[0] = 0x05;
+            uc_SendBuff[1] = Cmd;
+            USBH_BulkSendData(phost,uc_SendBuff,2,USB4000_Handle->OutPipe1,0);
+            USB4000_Handle->e_State = USB4000_WAIT_SEND;
+            break;
+                
+        case USB4000_WAIT_SEND:     //等待发送完成
+          
+            pv_Msg = OSTaskQPend(100,OS_OPT_PEND_BLOCKING,&uin_Len,NULL,&os_err);
+            if(os_err != OS_ERR_NONE)
+            {
+                USBH_ClrFeature(phost,USB4000_Handle->OutEp1);
+                USBH_ClrFeature(phost,USB4000_Handle->InEp1);
+                USBH_UsrLog ("超时");
+                return USBH_FAIL;
+            }
+            
+            if((INT32U)pv_Msg != USBH_URB_EVENT)
+                continue;
+          
+            URB_Status = USBH_LL_GetURBState(phost, USB4000_Handle->OutPipe1);
+            switch (URB_Status)
+            {
+            case USBH_URB_DONE:
+                USB4000_Handle->e_State = USB4000_GET_DATA;
+                break;
+            case USBH_URB_NOTREADY:
+                /* 重新发送 */
+                USB4000_Handle->e_State = USB4000_SEND_DATA;
+                break;
+            case USBH_URB_STALL:
+                return USBH_FAIL;
+                break;
+            default:
+                break;
+            }
+        case USB4000_GET_DATA:
+            HAL_Delay(1);
+            USBH_BulkReceiveData(phost, auc_Buff, 64, USB4000_Handle->InPipe1);
+            USB4000_Handle->e_State = USB4000_WAIT_GET;
+            break;
+        case USB4000_WAIT_GET:
+
+            pv_Msg = OSTaskQPend(100,OS_OPT_PEND_BLOCKING,&uin_Len,NULL,&os_err);
+            if(os_err != OS_ERR_NONE)
+            {                USBH_ClrFeature(phost,USB4000_Handle->OutEp1);
+                USBH_ClrFeature(phost,USB4000_Handle->OutEp1);
+                USBH_ClrFeature(phost,USB4000_Handle->InEp1);
+                USBH_UsrLog("请求信息失败 超时");
+                USB4000_Handle->e_State = USB4000_IDLE;
+                return USBH_FAIL;
+            }
+            
+            if((INT32U)pv_Msg != USBH_URB_EVENT)
+                continue;
+            
+            URB_Status = USBH_LL_GetURBState(phost, USB4000_Handle->InPipe1);
+      
+            if(URB_Status == USBH_URB_DONE)
+            {
+                USBH_UsrLog ("\r\nUSBH_URB_DONE");
+                if(auc_Buff[0] == uc_SendBuff[0] && auc_Buff[1] == uc_SendBuff[1])
+                {
+                    USBH_UsrLog ("请求信息完成 %u",Cmd);
+                    USB4000_Handle->e_State = USB4000_IDLE;  
+                    return USBH_OK;
+                }
+                else
+                {
+                    USBH_UsrLog ("请求信息失败 %u",Cmd);
+                    USBH_ClrFeature(phost,USB4000_Handle->OutEp1);
+                    USBH_ClrFeature(phost,USB4000_Handle->InEp1);
+
+                    USB4000_Handle->e_State = USB4000_IDLE;
+                    return USBH_FAIL;
+                }
+            }
+            else if(URB_Status == USBH_URB_IDLE)
+            {
+                if(++uc_ErrCnt>=10)
+                {
+                    USBH_UsrLog ("\r\nUSBH_URB_IDLE");
+                
+                    USBH_UsrLog ("请求信息失败");
+                    USBH_ClrFeature(phost,USB4000_Handle->OutEp1);
+                    USBH_ClrFeature(phost,USB4000_Handle->InEp1);
+                    USB4000_Handle->e_State = USB4000_IDLE;
+                    return USBH_FAIL;                
+                }
+            }
+            else if(URB_Status == USBH_URB_NOTREADY)
+            {
+                if(++uc_ErrCnt>=10)
+                {
+                    USBH_UsrLog ("\r\nUSBH_URB_NOTREADY");
+                
+                    USBH_UsrLog ("请求信息失败");
+                    USBH_ClrFeature(phost,USB4000_Handle->OutEp1);
+                    USBH_ClrFeature(phost,USB4000_Handle->InEp1);
+                    USB4000_Handle->e_State = USB4000_IDLE;
+                    return USBH_FAIL;                
+                }
+            }
+            else
+              return USBH_FAIL;
+            break;  
+        default:
+            break;
+        }
+    }
+    return USBH_OK;
+}
+//==================================================================================
+//| 函数名称 | USBH_USB4000_QueryInformation
+//|----------|----------------------------------------------------------------------
+//| 函数功能 | USB4000 获取所有的消息
+//|----------|----------------------------------------------------------------------
+//| 输入参数 | phost： 主机句柄
+//|----------|----------------------------------------------------------------------
+//| 返回参数 | 无
+//|----------|----------------------------------------------------------------------
+//| 函数设计 | wjb
+//==================================================================================
+static USBH_StatusTypeDef USBH_USB4000_QueryInformation(USBH_HandleTypeDef *phost)
+{
+    USB4000_HandleTypeDef *USB4000_Handle =  (USB4000_HandleTypeDef *) phost->pActiveClass->pData; 
+    INT8U   aauc_Str[31][64] = {0};
+      
+    for(int i = 0; i <= 18; )
+    {
+        if(USBH_OK == USBH_USB4000_GetInformation(phost,i,&aauc_Str[i][0]))
+        {
+            printf("信息%u = ",i);
+            printf((const char*)&aauc_Str[i][2]);
+            printf("\r\n");
+            i++;
+        }
+        else
+        {
+            OS_ERR os_err;
+            OSTimeDlyHMSM(0u, 0u, 0u, 100,
+                        OS_OPT_TIME_HMSM_STRICT ,/* 周期模式 */
+                        &os_err);
+            //USBH_ClrFeature(phost,USB4000_Handle->OutEp1);
+            //USBH_ClrFeature(phost,USB4000_Handle->InEp1);
+        }
+        
+        if(phost->gState != HOST_CLASS)
+            break;
+    } 
 }
 
 //==================================================================================
@@ -576,86 +932,12 @@ static USBH_StatusTypeDef USBH_USB4000_GetSpectrum(USBH_HandleTypeDef *phost)
             default:
                 break;
             }
+            break;
         case USB4000_GET_DATA:
             USBH_BulkReceiveData(phost, auc_Buff, 64, USB4000_Handle->InPipe2);
             USB4000_Handle->e_State = USB4000_WAIT_GET;
             break;
         case USB4000_WAIT_GET:
-#if 0
-        while(phost->gState == HOST_CLASS)
-        {
-            OSTaskQPend(0,OS_OPT_PEND_NON_BLOCKING,&uin_Len,NULL,&os_err);
-            if(os_err != OS_ERR_NONE)
-            {
-                USBH_ClrFeature(phost,USB4000_Handle->InEp2);
-                USBH_UsrLog ("超时");
-                return USBH_FAIL;
-            }
-            
-            URB_Status = USBH_LL_GetURBState(phost, USB4000_Handle->InPipe2);
-            
-            if(URB_Status == USBH_URB_DONE)
-            {
-                //USBH_UsrLog("Recv USBH_URB_DONE %u",USB4000_Handle->rx_count);
-                if(USB4000_Handle->rx_count >= 120)
-                {
-                    /* 接受成功 pack0~ pack120 rx = 121*/
-                    //USBH_USB4000_ProcessSpectrum(phost);
-                    if(auc_Buff[0] == 0x69)
-                    {
-                        USBH_UsrLog ("请求光谱完成 PackCount = %d", USB4000_Handle->rx_count);
-                        USB4000_Handle->rx_count = 0;   
-                        USB4000_Handle->e_State = USB4000_IDLE;                         
-                    }
-                    else
-                    {
-                        USBH_UsrLog("请求光谱失败");
-                        USB4000_Handle->rx_count = 0;   
-                        USB4000_Handle->e_State = USB4000_IDLE;  
-                    }
-                    return USBH_OK;
-                }
-                else
-                {
-                    uint16_t offset = (USB4000_Handle->rx_count) * 64;
-                    uint8_t* puc_buff = (uint8_t*)USB4000_Handle->pin_Spectrum;
-                      
-                    for(int i = 0 ; i < 64; i++)
-                    {
-                        puc_buff[offset+i] = auc_Buff[i];
-                    }
-                    
-                    USB4000_Handle->rx_count++; 
-                    USBH_BulkReceiveData(phost, auc_Buff, 64, USB4000_Handle->InPipe2);
-                }
-            }
-            else if(URB_Status == USBH_URB_STALL)
-            {
-                USBH_UsrLog("Recv USBH_URB_STALL");
-                return USBH_FAIL;
-            }
-            else if(URB_Status == USBH_URB_NOTREADY)
-            {
-                //USBH_UsrLog("Recv USBH_URB_NOTREADY");
-                /*
-                if(++uc_ErrCnt >= 10)
-                {
-                    USBH_UsrLog("Recv USBH_URB_NOTREADY OVER");
-                    return USBH_FAIL;
-                }*/
-            }
-            else if(URB_Status == USBH_URB_ERROR)
-            {
-                USBH_UsrLog("Recv USBH_URB_ERROR");
-                return USBH_FAIL;
-            }
-            else if(URB_Status == USBH_URB_IDLE)
-            {
-                //USBH_UsrLog("Recv USBH_URB_IDLE");
-            }       
-        }
-#endif
-#if 1
             pv_Msg = OSTaskQPend(100,OS_OPT_PEND_BLOCKING,&uin_Len,NULL,&os_err);
             if(os_err != OS_ERR_NONE)
             {
@@ -670,76 +952,7 @@ static USBH_StatusTypeDef USBH_USB4000_GetSpectrum(USBH_HandleTypeDef *phost)
                 continue;
             
             URB_Status = USBH_LL_GetURBState(phost, USB4000_Handle->InPipe2);
-#if 0        
-            switch (URB_Status)
-            {
-            case USBH_URB_DONE:
-                //USBH_UsrLog("Recv USBH_URB_DONE %u",USB4000_Handle->rx_count);
-                if(USB4000_Handle->rx_count >= 120)
-                {
-                    /* 接受成功 pack0~ pack120 rx = 121*/
-                    //USBH_USB4000_ProcessSpectrum(phost);
-                    if(auc_Buff[0] == 0x69)
-                    {
-                        USBH_UsrLog ("请求光谱完成");
-                        USB4000_Handle->rx_count = 0;   
-                        USB4000_Handle->e_State = USB4000_IDLE;                         
-                    }
-                    else
-                    {
-                        USBH_UsrLog("请求光谱失败");
-                        USB4000_Handle->rx_count = 0;   
-                        USB4000_Handle->e_State = USB4000_IDLE;  
-                    }
-                    return USBH_OK;
-                }
-                else
-                {
-                    uint16_t offset = (USB4000_Handle->rx_count) * 64;
-                    uint8_t* puc_buff = (uint8_t*)USB4000_Handle->pin_Spectrum;
-                    /**/ 
-                    for(int i = 0 ; i < 64; i++)
-                    {
-                        puc_buff[offset+i] = auc_Buff[i];
-                    }
-                    
-                    USBH_BulkReceiveData(phost, auc_Buff, 64, USB4000_Handle->InPipe2);
-                    USB4000_Handle->rx_count++; 
-                    uc_ErrCnt = 0;
-                }
-            
-                break;
-            case USBH_URB_STALL:
-                USBH_UsrLog("Recv USBH_URB_STALL");
-                USBH_UsrLog("请求光谱失败");
-                USB4000_Handle->rx_count = 0;   
-                USB4000_Handle->e_State = USB4000_IDLE;
-                return USBH_FAIL;
-            case USBH_URB_NOTREADY:
-                //USBH_UsrLog("Recv USBH_URB_NOTREADY");
-                if(++uc_ErrCnt >= 100)
-                {
-                    USBH_UsrLog("Recv USBH_URB_NOTREADY OVER");
-                    USBH_UsrLog("请求光谱失败");
-                    USB4000_Handle->rx_count = 0;   
-                    USB4000_Handle->e_State = USB4000_IDLE;
-                    return USBH_FAIL;
-                }
-                break;
-            case USBH_URB_ERROR:
-                USBH_UsrLog("Recv USBH_URB_ERROR");
-                USBH_UsrLog("请求光谱失败");
-                USB4000_Handle->rx_count = 0;   
-                USB4000_Handle->e_State = USB4000_IDLE; 
-                return USBH_FAIL;
-            case USBH_URB_IDLE:
-                return USBH_FAIL;
-            default:
-                break;
-            }
-
-#endif
-#if 1  
+  
             if(URB_Status == USBH_URB_DONE)
             {
                 //USBH_UsrLog("Recv USBH_URB_DONE %u",USB4000_Handle->rx_count);
@@ -808,8 +1021,6 @@ static USBH_StatusTypeDef USBH_USB4000_GetSpectrum(USBH_HandleTypeDef *phost)
             {
                 //USBH_UsrLog("Recv USBH_URB_IDLE");
             }
-#endif
-#endif
             break;  
         default:
             break;
@@ -818,75 +1029,17 @@ static USBH_StatusTypeDef USBH_USB4000_GetSpectrum(USBH_HandleTypeDef *phost)
     return USBH_OK;
 }
 
-static USBH_StatusTypeDef USBH_USB4000_QueryInformation(USBH_HandleTypeDef *phost)
-{
-    INT16U uin_Len;
-    OS_ERR os_err;
-  
-    USB4000_HandleTypeDef *USB4000_Handle =  (USB4000_HandleTypeDef *) phost->pActiveClass->pData; 
-    uint8_t buff[64] = {0};
-    
-    for(uint8_t i = 0; i < 31; i++)
-    {
-        buff[0] = 0x05;
-        buff[1] = i;
-        
-        /* 延时1ms 等到下个sof 在操作 */
-        //USB4000_Handle->sof_signal = FALSE;
-        //while(USB4000_Handle->sof_signal == FALSE){}
-        HAL_Delay(1);
-    
-        
-        /* 发送查询命令 */
-        USBH_BulkSendData(phost,buff,2,USB4000_Handle->OutPipe1,0);
-        OSTaskQPend(100,OS_OPT_PEND_BLOCKING,&uin_Len,NULL,&os_err);
-        if(os_err != OS_ERR_NONE)
-        {
-            USBH_ClrFeature(phost,USB4000_Handle->OutEp1);
-            USBH_UsrLog ("发送失败");
-            return USBH_FAIL;
-        }
-        
-        /* 延时1ms 等到下个sof 在读取 */
-        //USB4000_Handle->sof_signal = FALSE;
-        //while(USB4000_Handle->sof_signal == FALSE){}
-        HAL_Delay(1);
-    
-        
-        /* 请求接受数据 */ 
-        USBH_BulkReceiveData(phost, buff, 64, USB4000_Handle->InPipe1); 
-        OSTaskQPend(100,OS_OPT_PEND_BLOCKING,&uin_Len,NULL,&os_err);    
-      
-        if(os_err != OS_ERR_NONE)
-        {
-            USBH_ClrFeature(phost,USB4000_Handle->InEp1);
-            USBH_UsrLog ("接收超时");
-            return USBH_FAIL;
-        }
-
-        if(buff[1] >=1 && buff[1] <= 4)
-        {
-            uint8_t j = buff[1]-1;
-            USB4000_Handle->alf_WlcCoeff[j] = atof((const char *)&buff[2]);
-            USBH_UsrLog ("%d阶波长校正因子 = %04f",j,USB4000_Handle->alf_WlcCoeff[j] );
-        }
-       
-        if(buff[1] >=6 && buff[1] <= 13)
-        {
-            uint8_t j = buff[1]-6;
-            USB4000_Handle->alf_NlcCoeff[j] = atof((const char *)&buff[2]);
-            USBH_UsrLog ("%d阶非线性校正因子 = %04f",j,USB4000_Handle->alf_NlcCoeff[j] );
-        }
-        
-        if(buff[1] == 14)
-        {
-            USBH_UsrLog ("非线性 阶数");
-        }
-    }
-    
-    return USBH_OK;
-}
-
+//==================================================================================
+//| 函数名称 | USBH_USB4000_ProcessSpectrum
+//|----------|----------------------------------------------------------------------
+//| 函数功能 | USB4000 处理一张光谱
+//|----------|----------------------------------------------------------------------
+//| 输入参数 | phost： 主机句柄
+//|----------|----------------------------------------------------------------------
+//| 返回参数 | 无
+//|----------|----------------------------------------------------------------------
+//| 函数设计 | wjb
+//==================================================================================
 static USBH_StatusTypeDef USBH_USB4000_ProcessSpectrum(USBH_HandleTypeDef *phost)
 {
     USB4000_HandleTypeDef *USB4000_Handle =  (USB4000_HandleTypeDef *) phost->pActiveClass->pData;
@@ -1005,13 +1158,13 @@ static USBH_StatusTypeDef USBH_USB4000_ProcessSpectrum(USBH_HandleTypeDef *phost
             }
         }  
     
-        /* 通知上层 其他模块
+        /* 通知上层 其他模块*/
         OS_ERR  os_err;
         OSTaskQPost (&TaskGasProcTCB,
                      (void*)USB4000_Handle,
                      sizeof(USB4000_Handle),
                      OS_OPT_POST_FIFO,
-                     &os_err);*/
+                     &os_err);
     }
     
     return USBH_OK;
