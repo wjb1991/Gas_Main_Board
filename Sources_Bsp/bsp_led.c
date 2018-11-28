@@ -42,17 +42,6 @@ void  BSP_LedInit (void)
 {
     GPIO_InitTypeDef  gpio_init;
 
-    __HAL_RCC_GPIOG_CLK_ENABLE(); 
-    
-    gpio_init.Pin   = GPIO_PIN_6;
-    gpio_init.Mode  = GPIO_MODE_OUTPUT_PP;
-    gpio_init.Pull  = GPIO_PULLUP;
-    gpio_init.Speed = GPIO_SPEED_HIGH;
-    HAL_GPIO_Init(GPIOG, &gpio_init);
-    
-    HAL_GPIO_WritePin(GPIOG, GPIO_PIN_6, 1);
-
-    
 
     BSP_LED1_GPIO_CLK_ENABLE();                                 /* Enable GPIO clock for LED1(PF10)                     */
     BSP_LED2_GPIO_CLK_ENABLE();

@@ -212,7 +212,7 @@ USBH_StatusTypeDef USBH_BulkSendData (USBH_HandleTypeDef *phost,
     do_ping = 0U;
   }
 
-  return USBH_LL_SubmitURB (phost,                     /* Driver handle    */
+  USBH_LL_SubmitURB (phost,                     /* Driver handle    */
                           pipe_num,             /* Pipe index       */
                           0U,                    /* Direction : IN   */
                           USBH_EP_BULK,         /* EP type          */
@@ -220,7 +220,7 @@ USBH_StatusTypeDef USBH_BulkSendData (USBH_HandleTypeDef *phost,
                           buff,                 /* data buffer      */
                           length,               /* data length      */
                           do_ping);             /* do ping (HS Only)*/
-  //return USBH_OK;
+  return USBH_OK;
 }
 
 
@@ -238,7 +238,7 @@ USBH_StatusTypeDef USBH_BulkReceiveData(USBH_HandleTypeDef *phost,
                                 uint16_t length,
                                 uint8_t pipe_num)
 {
-  return USBH_LL_SubmitURB (phost,                     /* Driver handle    */
+  USBH_LL_SubmitURB (phost,                     /* Driver handle    */
                           pipe_num,             /* Pipe index       */
                           1U,                    /* Direction : IN   */
                           USBH_EP_BULK,         /* EP type          */
@@ -246,7 +246,7 @@ USBH_StatusTypeDef USBH_BulkReceiveData(USBH_HandleTypeDef *phost,
                           buff,                 /* data buffer      */
                           length,               /* data length      */
                           0U);
-  //return USBH_OK;
+  return USBH_OK;
 }
 
 

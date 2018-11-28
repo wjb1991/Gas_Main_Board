@@ -402,8 +402,8 @@ BOOL Bsp_UartOpen(Dev_SerialPort* pst_Dev)
     
     if(UartHandle->Init.Mode  == UART_MODE_TX_RX)
     {
-        Bsp_UsartTxEnable(pst_Dev);
-        Bsp_UsartRxEnable(pst_Dev);
+        //Bsp_UsartTxEnable(pst_Dev);
+        //Bsp_UsartRxEnable(pst_Dev);
     }
     else if(UartHandle->Init.Mode  == UART_MODE_TX)
     {
@@ -552,7 +552,6 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 #if (DEF_USE_COM2 == TRUE)
     if(huart->Instance == USART2)
     {
-#if 0
         /*##-1- Enable peripherals and GPIO Clocks #################################*/
         /* Enable GPIO TX/RX clock */
         __HAL_RCC_GPIOA_CLK_ENABLE();        
@@ -576,32 +575,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
         GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
 
         HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-#endif
-#if 1
-        /*##-1- Enable peripherals and GPIO Clocks #################################*/
-        /* Enable GPIO TX/RX clock */
-        __HAL_RCC_GPIOD_CLK_ENABLE();        
-        __HAL_RCC_GPIOD_CLK_ENABLE();
-          
-        /* Enable USARTx clock */
-        __HAL_RCC_USART2_CLK_ENABLE();       
-          
-        /*##-2- Configure peripheral GPIO ##########################################*/
-        /* UART TX GPIO pin configuration  */
-        GPIO_InitStruct.Pin       = GPIO_PIN_5;
-        GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
-        GPIO_InitStruct.Pull      = GPIO_PULLUP;
-        GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
-        GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
 
-        HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
-
-        /* UART RX GPIO pin configuration  */
-        GPIO_InitStruct.Pin       = GPIO_PIN_6;
-        GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
-
-        HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
-#endif
         /*##-3- Configure the NVIC for UART ########################################*/   
         /* NVIC for USARTx */
         HAL_NVIC_SetPriority(USART2_IRQn, 3, 1);
@@ -890,7 +864,6 @@ void Bsp_UartPrintf(const char * Format,...)
 
 int fputc(int ch, FILE *f)
 {
-    Bsp_UsartTxDisable(&COM1);
     while (!LL_USART_IsActiveFlag_TXE(USART1)){}
     LL_USART_TransmitData8(USART1, ch); 
     

@@ -183,9 +183,6 @@ void HAL_HCD_Disconnect_Callback(HCD_HandleTypeDef *hhcd)
 void HAL_HCD_HC_NotifyURBChange_Callback(HCD_HandleTypeDef *hhcd, uint8_t chnum, HCD_URBStateTypeDef urb_state)
 {
   /* To be used with OS to sync URB state with the global state machine */
-//#include "stdio.h"
-  //if(chnum < 2)
-  //  printf("chnum = %u urb_state = %u\r\n",chnum,urb_state);
 #if (USBH_USE_OS == 1)
   USBH_LL_NotifyURBChange(hhcd->pData);
 #endif

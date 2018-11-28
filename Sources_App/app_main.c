@@ -40,6 +40,7 @@ int main(void)
                  (void         *)0u,                                            /* 用户补充存储区 */
                  (OS_OPT        )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR| OS_OPT_TASK_SAVE_FP),
                  (OS_ERR       *)&err);                                         /* 存放错误值 */    
+
     
     OSStart(&err);                                              /* Start multitasking (i.e. give control to uC/OS-III). */
 
