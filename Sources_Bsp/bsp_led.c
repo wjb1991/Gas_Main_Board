@@ -13,7 +13,7 @@
 #define  BSP_LED2_GPIO_PORT                     GPIOE
 #define  BSP_LED2_GPIO_CLK_ENABLE()             __HAL_RCC_GPIOE_CLK_ENABLE(); 
 
-#define  BSP_RS485DE_GPIO_PIN                   GPIO_PIN_8
+#define  BSP_RS485DE_GPIO_PIN                   GPIO_PIN_4
 #define  BSP_RS485DE_GPIO_PORT                  GPIOA
 #define  BSP_RS485DE_GPIO_CLK_ENABLE()          __HAL_RCC_GPIOA_CLK_ENABLE(); 
 

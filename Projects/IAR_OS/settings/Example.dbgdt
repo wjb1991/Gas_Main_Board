@@ -990,7 +990,7 @@
             <IarPane-34109>
                 <expressions>
                     <item>pst_MasterPort</item>
-                    <item></item>
+                    <item />
                 </expressions>
                 <col-names>
                     <item>Expression</item>

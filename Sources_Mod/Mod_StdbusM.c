@@ -15,13 +15,13 @@
              
 #define STDBUS_DBG(x)                   printf(x)
 
-StdbusDev_t*   ast_PortList[DEF_STDBUS_PORTLIST_MAX];
+StdbusPort_t*   ast_PortList[DEF_STDBUS_PORTLIST_MAX];
 
 StdbusHost_t st_StdbusHost = {
-    ast_PortList,                   //pst_DevList
+    ast_PortList,                   //pst_PortList
     DEF_STDBUS_PORTLIST_MAX,        //uch_PortListLen
     0,                              //uch_UsePort
-    0,                              //uch_Address
+    DEF_STDBUS_HOST_ADDR,           //uch_Address
 };
 
 //==================================================================================
@@ -87,9 +87,9 @@ BOOL Mod_StdbusInit(StdbusHost_t* pst_Host,INT8U uch_Address)
 }
 
 //==================================================================================
-//| 函数名称 | Mod_StdbusRegDev
+//| 函数名称 | Mod_StdbusRegPort
 //|----------|----------------------------------------------------------------------
-//| 函数功能 | 注册一个设备
+//| 函数功能 | 注册一个端口到主机
 //|----------|----------------------------------------------------------------------
 //| 输入参数 | 无
 //|----------|----------------------------------------------------------------------
@@ -97,17 +97,45 @@ BOOL Mod_StdbusInit(StdbusHost_t* pst_Host,INT8U uch_Address)
 //|----------|----------------------------------------------------------------------
 //| 函数设计 | wjb
 //==================================================================================
-BOOL Mod_StdbusRegDev(StdbusHost_t* pst_Host, StdbusDev_t* pst_Dev)
+BOOL Mod_StdbusRegPort(StdbusHost_t* pst_Host, StdbusPort_t* pst_Port)
 {
-    if(pst_Dev == NULL || pst_Dev->pv_Handle == NULL || pst_Dev->puc_Buff == NULL)
+    if(pst_Port == NULL || pst_Port->pv_Handle == NULL || pst_Port->puc_Buff == NULL)
         return FALSE;
 
     if( pst_Host->uch_UsePort >= pst_Host->uch_PortListLen)
         return FALSE;
 
-    pst_Host->ppst_DevList[pst_Host->uch_UsePort++] = pst_Dev;
-    pst_Dev->pv_HostHandle = pst_Host;
+    pst_Host->ppst_PortList[pst_Host->uch_UsePort++] = pst_Port;
+    pst_Port->pv_HostHandle = pst_Host;
     
+    return TRUE;
+}
+
+//==================================================================================
+//| 函数名称 | Mod_StdbusRegDev
+//|----------|----------------------------------------------------------------------
+//| 函数功能 | 注册一个设备到端口
+//|----------|----------------------------------------------------------------------
+//| 输入参数 | 无
+//|----------|----------------------------------------------------------------------
+//| 返回参数 | 无
+//|----------|----------------------------------------------------------------------
+//| 函数设计 | wjb
+//==================================================================================
+BOOL Mod_StdbusRegDev(StdbusPort_t* pst_Port,StdbusDev_t* pst_Dev)
+{
+    StdbusHost_t* pst_Host = pst_Port->pv_HostHandle;
+    
+    if(pst_Dev == NULL || pst_Port == NULL || pst_Port->pv_Handle == NULL ||
+       pst_Port->ppst_DevList == NULL || pst_Port->uch_DevListLen == 0 )
+        return FALSE;
+
+    if( pst_Port->uch_DevUse >= pst_Port->uch_DevListLen)
+        return FALSE;
+    
+    pst_Port->ppst_DevList[pst_Port->uch_DevUse++] = pst_Dev;
+    pst_Dev->pv_PortHandle = pst_Port;
+    pst_Dev->puc_AddrList[0] = pst_Host->uch_Addr;
     return TRUE;
 }
 
@@ -122,25 +150,25 @@ BOOL Mod_StdbusRegDev(StdbusHost_t* pst_Host, StdbusDev_t* pst_Dev)
 //|----------|----------------------------------------------------------------------
 //| 函数设计 | wjb
 //==================================================================================
-void Mod_StdbusRscPack(StdbusDev_t* pst_Dev )
+void Mod_StdbusRscPack(StdbusPort_t* pst_Port )
 {
-    pst_Dev->pst_Fram.uch_Resv[0] = 0;
-    pst_Dev->pst_Fram.uch_Resv[1] = 0;
-    pst_Dev->pst_Fram.uch_Resv[2] = 0;
-    pst_Dev->pst_Fram.uch_Resv[3] = 0;
+    pst_Port->pst_Fram.uch_Resv[0] = 0;
+    pst_Port->pst_Fram.uch_Resv[1] = 0;
+    pst_Port->pst_Fram.uch_Resv[2] = 0;
+    pst_Port->pst_Fram.uch_Resv[3] = 0;
 
-    pst_Dev->pst_Fram.uch_AddrLen = 0;
-    pst_Dev->pst_Fram.uch_AddrIndex = 0;
-    pst_Dev->pst_Fram.puc_AddrList = 0;
+    pst_Port->pst_Fram.uch_AddrLen = 0;
+    pst_Port->pst_Fram.uch_AddrIndex = 0;
+    pst_Port->pst_Fram.puc_AddrList = 0;
 
-    pst_Dev->pst_Fram.uch_Cmd = 0;
-    pst_Dev->pst_Fram.uch_SubCmd = 0;
-    pst_Dev->pst_Fram.uin_PayLoadLenth =  0;
-    pst_Dev->pst_Fram.puc_PayLoad = 0;
+    pst_Port->pst_Fram.uch_Cmd = 0;
+    pst_Port->pst_Fram.uch_SubCmd = 0;
+    pst_Port->pst_Fram.uin_PayLoadLenth =  0;
+    pst_Port->pst_Fram.puc_PayLoad = 0;
 
-    pst_Dev->e_State = e_StdbusIdle;
-    pst_Dev->uch_LastByte = 0;
-    pst_Dev->uin_BuffLenth = 0;
+    pst_Port->e_State = e_StdbusIdle;
+    pst_Port->uch_LastByte = 0;
+    pst_Port->uin_BuffLenth = 0;
 }
 
 //==================================================================================
@@ -148,13 +176,13 @@ void Mod_StdbusRscPack(StdbusDev_t* pst_Dev )
 //|----------|----------------------------------------------------------------------
 //| 函数功能 | 处理一包数据
 //|----------|----------------------------------------------------------------------
-//| 输入参数 | StdbusDev_t 数据结构体
+//| 输入参数 | stdbusPort_tev_t 数据结构体
 //|----------|----------------------------------------------------------------------
 //| 返回参数 | 无
 //|----------|----------------------------------------------------------------------
 //| 函数设计 | wjb
 //==================================================================================
-void Mod_StdbusSend_Other(StdbusDev_t * pst_Dev)
+void Mod_StdbusSend_Other(StdbusPort_t * pst_Port)
 {
 
 }
@@ -170,55 +198,66 @@ void Mod_StdbusSend_Other(StdbusDev_t * pst_Dev)
 //|----------|----------------------------------------------------------------------
 //| 函数设计 | wjb
 //==================================================================================
-BOOL Mod_StdbusPortRecvOneByte(StdbusDev_t* pst_Dev,INT8U uch_Byte)
+void Mod_StdbusPortSendOneByte(StdbusPort_t * pst_Port)
 {
-    if(pst_Dev == NULL || pst_Dev->pv_Handle == NULL || pst_Dev->puc_Buff == NULL)
+    if(pst_Port->e_State == e_StdbusSend)
     {
-        return FALSE;
-    }
+        INT8U uch_data = 0;
+        
+        if (pst_Port->uin_BuffIndex == 0)
+        {
+            if( pst_Port->pv_Handle == (void *)&COM4)
+                Bsp_Rs485de(eRs485Trans);
 
-    if (pst_Dev->e_State == e_StdbusIdle)
-    {
-        if (uch_Byte == 0x7b)
+            pst_Port->uin_BuffIndex = 0;
+            Bsp_UartSend(pst_Port->pv_Handle,
+                        &pst_Port->puc_Buff[pst_Port->uin_BuffIndex++],
+                        1);
+            pst_Port->e_State == e_StdbusSend;
+        }
+        else if (pst_Port->uin_BuffIndex < pst_Port->uin_BuffLenth - 1 )
         {
-            Mod_StdbusRscPack(pst_Dev);                  //释放本端口的数据
-            pst_Dev->e_State = e_StdbusRecv;
-            pst_Dev->puc_Buff[pst_Dev->uin_BuffLenth++] = uch_Byte;
+            uch_data = pst_Port->puc_Buff[pst_Port->uin_BuffIndex++];
+            if (pst_Port->uch_LastByte == 0x7c)
+            {
+                uch_data ^= 0x7c;
+            }
+            else if(uch_data == 0x7b || uch_data == 0x7c|| uch_data == 0x7d)
+            {
+                uch_data = 0x7c;
+                pst_Port->uin_BuffIndex--;
+
+            }
+            pst_Port->uch_LastByte = uch_data;
+
+            Bsp_UartSend(pst_Port->pv_Handle,
+                          &uch_data,
+                          1);
+
+        }
+        else if (pst_Port->uin_BuffIndex < pst_Port->uin_BuffLenth )
+        {
+            uch_data = pst_Port->puc_Buff[pst_Port->uin_BuffIndex++];
+            Bsp_UartSend(pst_Port->pv_Handle,
+                          &uch_data,
+                          1);
+        }
+        else
+        {
+            if( pst_Port->pv_Handle == (void *)&COM4)
+                Bsp_Rs485de(eRs485Recv);
+
+            Mod_StdbusRscPack(pst_Port);                  //释放本端口的数据
+            //TRACE_DBG(">>DBG:       发送完成\r\n");
         }
     }
-    else if (pst_Dev->e_State == e_StdbusRecv)
-    {
-        if(pst_Dev->uin_BuffLenth <= pst_Dev->uin_BuffSize)
-        {
-            if (uch_Byte == 0x7d)                               //判断是否接受到帧尾
-            {
-                pst_Dev->e_State = e_StdbusRecved;
-                pst_Dev->puc_Buff[pst_Dev->uin_BuffLenth++] = uch_Byte;
-                PostMsg(pst_Dev);
-            }
-            else if (uch_Byte == 0x7b)                          //再次接收到帧头
-            {
-                Mod_StdbusRscPack(pst_Dev);                  //释放本端口的数据
-                pst_Dev->e_State = e_StdbusRecv;
-                pst_Dev->puc_Buff[pst_Dev->uin_BuffLenth++] = uch_Byte;
-            }
-            else                                                //其他情况
-            {
-                if(pst_Dev->uch_LastByte == 0x7c)
-                    pst_Dev->puc_Buff[pst_Dev->uin_BuffLenth-1] ^= uch_Byte;
-                else
-                    pst_Dev->puc_Buff[pst_Dev->uin_BuffLenth++] = uch_Byte;
-                pst_Dev->uch_LastByte =uch_Byte;
-            }
-        }
-    }
-    return TRUE;
 }
 
+
 //==================================================================================
-//| 函数名称 | Mod_StdbusFindPort
+//| 函数名称 | Mod_StdbusPortRecvOneByte
 //|----------|----------------------------------------------------------------------
-//| 函数功能 | 根据地址搜索端口
+//| 函数功能 | 端口处理一个字节的数据
 //|----------|----------------------------------------------------------------------
 //| 输入参数 | 无
 //|----------|----------------------------------------------------------------------
@@ -226,19 +265,79 @@ BOOL Mod_StdbusPortRecvOneByte(StdbusDev_t* pst_Dev,INT8U uch_Byte)
 //|----------|----------------------------------------------------------------------
 //| 函数设计 | wjb
 //==================================================================================
-StdbusDev_t* Mod_StdbusFindPort(StdbusHost_t * pst_Host,INT8U uch_FindAddr)
+BOOL Mod_StdbusPortRecvOneByte(StdbusPort_t* pst_Port,INT8U uch_Byte)
+{
+    if(pst_Port == NULL || pst_Port->pv_Handle == NULL || pst_Port->puc_Buff == NULL)
+    {
+        return FALSE;
+    }
+
+    if (pst_Port->e_State == e_StdbusIdle)
+    {
+        if (uch_Byte == 0x7b)
+        {
+            Mod_StdbusRscPack(pst_Port);                  //释放本端口的数据
+            pst_Port->e_State = e_StdbusRecv;
+            pst_Port->puc_Buff[pst_Port->uin_BuffLenth++] = uch_Byte;
+        }
+    }
+    else if (pst_Port->e_State == e_StdbusRecv)
+    {
+        if(pst_Port->uin_BuffLenth <= pst_Port->uin_BuffSize)
+        {
+            if (uch_Byte == 0x7d)                               //判断是否接受到帧尾
+            {
+                pst_Port->e_State = e_StdbusRecved;
+                pst_Port->puc_Buff[pst_Port->uin_BuffLenth++] = uch_Byte;
+                PostMsg(pst_Port);
+            }
+            else if (uch_Byte == 0x7b)                          //再次接收到帧头
+            {
+                Mod_StdbusRscPack(pst_Port);                  //释放本端口的数据
+                pst_Port->e_State = e_StdbusRecv;
+                pst_Port->puc_Buff[pst_Port->uin_BuffLenth++] = uch_Byte;
+            }
+            else                                                //其他情况
+            {
+                if(pst_Port->uch_LastByte == 0x7c)
+                    pst_Port->puc_Buff[pst_Port->uin_BuffLenth-1] ^= uch_Byte;
+                else
+                    pst_Port->puc_Buff[pst_Port->uin_BuffLenth++] = uch_Byte;
+                pst_Port->uch_LastByte =uch_Byte;
+            }
+        }
+    }
+    return TRUE;
+}
+
+//==================================================================================
+//| 函数名称 | Mod_StdbusFindDev
+//|----------|----------------------------------------------------------------------
+//| 函数功能 | 根据地址搜索设备
+//|----------|----------------------------------------------------------------------
+//| 输入参数 | 无
+//|----------|----------------------------------------------------------------------
+//| 返回参数 | 无
+//|----------|----------------------------------------------------------------------
+//| 函数设计 | wjb
+//==================================================================================
+StdbusDev_t* Mod_StdbusFindDev(StdbusPort_t * pst_Port,INT8U uch_FindAddr)
 {
     INT8U i = 0;
-    if(pst_Host == NULL || pst_Host->ppst_DevList == NULL ||  pst_Host->uch_UsePort == 0)
+    if(pst_Port == NULL || pst_Port->ppst_DevList == NULL ||  pst_Port->uch_DevUse == 0)
     {
         return NULL;
     }
 
-    for ( i = 0; i < pst_Host->uch_UsePort; i++)
+    for ( i = 0; i < pst_Port->uch_DevUse; i++)
     {
-        if (pst_Host->ppst_DevList[i]->uch_Addr == uch_FindAddr)
+        StdbusDev_t* pst_Dev = pst_Port->ppst_DevList[i];
+        if(pst_Dev == NULL || pst_Dev->puc_AddrList == NULL || pst_Dev->uch_AddrLen == 0)
+            continue;
+        
+        if (pst_Dev->puc_AddrList[pst_Dev->uch_AddrLen-1] == uch_FindAddr)
         {
-            return pst_Host->ppst_DevList[i];
+            return pst_Dev;
         }
     }
     return NULL;
@@ -255,27 +354,25 @@ StdbusDev_t* Mod_StdbusFindPort(StdbusHost_t * pst_Host,INT8U uch_FindAddr)
 //|----------|----------------------------------------------------------------------
 //| 函数设计 | wjb
 //==================================================================================
-BOOL Mod_StdbusDealFram(StdbusDev_t * pst_Dev)
+BOOL Mod_StdbusDealFram(StdbusPort_t * pst_Port)
 {
-    if(pst_Dev->pst_Fram.uch_SubCmd == e_StdbusReadCmd ||
-       pst_Dev->pst_Fram.uch_SubCmd == e_StdbusWriteCmd)
+    if(pst_Port->pst_Fram.uch_SubCmd == e_StdbusReadCmd ||
+       pst_Port->pst_Fram.uch_SubCmd == e_StdbusWriteCmd)
     {
         /* 其他设备访问本设备 直接搜索本机地址 搜索到端口后调用回调  */
-        StdbusDev_t* pst_MasterPort = Mod_StdbusFindPort(pst_Dev->pv_HostHandle,((StdbusHost_t*)pst_Dev->pv_HostHandle)->uch_Addr);
-        if(pst_MasterPort == NULL)
-            return FALSE;
-        if(pst_MasterPort->cb_DealFram != NULL)
-            return pst_MasterPort->cb_DealFram(&pst_Dev->pst_Fram);        //调用回调函数处理帧
+        return App_StdbusMasterDealFram(&pst_Port->pst_Fram);        //调用回调函数处理帧
     }
-    else if(pst_Dev->pst_Fram.uch_SubCmd == e_StdbusReadAck ||
-            pst_Dev->pst_Fram.uch_SubCmd == e_StdbusWriteAck)
+    else if(pst_Port->pst_Fram.uch_SubCmd == e_StdbusReadAck ||
+            pst_Port->pst_Fram.uch_SubCmd == e_StdbusWriteAck)
     {
-        /* 本设备访问其他设备后接受到的应答 搜索地址列表第一个地址 源地址 搜索到对应端口后调用回调*/
-        StdbusDev_t* pst_SlavePort = Mod_StdbusFindPort(pst_Dev->pv_HostHandle,pst_Dev->pst_Fram.puc_AddrList[0]);
-        if(pst_SlavePort == NULL)
+        /* 本设备访问其他设备后接受到的应答 搜索对应的设备 
+           搜索帧地址列表第一个地址 源地址 
+           设备地址列表的最后一个地址是才是那个设备的地址 */
+        StdbusDev_t* pst_Dev = Mod_StdbusFindDev(pst_Port,pst_Port->pst_Fram.puc_AddrList[0]);
+        if(pst_Dev == NULL)
             return FALSE;
-        if(pst_SlavePort->cb_DealFram != NULL)
-            return pst_SlavePort->cb_DealFram(&pst_Dev->pst_Fram);        //调用回调函数处理帧
+        if(pst_Dev->cb_DealFram != NULL)
+            return pst_Dev->cb_DealFram(&pst_Port->pst_Fram);        //调用回调函数处理帧 
     }
     return FALSE;
 }
@@ -291,41 +388,108 @@ BOOL Mod_StdbusDealFram(StdbusDev_t * pst_Dev)
 //|----------|----------------------------------------------------------------------
 //| 函数设计 | wjb
 //==================================================================================
-void Mod_StdbusMakePack(StdbusDev_t* pst_Dev)
+void Mod_StdbusMakePack(StdbusPort_t* pst_Port)
 {
     /* 改变puc_AddrList的长度可能出现数据覆盖需注意！！*/
     uint16_t i = 0,j = 0 ,crc16 = 0;
 
-    pst_Dev->puc_Buff[i++] = 0x7b;
+    pst_Port->puc_Buff[i++] = 0x7b;
 
-    pst_Dev->puc_Buff[i++] = pst_Dev->pst_Fram.uch_Resv[0];
-    pst_Dev->puc_Buff[i++] = pst_Dev->pst_Fram.uch_Resv[1];
-    pst_Dev->puc_Buff[i++] = pst_Dev->pst_Fram.uch_Resv[2];
-    pst_Dev->puc_Buff[i++] = pst_Dev->pst_Fram.uch_Resv[3];
+    pst_Port->puc_Buff[i++] = pst_Port->pst_Fram.uch_Resv[0];
+    pst_Port->puc_Buff[i++] = pst_Port->pst_Fram.uch_Resv[1];
+    pst_Port->puc_Buff[i++] = pst_Port->pst_Fram.uch_Resv[2];
+    pst_Port->puc_Buff[i++] = pst_Port->pst_Fram.uch_Resv[3];
 
-    pst_Dev->puc_Buff[i++] = pst_Dev->pst_Fram.uch_AddrLen;
-    pst_Dev->puc_Buff[i++] = pst_Dev->pst_Fram.uch_AddrIndex;
+    pst_Port->puc_Buff[i++] = pst_Port->pst_Fram.uch_AddrLen;
+    pst_Port->puc_Buff[i++] = pst_Port->pst_Fram.uch_AddrIndex;
 
-    for( j = 0; j < pst_Dev->pst_Fram.uch_AddrLen; j++)
-        pst_Dev->puc_Buff[i++] = pst_Dev->pst_Fram.puc_AddrList[j];
+    for( j = 0; j < pst_Port->pst_Fram.uch_AddrLen; j++)
+        pst_Port->puc_Buff[i++] = pst_Port->pst_Fram.puc_AddrList[j];
 
-    pst_Dev->puc_Buff[i++] = pst_Dev->pst_Fram.uch_Cmd;
-    pst_Dev->puc_Buff[i++] = pst_Dev->pst_Fram.uch_SubCmd;
-    pst_Dev->puc_Buff[i++] = (uint8_t)(pst_Dev->pst_Fram.uin_PayLoadLenth>>8);
-    pst_Dev->puc_Buff[i++] = (uint8_t)(pst_Dev->pst_Fram.uin_PayLoadLenth&0xff);
+    pst_Port->puc_Buff[i++] = pst_Port->pst_Fram.uch_Cmd;
+    pst_Port->puc_Buff[i++] = pst_Port->pst_Fram.uch_SubCmd;
+    pst_Port->puc_Buff[i++] = (uint8_t)(pst_Port->pst_Fram.uin_PayLoadLenth>>8);
+    pst_Port->puc_Buff[i++] = (uint8_t)(pst_Port->pst_Fram.uin_PayLoadLenth&0xff);
 
-    for( j = 0; j < pst_Dev->pst_Fram.uin_PayLoadLenth; j++)
-        pst_Dev->puc_Buff[i++] = pst_Dev->pst_Fram.puc_PayLoad[j];
+    for( j = 0; j < pst_Port->pst_Fram.uin_PayLoadLenth; j++)
+        pst_Port->puc_Buff[i++] = pst_Port->pst_Fram.puc_PayLoad[j];
 
-    GetCrc16Bit(pst_Dev->puc_Buff + 1,i-1, &crc16);
-    pst_Dev->puc_Buff[i++] = (uint8_t)(crc16 >> 8);
-    pst_Dev->puc_Buff[i++] = (uint8_t)(crc16 );
+    GetCrc16Bit(pst_Port->puc_Buff + 1,i-1, &crc16);
+    pst_Port->puc_Buff[i++] = (uint8_t)(crc16 >> 8);
+    pst_Port->puc_Buff[i++] = (uint8_t)(crc16 );
 
-    pst_Dev->puc_Buff[i++] = 0x7d;
-    pst_Dev->uin_BuffLenth = i;
+    pst_Port->puc_Buff[i++] = 0x7d;
+    pst_Port->uin_BuffLenth = i;
 
-    pst_Dev->e_State = e_StdbusSend;
-    //Send_ComPack(pst_Fram);
+    pst_Port->e_State = e_StdbusSend;
+    pst_Port->uin_BuffIndex = 0;
+    Mod_StdbusPortSendOneByte(pst_Port);
+}
+
+//==================================================================================
+//| 函数名称 | Mod_StdbusWriteCmd
+//|----------|----------------------------------------------------------------------
+//| 函数功能 | 组帧并发送
+//|----------|----------------------------------------------------------------------
+//| 输入参数 | Stdbus数据结构体
+//|----------|----------------------------------------------------------------------
+//| 返回参数 | 无
+//|----------|----------------------------------------------------------------------
+//| 函数设计 | wjb
+//==================================================================================
+void Mod_StdbusWriteCmd(StdbusDev_t* pst_Dev,INT8U uch_Cmd,INT8U* puc_Payload, INT16U puc_PayloadLen)
+{   
+    StdbusPort_t* pst_Port = pst_Dev->pv_PortHandle;
+    
+    pst_Port->pst_Fram.uch_Resv[0] = 0;                             /*保留*/
+    pst_Port->pst_Fram.uch_Resv[1] = 0;                            
+    pst_Port->pst_Fram.uch_Resv[2] = 0;                            
+    pst_Port->pst_Fram.uch_Resv[3] = 0;                            
+                                                                   
+    pst_Port->pst_Fram.puc_AddrList = pst_Dev->puc_AddrList;       /*地址列表*/
+    pst_Port->pst_Fram.uch_AddrLen = pst_Dev->uch_AddrLen;         /*地址列表长度*/
+    pst_Port->pst_Fram.uch_AddrIndex = 1;                          /*当前位置*/
+                                                                   
+    pst_Port->pst_Fram.uch_Cmd = uch_Cmd;                          /*功能命令*/
+    pst_Port->pst_Fram.uch_SubCmd = e_StdbusWriteCmd;              /*辅助命令 0x55 0x66 0xaa 0x99*/
+                                                                   
+    pst_Port->pst_Fram.uin_PayLoadLenth = puc_PayloadLen;          /*数据载荷长度*/
+    pst_Port->pst_Fram.puc_PayLoad = puc_Payload;                  /*数据载荷*/
+    
+    Mod_StdbusMakePack(pst_Port);
+}
+
+//==================================================================================
+//| 函数名称 | Mod_StdbusReadCmd
+//|----------|----------------------------------------------------------------------
+//| 函数功能 | 组帧并发送
+//|----------|----------------------------------------------------------------------
+//| 输入参数 | Stdbus数据结构体
+//|----------|----------------------------------------------------------------------
+//| 返回参数 | 无
+//|----------|----------------------------------------------------------------------
+//| 函数设计 | wjb
+//==================================================================================
+void Mod_StdbusReadCmd(StdbusDev_t* pst_Dev,INT8U uch_Cmd,INT8U* puc_Payload, INT16U puc_PayloadLen)
+{   
+    StdbusPort_t* pst_Port = pst_Dev->pv_PortHandle;
+    
+    pst_Port->pst_Fram.uch_Resv[0] = 0;                             /*保留*/
+    pst_Port->pst_Fram.uch_Resv[1] = 0;                            
+    pst_Port->pst_Fram.uch_Resv[2] = 0;                            
+    pst_Port->pst_Fram.uch_Resv[3] = 0;                            
+                                                                   
+    pst_Port->pst_Fram.puc_AddrList = pst_Dev->puc_AddrList;       /*地址列表*/
+    pst_Port->pst_Fram.uch_AddrLen = pst_Dev->uch_AddrLen;         /*地址列表长度*/
+    pst_Port->pst_Fram.uch_AddrIndex = 1;                          /*当前位置*/
+                                                                   
+    pst_Port->pst_Fram.uch_Cmd = uch_Cmd;                          /*功能命令*/
+    pst_Port->pst_Fram.uch_SubCmd = e_StdbusReadCmd;               /*辅助命令 0x55 0x66 0xaa 0x99*/
+                                                                   
+    pst_Port->pst_Fram.uin_PayLoadLenth = puc_PayloadLen;          /*数据载荷长度*/
+    pst_Port->pst_Fram.puc_PayLoad = puc_Payload;                  /*数据载荷*/
+    
+    Mod_StdbusMakePack(pst_Port);
 }
 
 //==================================================================================
@@ -339,62 +503,60 @@ void Mod_StdbusMakePack(StdbusDev_t* pst_Dev)
 //|----------|----------------------------------------------------------------------
 //| 函数设计 | wjb
 //==================================================================================
-void Mod_StdbusDealPack(StdbusDev_t* pst_Dev)
+void Mod_StdbusDealPack(StdbusPort_t* pst_Port)
 {
     INT16U i = 1;
 
-    pst_Dev->pst_Fram.uch_Resv[0]     = pst_Dev->puc_Buff[i++];
-    pst_Dev->pst_Fram.uch_Resv[1]     = pst_Dev->puc_Buff[i++];
-    pst_Dev->pst_Fram.uch_Resv[2]     = pst_Dev->puc_Buff[i++];
-    pst_Dev->pst_Fram.uch_Resv[3]     = pst_Dev->puc_Buff[i++];
+    pst_Port->pst_Fram.uch_Resv[0]     = pst_Port->puc_Buff[i++];
+    pst_Port->pst_Fram.uch_Resv[1]     = pst_Port->puc_Buff[i++];
+    pst_Port->pst_Fram.uch_Resv[2]     = pst_Port->puc_Buff[i++];
+    pst_Port->pst_Fram.uch_Resv[3]     = pst_Port->puc_Buff[i++];
 
-    pst_Dev->pst_Fram.uch_AddrLen     = pst_Dev->puc_Buff[i++];
-    pst_Dev->pst_Fram.uch_AddrIndex   = pst_Dev->puc_Buff[i++];
-    pst_Dev->pst_Fram.puc_AddrList    = &pst_Dev->puc_Buff[i];
+    pst_Port->pst_Fram.uch_AddrLen     = pst_Port->puc_Buff[i++];
+    pst_Port->pst_Fram.uch_AddrIndex   = pst_Port->puc_Buff[i++];
+    pst_Port->pst_Fram.puc_AddrList    = &pst_Port->puc_Buff[i];
 
-    i += pst_Dev->pst_Fram.uch_AddrLen;
+    i += pst_Port->pst_Fram.uch_AddrLen;
 
-    pst_Dev->pst_Fram.uch_Cmd         = pst_Dev->puc_Buff[i++];
-    pst_Dev->pst_Fram.uch_SubCmd      = pst_Dev->puc_Buff[i++];
-    pst_Dev->pst_Fram.uin_PayLoadLenth    =  (uint16_t)(pst_Dev->puc_Buff[i++]<<8);
-    pst_Dev->pst_Fram.uin_PayLoadLenth    +=  pst_Dev->puc_Buff[i++];
-    pst_Dev->pst_Fram.puc_PayLoad         =  &pst_Dev->puc_Buff[i];
+    pst_Port->pst_Fram.uch_Cmd         = pst_Port->puc_Buff[i++];
+    pst_Port->pst_Fram.uch_SubCmd      = pst_Port->puc_Buff[i++];
+    pst_Port->pst_Fram.uin_PayLoadLenth    =  (uint16_t)(pst_Port->puc_Buff[i++]<<8);
+    pst_Port->pst_Fram.uin_PayLoadLenth    +=  pst_Port->puc_Buff[i++];
+    pst_Port->pst_Fram.puc_PayLoad         =  &pst_Port->puc_Buff[i];
 
     //判断是否是最末节点
-    if(pst_Dev->pst_Fram.puc_AddrList[pst_Dev->pst_Fram.uch_AddrIndex] !=
-        ((StdbusHost_t*)pst_Dev->pv_HostHandle)->uch_Addr)
+    if(pst_Port->pst_Fram.puc_AddrList[pst_Port->pst_Fram.uch_AddrIndex] !=
+        ((StdbusHost_t*)pst_Port->pv_HostHandle)->uch_Addr)
     {
         //转发到其他端口
         STDBUS_DBG(">>STDBUS DBG:   不是最末节点转发到下一个节点\r\n");
-        Mod_StdbusSend_Other(pst_Dev);
-        Mod_StdbusRscPack(pst_Dev);                    //释放本端口的数据
+        Mod_StdbusSend_Other(pst_Port);
+        Mod_StdbusRscPack(pst_Port);                    //释放本端口的数据
     }
     else
     {
         //其他设备访问本设备 到App层去解析
         STDBUS_DBG(">>STDBUS DBG:   其他设备访问本设备 到App层去解析\r\n");
-        if(TRUE == Mod_StdbusDealFram(pst_Dev))
+        if(TRUE == Mod_StdbusDealFram(pst_Port))
         {
             int i = 0;
             //翻转地址列表 原路返回
-            for(i = 0 ; i < pst_Dev->pst_Fram.uch_AddrLen/2; i++)
+            for(i = 0 ; i < pst_Port->pst_Fram.uch_AddrLen/2; i++)
             {
-                uint8_t uch_temp = pst_Dev->pst_Fram.puc_AddrList[pst_Dev->pst_Fram.uch_AddrLen -1 -i];
-                pst_Dev->pst_Fram.puc_AddrList[pst_Dev->pst_Fram.uch_AddrLen -1 -i] = pst_Dev->pst_Fram.puc_AddrList[i];    //len = 4 0<>3 1<>2 // len = 5  0<>4 1<>3
-                pst_Dev->pst_Fram.puc_AddrList[i] = uch_temp;
+                uint8_t uch_temp = pst_Port->pst_Fram.puc_AddrList[pst_Port->pst_Fram.uch_AddrLen -1 -i];
+                pst_Port->pst_Fram.puc_AddrList[pst_Port->pst_Fram.uch_AddrLen -1 -i] = pst_Port->pst_Fram.puc_AddrList[i];    //len = 4 0<>3 1<>2 // len = 5  0<>4 1<>3
+                pst_Port->pst_Fram.puc_AddrList[i] = uch_temp;
             }
-            pst_Dev->pst_Fram.uch_AddrIndex = 1;           //从第一个地址位置开始
-            pst_Dev->pst_Fram.uch_SubCmd ^= 0xff;          //取反命令码
-            Mod_StdbusMakePack(pst_Dev);
+            pst_Port->pst_Fram.uch_AddrIndex = 1;           //从第一个地址位置开始
+            pst_Port->pst_Fram.uch_SubCmd ^= 0xff;          //取反命令码
+            Mod_StdbusMakePack(pst_Port);
         }
         else
         {
             //不需要回复
-            Mod_StdbusRscPack(pst_Dev);                    //释放本端口的数据
+            Mod_StdbusRscPack(pst_Port);                    //释放本端口的数据
         }
     }
-
-
 }
 
 //==================================================================================
@@ -410,24 +572,30 @@ void Mod_StdbusDealPack(StdbusDev_t* pst_Dev)
 //==================================================================================
 void Mod_StdbusPoll(void)
 {
-    StdbusDev_t * pst_Dev = (StdbusDev_t*)PendMsg();
+    StdbusPort_t * pst_Port = (StdbusPort_t*)PendMsg();
 
-    if(pst_Dev != NULL)
+    if(pst_Port != NULL)
     {
         INT16U  uin_crc16;
 
         STDBUS_DBG(">>STDBUS DBG:   接受完成\r\n");
-        GetCrc16Bit(pst_Dev->puc_Buff + 1,pst_Dev->uin_BuffLenth - 2,&uin_crc16);
+        GetCrc16Bit(pst_Port->puc_Buff + 1,pst_Port->uin_BuffLenth - 2,&uin_crc16);
         if (uin_crc16 == 0)
         {
             STDBUS_DBG(">>STDBUS DBG:   CRC校验通过\r\n");
             //CRC校验通过
-            Mod_StdbusDealPack(pst_Dev);
+            Mod_StdbusDealPack(pst_Port);
         }
         else
         {
             STDBUS_DBG(">>STDBUS DBG:   CRC校验不通过\r\n");
-            Mod_StdbusRscPack(pst_Dev);                  //释放本端口的数据
+            Mod_StdbusRscPack(pst_Port);                  //释放本端口的数据
         }
     }
 }
+
+__weak BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)  //处理函数
+{
+    return FALSE;
+}
+

@@ -875,7 +875,7 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
 void Bsp_UartPrintf(const char * Format,...)
 {
     static INT8U    auch_PrintfBuff[100] = {0};
-	Dev_SerialPort* p = &COM1;      //打印串口更改此处
+	Dev_SerialPort* p = &COM4;      //打印串口更改此处
 	while(p->uin_TxLen != 0){}      //等待发送完成 
     
 	va_list pArgs;
@@ -891,8 +891,8 @@ void Bsp_UartPrintf(const char * Format,...)
 
 int fputc(int ch, FILE *f)
 {
-    //while (!LL_USART_IsActiveFlag_TXE(USART2)){}
-    //LL_USART_TransmitData8(USART2, ch); 
+    while (!LL_USART_IsActiveFlag_TXE(USART1)){}
+    LL_USART_TransmitData8(USART1, ch); 
     
     //while (!LL_USART_IsActiveFlag_TC(USART2)){}
     //LL_USART_ClearFlag_TC(USART2);

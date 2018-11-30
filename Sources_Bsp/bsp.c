@@ -38,7 +38,7 @@ void  Bsp_Init (void)
     Bsp_UartOpen(&COM1); 
     
     /**/
-    COM2.ul_BaudRate   = 230400;
+    COM2.ul_BaudRate   = 115200;
     COM2.ul_WordLength = UART_WORDLENGTH_8B;
     COM2.ul_StopBits   = UART_STOPBITS_1;
     COM2.ul_Parity     = UART_PARITY_NONE;
@@ -55,14 +55,14 @@ void  Bsp_Init (void)
     COM3.ul_Mode       = UART_MODE_TX_RX;
     Bsp_UartOpen(&COM3);*/
     
-    /* COM4->RS485 
+    /* COM4->RS485 */
     COM4.ul_BaudRate   = 115200;
     COM4.ul_WordLength = UART_WORDLENGTH_8B;
     COM4.ul_StopBits   = UART_STOPBITS_1;
     COM4.ul_Parity     = UART_PARITY_NONE;
     COM4.ul_HwFlowCtl  = UART_HWCONTROL_NONE;
     COM4.ul_Mode       = UART_MODE_TX_RX;
-    Bsp_UartOpen(&COM4);*/
+    Bsp_UartOpen(&COM4);
     
     /* COM6->上位机接口 */
     COM6.ul_BaudRate   = 230400;

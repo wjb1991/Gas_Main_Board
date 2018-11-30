@@ -19,6 +19,8 @@
 
 #include  "task_cml.h"
 
+#include  "Mod_Include.h"
+
 #include  "app_save.h"
 
 //==================================================================================
@@ -30,6 +32,7 @@
 #define  TASK_GREYPROC_PRIO             6u
 
 #define  TASK_STDBUS_PRIO               10u
+#define  TASK_DISBOARD_PRIO             11u
 
 #define  TASK_CML_RECV_PRIO             20u
 #define  TASK_CML_SEND_PRIO             21u
@@ -45,7 +48,7 @@
 #define  TASK_CML_RECV_STK_SIZE         256u
 #define  TASK_USB_HOST_STK_SIZE         2048u
 #define  TASK_STDBUS_STK_SIZE           512u
-
+#define  TASK_DISBOARD_STK_SIZE         256u
 
 //==================================================================================
 //                                   任务控制块声明
@@ -56,7 +59,7 @@ extern  OS_TCB       TaskCmlSendTCB;         /*  命令行调试任务    */
 extern  OS_TCB       TaskCmlRecvTCB;         /*  命令行调试任务    */
 extern  OS_TCB       TaskUsbHostTCB;         /*  Usb光谱仪通讯任务    */
 extern  OS_TCB       TaskStdBusTCB;          /*  STDBUS任务    */
-
+extern  OS_TCB       TaskDisBoardTCB;        /*  显示板任务    */
 //==================================================================================
 //                                   任务堆栈声明
 //==================================================================================
@@ -66,7 +69,7 @@ extern  CPU_STK      TaskCmlSendStk [TASK_CML_SEND_STK_SIZE];               /*  
 extern  CPU_STK      TaskCmlRecvStk [TASK_CML_RECV_STK_SIZE];               /*  命令行调试任务    */
 extern  CPU_STK      TaskUsbHostStk [TASK_USB_HOST_STK_SIZE];               /*  光谱仪任务    */
 extern  CPU_STK      TaskStdBusStk  [TASK_STDBUS_STK_SIZE];                 /*  STDBUS任务    */
-
+extern  CPU_STK      TaskDisBoardStk[TASK_DISBOARD_STK_SIZE];               /*  显示板任务    */
 
 //==================================================================================
 //                                   任务函数声明
@@ -77,7 +80,7 @@ extern void Task_TransCml (void  *p_arg);            /*  命令行调试任务    */
 extern void Task_RecvCml (void  *p_arg);             /*  命令行调试任务    */
 extern void Task_UsbHost (void  *p_arg);             /*  Usb光谱仪通讯任务 */
 extern void Task_StdBus (void  *p_arg);              /*  STDBUS总线通讯    */
-
+extern void Task_DisBoard (void *p_arg);             /*  显示板任务    */
 
 //==================================================================================
 //                                   队列声明

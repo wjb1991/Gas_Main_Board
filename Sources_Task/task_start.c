@@ -10,6 +10,7 @@ OS_TCB       TaskCmlSendTCB;                                    /*  命令行调试任
 OS_TCB       TaskCmlRecvTCB;                                    /*  命令行调试任务    */
 OS_TCB       TaskUsbHostTCB;                                    /*  Usb光谱仪通讯任务    */
 OS_TCB       TaskStdBusTCB;                                     /*  STDBUS任务    */
+OS_TCB       TaskDisBoardTCB;                                      /*  显示板任务    */
 
 //==================================================================================
 //                                   任务堆栈定义
@@ -21,6 +22,7 @@ CPU_STK      TaskCmlSendStk [TASK_CML_SEND_STK_SIZE];           /*  命令行调试任
 CPU_STK      TaskCmlRecvStk [TASK_CML_RECV_STK_SIZE];           /*  命令行调试任务    */
 CPU_STK      TaskUsbHostStk [TASK_USB_HOST_STK_SIZE];           /*  光谱仪任务    */
 CPU_STK      TaskStdBusStk  [TASK_STDBUS_STK_SIZE];             /*  STDBUS任务    */
+CPU_STK      TaskDisBoardStk[TASK_DISBOARD_STK_SIZE];           /*  显示板任务    */
 //==================================================================================
 //                                   任务函数定义
 //==================================================================================
@@ -31,6 +33,8 @@ void Task_CmlSend (void  *p_arg);                               /*  命令行调试任
 void Task_CmlRecv (void  *p_arg);                               /*  命令行调试任务    */
 void Task_Host (void  *p_arg);                                  /*  Usb光谱仪通讯任务 */
 void Task_StdBus (void *p_arg);                                 /*  STDBUS任务    */
+void Task_DisBoard (void *p_arg);                               /*  显示板任务    */
+
 /*  信号量     */
 #if (OS_CFG_SEM_EN > 0u)
 OS_SEM       Sem_CmlSend;                                       /*  命令行发送计数信号量    */
@@ -165,6 +169,27 @@ void AppTaskCreate (void)
                  (OS_ERR       *)&os_err);                                      /* 存放错误值 */
     
 #endif
+    
+#if 1
+    /* 显示板任务 */
+    OSTaskCreate((OS_TCB       *)&TaskDisBoardTCB,                                /* 创建任务控制块 */
+                 (CPU_CHAR     *)"DisBorad Task",                                 /* 任务名称 */
+                 (OS_TASK_PTR   )Task_DisBoard,                                   /* 任务函数 */    
+                 (void         *)0u,                                            /* 任务入参 */
+                 (OS_PRIO       )TASK_DISBOARD_PRIO,                              /* 任务优先级 */
+                 (CPU_STK      *)&TaskDisBoardStk[0u],                            /* 任务堆载地址 */    
+                 (CPU_STK_SIZE  )TASK_DISBOARD_STK_SIZE / 10u,                    /* 任务栈深限制 */        
+                 (CPU_STK_SIZE  )TASK_DISBOARD_STK_SIZE,                          /* 任务堆栈大小 */ 
+                 (OS_MSG_QTY    )100u,                                           /* 内部消息队列的最大消息数目 */
+                 (OS_TICK       )0u,                                            /* 时间片轮询的时间片数 */
+                 (void         *)0u,                                            /* 用户补充存储区 */
+                 (OS_OPT        )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_SAVE_FP),
+                 (OS_ERR       *)&os_err);                                      /* 存放错误值 */
+    
+#endif
+    
+    
+    
 #if 0
     /* 紫外处理光谱仪 */
     OSTaskCreate((OS_TCB       *)&TaskGasProcTCB,                               /* 创建任务控制块 */

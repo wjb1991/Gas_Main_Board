@@ -28,22 +28,9 @@ void Task_StdBus (void *p_arg)
 {
     //OS_ERR  os_err;
     Mod_StdbusMasterInit();
+    Mod_StdbusSlaveInit();
     while(1)
     {
         Mod_StdbusPoll();
     }
 }
-/*
-void Task_StdBus (void *p_arg)
-{
-    //OS_ERR  os_err;
-    StdBus_Init(0x30);
-  
-    while(1)
-    {
-        BSP_Led2Toggle();
-        StdbusPoll();
-    }
-}
-*/
-
