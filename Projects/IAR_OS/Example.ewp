@@ -2208,12 +2208,15 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\Sources_Mod\mod_stdbus.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\Sources_Mod\Mod_StdbusM.c</name>
             <excluded>
                 <configuration>Debug</configuration>
             </excluded>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\Sources_Mod\Mod_StdbusM.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\Sources_Mod\Mod_StdbusMaster.c</name>
         </file>
     </group>
     <group>

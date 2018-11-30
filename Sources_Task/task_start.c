@@ -148,7 +148,7 @@ void AppTaskCreate (void)
 #endif 
     
     
-#if 0
+#if 1
     /* STDBUS */
     OSTaskCreate((OS_TCB       *)&TaskStdBusTCB,                                /* 创建任务控制块 */
                  (CPU_CHAR     *)"StdBus Task",                                 /* 任务名称 */

@@ -10,7 +10,7 @@
 
 
 #include "app_cfg.h"
-#include "mod_stdbus.h"
+#include "mod_stdbusm.h"
 
                
 //==================================================================================
@@ -27,6 +27,16 @@
 void Task_StdBus (void *p_arg)
 {
     //OS_ERR  os_err;
+    Mod_StdbusMasterInit();
+    while(1)
+    {
+        Mod_StdbusPoll();
+    }
+}
+/*
+void Task_StdBus (void *p_arg)
+{
+    //OS_ERR  os_err;
     StdBus_Init(0x30);
   
     while(1)
@@ -35,5 +45,5 @@ void Task_StdBus (void *p_arg)
         StdbusPoll();
     }
 }
-
+*/
 

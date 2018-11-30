@@ -402,8 +402,8 @@ BOOL Bsp_UartOpen(Dev_SerialPort* pst_Dev)
     
     if(UartHandle->Init.Mode  == UART_MODE_TX_RX)
     {
-        //Bsp_UsartTxEnable(pst_Dev);
-        //Bsp_UsartRxEnable(pst_Dev);
+        Bsp_UsartTxEnable(pst_Dev);
+        Bsp_UsartRxEnable(pst_Dev);
     }
     else if(UartHandle->Init.Mode  == UART_MODE_TX)
     {
@@ -891,8 +891,8 @@ void Bsp_UartPrintf(const char * Format,...)
 
 int fputc(int ch, FILE *f)
 {
-    while (!LL_USART_IsActiveFlag_TXE(USART2)){}
-    LL_USART_TransmitData8(USART2, ch); 
+    //while (!LL_USART_IsActiveFlag_TXE(USART2)){}
+    //LL_USART_TransmitData8(USART2, ch); 
     
     //while (!LL_USART_IsActiveFlag_TC(USART2)){}
     //LL_USART_ClearFlag_TC(USART2);

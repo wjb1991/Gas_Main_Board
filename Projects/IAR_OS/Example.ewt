@@ -2506,6 +2506,9 @@
         <file>
             <name>$PROJ_DIR$\..\..\Sources_Mod\Mod_StdbusM.c</name>
         </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\Sources_Mod\Mod_StdbusMaster.c</name>
+        </file>
     </group>
     <group>
         <name>Sources_Public</name>
