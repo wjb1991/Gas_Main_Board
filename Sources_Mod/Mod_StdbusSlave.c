@@ -62,7 +62,7 @@ static void Mod_ErrHandle(void * pv_dev)
 void Mod_StdbusSlaveInit(void)
 {
     Mod_StdbusRegPort(&st_StdbusHost,&st_StdbusSlave);
-    Mod_StdbusRegDev(&st_StdbusSlave,&st_StdbusMeasSpeed);
+    Mod_StdbusRegDev(&st_StdbusSlave,st_MeasSpeed.pst_Handle);
     Mod_StdbusRegDev(&st_StdbusSlave,st_DisBoard.pst_Handle);
     ((Dev_SerialPort*)st_StdbusSlave.pv_Handle)->cb_SendComplete = Mod_SendComplete;
     ((Dev_SerialPort*)st_StdbusSlave.pv_Handle)->cb_RecvReady =  Mod_RecvReady;

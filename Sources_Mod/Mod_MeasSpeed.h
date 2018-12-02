@@ -5,6 +5,6 @@
 
 #include "Mod_Include"
 
-extern StdbusDev_t st_StdbusMeasSpeed;
+extern MeasSpeed_t st_MeasSpeed;
 
 #endif
