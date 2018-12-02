@@ -11,6 +11,8 @@ static StdbusDev_t* ast_DevList[DEF_STDBUS_SLAVE_DEV_LEN] = {0};
 
 StdbusPort_t st_StdbusSlave ={
     e_StdbusIdle,                           /* 状态 */
+    &Sem_Rs485,                             /* 端口占用锁  OS情况下是一个信号量 */
+    &TaskStdBusSlaveTCB,                    /* 端口消息 OS情况下是一个消息队列*/
     DEF_STDBUS_SLAVE_PORT,                  /* 串口句柄 */
     NULL,                                   /* 主机句柄 */
     ast_DevList,                            /* 设备列表 */
@@ -35,19 +37,8 @@ StdbusPort_t st_StdbusSlave ={
     },
 };
 
-StdbusDev_t st_StdbusMeasSpeed = {
-    {0,0x30},                               /*地址列表*/
-    2,                                      /*地址列表长度*/
-    NULL,                                   /*端口句柄*/
-    NULL,                                   /*处理函数*/
-};
-    
-StdbusDev_t st_StdbusDis = {    
-    {0,0x40},                               /*地址列表*/
-    2,                                      /*地址列表长度*/
-    NULL,                                   /*端口句柄*/
-    NULL,                                   /*处理函数*/
-};
+
+
 
 static void Mod_SendComplete(void * pv_dev)
 {
@@ -72,8 +63,13 @@ void Mod_StdbusSlaveInit(void)
 {
     Mod_StdbusRegPort(&st_StdbusHost,&st_StdbusSlave);
     Mod_StdbusRegDev(&st_StdbusSlave,&st_StdbusMeasSpeed);
-    Mod_StdbusRegDev(&st_StdbusSlave,&st_StdbusDis);
+    Mod_StdbusRegDev(&st_StdbusSlave,st_DisBoard.pst_Handle);
     ((Dev_SerialPort*)st_StdbusSlave.pv_Handle)->cb_SendComplete = Mod_SendComplete;
     ((Dev_SerialPort*)st_StdbusSlave.pv_Handle)->cb_RecvReady =  Mod_RecvReady;
     ((Dev_SerialPort*)st_StdbusSlave.pv_Handle)->cb_ErrHandle = Mod_ErrHandle;
+}
+
+void Mod_StdbusSlavePoll(void)
+{
+    Mod_StdbusPortPoll(&st_StdbusSlave);
 }

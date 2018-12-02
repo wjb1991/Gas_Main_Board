@@ -3,7 +3,7 @@
 //|--------- |--------------------------------------------------------------------------------------
 //| 文件描述 | 板级串口功能的实现 STM32版本
 //|--------- |--------------------------------------------------------------------------------------
-//| 版权声明 | 
+//| 版权声明 |
 //|----------|--------------------------------------------------------------------------------------
 //|  版本    |  时间       |  作者     | 描述
 //|--------- |-------------|-----------|------------------------------------------------------------
@@ -43,90 +43,90 @@ static INT8U    auch_RxBuff[6][DEF_UART_BUFF_SIZE] = {0};
 #if (DEF_USE_COM1 == TRUE)
 Dev_SerialPort COM1 = {"COM1",                              //端口名
                         DEF_UART_CONFIG,                    //默认配置
-                        
+
                         NULL,                               //发送缓冲区配置
                         0,
                         0,
-                        
+
                         &auch_RxBuff[0][0],                 //接收缓冲区配置
                         DEF_UART_BUFF_SIZE,
-                        0,                     
-                        
+                        0,
+
                         DEF_UART_HOOK,                      //回调函数
                         &stm32f7xx_usart1};                 //底层句柄
 #endif
 #if (DEF_USE_COM2 == TRUE)
 Dev_SerialPort COM2 = {"COM2",                              //端口名
                         DEF_UART_CONFIG,                    //默认配置
-                        
+
                         NULL,                               //发送缓冲区配置
                         0,
                         0,
-                        
+
                         &auch_RxBuff[1][0],                 //接收缓冲区配置
                         DEF_UART_BUFF_SIZE,
-                        0,                     
-                        
+                        0,
+
                         DEF_UART_HOOK,                      //回调函数
                         &stm32f7xx_usart2};                 //底层句柄
 #endif
 #if (DEF_USE_COM3 == TRUE)
 Dev_SerialPort COM3 = {"COM3",                              //端口名
                         DEF_UART_CONFIG,                    //默认配置
-                        
+
                         NULL,                               //发送缓冲区配置
                         0,
                         0,
-                        
+
                         &auch_RxBuff[2][0],                 //接收缓冲区配置
                         DEF_UART_BUFF_SIZE,
-                        0,                     
-                        
+                        0,
+
                         DEF_UART_HOOK,                      //回调函数
                         &stm32f7xx_usart3};                 //底层句柄
 #endif
 #if (DEF_USE_COM4 == TRUE)
 Dev_SerialPort COM4 = {"COM4",                              //端口名
                         DEF_UART_CONFIG,                    //默认配置
-                        
+
                         NULL,                               //发送缓冲区配置
                         0,
                         0,
-                        
+
                         &auch_RxBuff[3][0],                 //接收缓冲区配置
                         DEF_UART_BUFF_SIZE,
-                        0,                     
-                        
+                        0,
+
                         DEF_UART_HOOK,                      //回调函数
                         &stm32f7xx_uart4};                  //底层句柄
 #endif
 #if (DEF_USE_COM5 == TRUE)
 Dev_SerialPort COM5 = {"COM5",                              //端口名
                         DEF_UART_CONFIG,                    //默认配置
-                        
+
                         NULL,                               //发送缓冲区配置
                         0,
                         0,
-                        
+
                         &auch_RxBuff[4][0],                 //接收缓冲区配置
                         DEF_UART_BUFF_SIZE,
-                        0,                     
-                        
+                        0,
+
                         DEF_UART_HOOK,                      //回调函数
                         &stm32f7xx_uart5};                  //底层句柄
 #endif
 #if (DEF_USE_COM6 == TRUE)
 Dev_SerialPort COM6 = {"COM6",                              //端口名
                         DEF_UART_CONFIG,                    //默认配置
-                        
+
                         NULL,                               //发送缓冲区配置
                         0,
                         0,
-                        
+
                         &auch_RxBuff[5][0],                 //接收缓冲区配置
                         DEF_UART_BUFF_SIZE,
-                        0,                     
-                        
+                        0,
+
                         DEF_UART_HOOK,                      //回调函数
                         &stm32f7xx_usart6};                 //底层句柄
 #endif
@@ -134,30 +134,30 @@ Dev_SerialPort COM6 = {"COM6",                              //端口名
 void Bsp_UsartRxEnable(Dev_SerialPort* pst_Dev)
 {
     UART_HandleTypeDef* UartHandle = pst_Dev->pv_UartHandle;
-    /* 开启接受完成中断 */  
+    /* 开启接受完成中断 */
     LL_USART_EnableIT_RXNE(UartHandle->Instance);
 }
 
 void Bsp_UsartRxDisable(Dev_SerialPort* pst_Dev)
 {
     UART_HandleTypeDef* UartHandle = pst_Dev->pv_UartHandle;
-    /* 关闭接受完成中断 */  
+    /* 关闭接受完成中断 */
     LL_USART_DisableIT_RXNE(UartHandle->Instance);
 }
 
 void Bsp_UsartTxEnable(Dev_SerialPort* pst_Dev)
 {
     UART_HandleTypeDef* UartHandle = pst_Dev->pv_UartHandle;
-    /* 清除发送完成中断 */ 
+    /* 清除发送完成中断 */
     LL_USART_ClearFlag_TC(UartHandle->Instance);
-    /* 开启发送完成中断 */ 
+    /* 开启发送完成中断 */
     LL_USART_EnableIT_TC(UartHandle->Instance);
 }
 
 void Bsp_UsartTxDisable(Dev_SerialPort* pst_Dev)
 {
     UART_HandleTypeDef* UartHandle = pst_Dev->pv_UartHandle;
-    /* 关闭发送完成中断 */  
+    /* 关闭发送完成中断 */
     LL_USART_DisableIT_TC(UartHandle->Instance);
 }
 
@@ -167,14 +167,14 @@ void Bsp_UsartTxDisable(Dev_SerialPort* pst_Dev)
 
     /* 接受完成中断 */
     if(LL_USART_IsActiveFlag_RXNE(USARTx) && LL_USART_IsEnabledIT_RXNE(USARTx))
-    {            
+    {
         uint8_t tmp = LL_USART_ReceiveData8(USARTx);
         if(pst_Dev->cb_RecvReady != NULL)
         {
             pst_Dev->cb_RecvReady(pst_Dev, &tmp, 1);
         }
     }
-    
+
     /* 发送为空中断 */
     if(LL_USART_IsEnabledIT_TXE(USARTx) && LL_USART_IsActiveFlag_TXE(USARTx))
     {
@@ -185,7 +185,7 @@ void Bsp_UsartTxDisable(Dev_SerialPort* pst_Dev)
     if(LL_USART_IsEnabledIT_TC(USARTx) && LL_USART_IsActiveFlag_TC(USARTx))
     {
         LL_USART_ClearFlag_TC(USARTx);
-        
+
         if( pst_Dev->uin_TxCount < pst_Dev->uin_TxLen)
         {
             LL_USART_TransmitData8(USARTx, pst_Dev->puch_TxBuff[pst_Dev->uin_TxCount++]);
@@ -197,7 +197,7 @@ void Bsp_UsartTxDisable(Dev_SerialPort* pst_Dev)
             if(pst_Dev->cb_SendComplete != NULL)
             {
                 pst_Dev->cb_SendComplete(pst_Dev);
-            }        
+            }
         }
     }
 
@@ -209,12 +209,12 @@ void Bsp_UsartTxDisable(Dev_SerialPort* pst_Dev)
             pst_Dev->cb_ErrHandle(pst_Dev);
         }
     }
-    
+
     if(LL_USART_IsActiveFlag_ORE(USARTx))
     {
         LL_USART_ClearFlag_ORE(USARTx);
     }
-    
+
     if(LL_USART_IsActiveFlag_FE(USARTx))
     {
         LL_USART_ClearFlag_FE(USARTx);
@@ -244,7 +244,7 @@ void USART1_IRQHandler(void)
     CPU_CRITICAL_EXIT();
 #endif
     USARTx_IRQHandler(&COM1);
-    
+
 #ifdef  OS_SUPPORT
     OSIntExit();
 #endif
@@ -271,10 +271,10 @@ void USART2_IRQHandler(void)
     OSIntEnter();
     CPU_CRITICAL_EXIT();
 #endif
-    
+
     USARTx_IRQHandler(&COM2);
-    
-#ifdef  OS_SUPPORT   
+
+#ifdef  OS_SUPPORT
     OSIntExit();
 #endif
 }
@@ -300,9 +300,9 @@ void USART3_IRQHandler(void)
     OSIntEnter();
     CPU_CRITICAL_EXIT();
 #endif
-    
+
     USARTx_IRQHandler(&COM3);
-    
+
 #ifdef  OS_SUPPORT
     OSIntExit();
 #endif
@@ -328,7 +328,7 @@ void UART4_IRQHandler(void)
     OSIntEnter();
     CPU_CRITICAL_EXIT();
 #endif
-    
+
     USARTx_IRQHandler(&COM4);
 
 #ifdef  OS_SUPPORT
@@ -359,9 +359,9 @@ void USART6_IRQHandler(void)
     OSIntEnter();
     CPU_CRITICAL_EXIT();
 #endif
-    
+
     USARTx_IRQHandler(&COM6);
-    
+
 #ifdef  OS_SUPPORT
     OSIntExit();
 #endif
@@ -381,7 +381,7 @@ void USART6_IRQHandler(void)
 BOOL Bsp_UartOpen(Dev_SerialPort* pst_Dev)
 {
     UART_HandleTypeDef* UartHandle = pst_Dev->pv_UartHandle;
-    
+
     UartHandle->Init.BaudRate   = pst_Dev->ul_BaudRate;
     UartHandle->Init.WordLength = pst_Dev->ul_WordLength;
     UartHandle->Init.StopBits   = pst_Dev->ul_StopBits;
@@ -396,10 +396,10 @@ BOOL Bsp_UartOpen(Dev_SerialPort* pst_Dev)
         Bsp_UartClose(pst_Dev);
         return FALSE;
     }
-    
+
     /* 开启 错误中断 */
     LL_USART_EnableIT_ERROR(UartHandle->Instance);
-    
+
     if(UartHandle->Init.Mode  == UART_MODE_TX_RX)
     {
         Bsp_UsartTxEnable(pst_Dev);
@@ -408,13 +408,13 @@ BOOL Bsp_UartOpen(Dev_SerialPort* pst_Dev)
     else if(UartHandle->Init.Mode  == UART_MODE_TX)
     {
         Bsp_UsartTxEnable(pst_Dev);
-        Bsp_UsartRxDisable(pst_Dev);       
+        Bsp_UsartRxDisable(pst_Dev);
     }
     else if(UartHandle->Init.Mode  == UART_MODE_RX)
     {
         Bsp_UsartTxDisable(pst_Dev);
-        Bsp_UsartRxEnable(pst_Dev);       
-    }  
+        Bsp_UsartRxEnable(pst_Dev);
+    }
     return TRUE;
 }
 
@@ -451,20 +451,20 @@ BOOL Bsp_UartSendBlock(Dev_SerialPort *pst_Dev, INT8U* puch_Buff, INT16U uin_Len
 {
     INT16U i = 0;
     USART_TypeDef *USARTx = ((UART_HandleTypeDef*)pst_Dev->pv_UartHandle)->Instance;
-    
+
     if( pst_Dev == NULL || puch_Buff == NULL || uin_Len == 0 )
         return FALSE;
-    
+
     /* 非阻塞发送完成 才能使用阻塞的发送 */
     if( pst_Dev->uin_TxCount != 0 || pst_Dev->uin_TxLen != 0)
         return FALSE;
 
-    
+
     /* 需要关闭串口发送完成中断 */
     while(uin_Len--)
     {
         while (!LL_USART_IsActiveFlag_TXE(USARTx)){}
-        LL_USART_TransmitData8(USARTx, puch_Buff[i++]);  
+        LL_USART_TransmitData8(USARTx, puch_Buff[i++]);
     }
     return TRUE;
 }
@@ -484,19 +484,19 @@ BOOL Bsp_UartSend(Dev_SerialPort *pst_Dev, INT8U* puch_Buff, INT16U uin_Len)
 {
     INT16U i = 0;
     USART_TypeDef *USARTx = ((UART_HandleTypeDef*)pst_Dev->pv_UartHandle)->Instance;
-    
+
     if( pst_Dev == NULL || puch_Buff == NULL || uin_Len == 0 )
         return FALSE;
-    
+
     if( pst_Dev->uin_TxCount < pst_Dev->uin_TxLen)
         return FALSE;
 
     pst_Dev->puch_TxBuff    = puch_Buff;
     pst_Dev->uin_TxLen      = uin_Len;
     pst_Dev->uin_TxCount    = 0;
-    
+
     while (!LL_USART_IsActiveFlag_TXE(USARTx)){}
-    LL_USART_TransmitData8(USARTx, puch_Buff[pst_Dev->uin_TxCount++]);  
+    LL_USART_TransmitData8(USARTx, puch_Buff[pst_Dev->uin_TxCount++]);
 
     return TRUE;
 }
@@ -506,7 +506,7 @@ BOOL Bsp_UartSend(Dev_SerialPort *pst_Dev, INT8U* puch_Buff, INT16U uin_Len)
   *        This function configures the hardware resources used in this example:
   *           - Peripheral's clock enable
   *           - Peripheral's GPIO Configuration
-  *           - Peripheral's GPIO Configuration  
+  *           - Peripheral's GPIO Configuration
   *           - NVIC configuration for UART interrupt request enable
   * @param huart: UART handle pointer
   * @retval None
@@ -520,12 +520,12 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
     {
         /*##-1- Enable peripherals and GPIO Clocks #################################*/
         /* Enable GPIO TX/RX clock */
-        __HAL_RCC_GPIOA_CLK_ENABLE();        
         __HAL_RCC_GPIOA_CLK_ENABLE();
-          
+        __HAL_RCC_GPIOA_CLK_ENABLE();
+
         /* Enable USARTx clock */
-        __HAL_RCC_USART1_CLK_ENABLE();       
-          
+        __HAL_RCC_USART1_CLK_ENABLE();
+
         /*##-2- Configure peripheral GPIO ##########################################*/
         /* UART TX GPIO pin configuration  */
         GPIO_InitStruct.Pin       = GPIO_PIN_9;
@@ -542,10 +542,10 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 
         HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-        /*##-3- Configure the NVIC for UART ########################################*/   
+        /*##-3- Configure the NVIC for UART ########################################*/
         /* NVIC for USARTx */
         HAL_NVIC_SetPriority(USART1_IRQn, 3, 1);
-        HAL_NVIC_EnableIRQ(USART1_IRQn); 
+        HAL_NVIC_EnableIRQ(USART1_IRQn);
 
     }
 #endif
@@ -555,12 +555,12 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 #if 0
         /*##-1- Enable peripherals and GPIO Clocks #################################*/
         /* Enable GPIO TX/RX clock */
-        __HAL_RCC_GPIOA_CLK_ENABLE();        
         __HAL_RCC_GPIOA_CLK_ENABLE();
-          
+        __HAL_RCC_GPIOA_CLK_ENABLE();
+
         /* Enable USARTx clock */
-        __HAL_RCC_USART2_CLK_ENABLE();       
-          
+        __HAL_RCC_USART2_CLK_ENABLE();
+
         /*##-2- Configure peripheral GPIO ##########################################*/
         /* UART TX GPIO pin configuration  */
         GPIO_InitStruct.Pin       = GPIO_PIN_2;
@@ -576,17 +576,17 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
         GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
 
         HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-#endif        
+#endif
 
 #if 1
         /*##-1- Enable peripherals and GPIO Clocks #################################*/
         /* Enable GPIO TX/RX clock */
-        __HAL_RCC_GPIOD_CLK_ENABLE();        
         __HAL_RCC_GPIOD_CLK_ENABLE();
-          
+        __HAL_RCC_GPIOD_CLK_ENABLE();
+
         /* Enable USARTx clock */
-        __HAL_RCC_USART2_CLK_ENABLE();       
-          
+        __HAL_RCC_USART2_CLK_ENABLE();
+
         /*##-2- Configure peripheral GPIO ##########################################*/
         /* UART TX GPIO pin configuration  */
         GPIO_InitStruct.Pin       = GPIO_PIN_5;
@@ -596,17 +596,17 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
         GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
 
         HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
-        
+
         /* UART RX GPIO pin configuration  */
         GPIO_InitStruct.Pin       = GPIO_PIN_6;
         GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
 
         HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 #endif
-        /*##-3- Configure the NVIC for UART ########################################*/   
+        /*##-3- Configure the NVIC for UART ########################################*/
         /* NVIC for USARTx */
         HAL_NVIC_SetPriority(USART2_IRQn, 3, 1);
-        HAL_NVIC_EnableIRQ(USART2_IRQn); 
+        HAL_NVIC_EnableIRQ(USART2_IRQn);
 
     }
 #endif
@@ -615,12 +615,12 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
     {
         /*##-1- Enable peripherals and GPIO Clocks #################################*/
         /* Enable GPIO TX/RX clock */
-        __HAL_RCC_GPIOB_CLK_ENABLE();        
         __HAL_RCC_GPIOB_CLK_ENABLE();
-          
+        __HAL_RCC_GPIOB_CLK_ENABLE();
+
         /* Enable USARTx clock */
-        __HAL_RCC_USART3_CLK_ENABLE();       
-          
+        __HAL_RCC_USART3_CLK_ENABLE();
+
         /*##-2- Configure peripheral GPIO ##########################################*/
         /* UART TX GPIO pin configuration  */
         GPIO_InitStruct.Pin       = GPIO_PIN_10;
@@ -637,10 +637,10 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 
         HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-        /*##-3- Configure the NVIC for UART ########################################*/   
+        /*##-3- Configure the NVIC for UART ########################################*/
         /* NVIC for USARTx */
         HAL_NVIC_SetPriority(USART3_IRQn, 3, 1);
-        HAL_NVIC_EnableIRQ(USART3_IRQn); 
+        HAL_NVIC_EnableIRQ(USART3_IRQn);
 
     }
 #endif
@@ -649,12 +649,12 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
     {
         /*##-1- Enable peripherals and GPIO Clocks #################################*/
         /* Enable GPIO TX/RX clock */
-        __HAL_RCC_GPIOA_CLK_ENABLE();        
         __HAL_RCC_GPIOA_CLK_ENABLE();
-          
+        __HAL_RCC_GPIOA_CLK_ENABLE();
+
         /* Enable USARTx clock */
-        __HAL_RCC_UART4_CLK_ENABLE();       
-          
+        __HAL_RCC_UART4_CLK_ENABLE();
+
         /*##-2- Configure peripheral GPIO ##########################################*/
         /* UART TX GPIO pin configuration  */
         GPIO_InitStruct.Pin       = GPIO_PIN_0;
@@ -671,10 +671,10 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 
         HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-        /*##-3- Configure the NVIC for UART ########################################*/   
+        /*##-3- Configure the NVIC for UART ########################################*/
         /* NVIC for USARTx */
         HAL_NVIC_SetPriority(UART4_IRQn, 3, 1);
-        HAL_NVIC_EnableIRQ(UART4_IRQn); 
+        HAL_NVIC_EnableIRQ(UART4_IRQn);
 
     }
 #endif
@@ -683,12 +683,12 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
     {
         /*##-1- Enable peripherals and GPIO Clocks #################################*/
         /* Enable GPIO TX/RX clock */
-        __HAL_RCC_GPIOA_CLK_ENABLE();        
         __HAL_RCC_GPIOA_CLK_ENABLE();
-          
+        __HAL_RCC_GPIOA_CLK_ENABLE();
+
         /* Enable USARTx clock */
-        __HAL_RCC_UART5_CLK_ENABLE();       
-          
+        __HAL_RCC_UART5_CLK_ENABLE();
+
         /*##-2- Configure peripheral GPIO ##########################################*/
         /* UART TX GPIO pin configuration  */
         GPIO_InitStruct.Pin       = GPIO_PIN_0;
@@ -705,10 +705,10 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 
         HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-        /*##-3- Configure the NVIC for UART ########################################*/   
+        /*##-3- Configure the NVIC for UART ########################################*/
         /* NVIC for USARTx */
         HAL_NVIC_SetPriority(UART5_IRQn, 3, 1);
-        HAL_NVIC_EnableIRQ(UART5_IRQn); 
+        HAL_NVIC_EnableIRQ(UART5_IRQn);
 
     }
 #endif
@@ -718,10 +718,10 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
         /*##-1- Enable peripherals and GPIO Clocks #################################*/
         /* Enable GPIO TX/RX clock */
         __HAL_RCC_GPIOC_CLK_ENABLE();
-          
+
         /* Enable USARTx clock */
-        __HAL_RCC_USART6_CLK_ENABLE();       
-          
+        __HAL_RCC_USART6_CLK_ENABLE();
+
         /*##-2- Configure peripheral GPIO ##########################################*/
         /* UART TX GPIO pin configuration  */
         GPIO_InitStruct.Pin       = GPIO_PIN_6;
@@ -738,10 +738,10 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 
         HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-        /*##-3- Configure the NVIC for UART ########################################*/   
+        /*##-3- Configure the NVIC for UART ########################################*/
         /* NVIC for USARTx */
         HAL_NVIC_SetPriority(USART6_IRQn, 3, 1);
-        HAL_NVIC_EnableIRQ(USART6_IRQn); 
+        HAL_NVIC_EnableIRQ(USART6_IRQn);
 
     }
 #endif
@@ -876,8 +876,8 @@ void Bsp_UartPrintf(const char * Format,...)
 {
     static INT8U    auch_PrintfBuff[100] = {0};
 	Dev_SerialPort* p = &COM4;      //打印串口更改此处
-	while(p->uin_TxLen != 0){}      //等待发送完成 
-    
+	while(p->uin_TxLen != 0){}      //等待发送完成
+
 	va_list pArgs;
 	va_start(pArgs,Format);
 	vsprintf((char *)auch_PrintfBuff,Format,pArgs);
@@ -892,10 +892,9 @@ void Bsp_UartPrintf(const char * Format,...)
 int fputc(int ch, FILE *f)
 {
     while (!LL_USART_IsActiveFlag_TXE(USART1)){}
-    LL_USART_TransmitData8(USART1, ch); 
-    
+    LL_USART_TransmitData8(USART1, ch);
+
     //while (!LL_USART_IsActiveFlag_TC(USART2)){}
     //LL_USART_ClearFlag_TC(USART2);
     return ch;
 }
-

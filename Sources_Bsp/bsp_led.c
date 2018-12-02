@@ -54,13 +54,15 @@ void  BSP_LedInit (void)
 
     
 
-    BSP_LED1_GPIO_CLK_ENABLE();                                 /* Enable GPIO clock for LED1(PF10)                     */
-    BSP_LED2_GPIO_CLK_ENABLE();
-    BSP_LTC1867CS0_GPIO_CLK_ENABLE();
-    BSP_LTC1867CS1_GPIO_CLK_ENABLE();
-    BSP_IIC0SCL_GPIO_CLK_ENABLE();
-    BSP_EPROMWP_GPIO_CLK_ENABLE();
-    BSP_IIC0SDA_GPIO_CLK_ENABLE();
+                                                                /* Enable GPIO clock for LED1(PF10)                     */
+    __HAL_RCC_GPIOA_CLK_ENABLE();                                  
+    __HAL_RCC_GPIOB_CLK_ENABLE();                                   
+    __HAL_RCC_GPIOC_CLK_ENABLE();                                    
+    __HAL_RCC_GPIOD_CLK_ENABLE();                                    
+    __HAL_RCC_GPIOE_CLK_ENABLE();                                     
+    __HAL_RCC_GPIOF_CLK_ENABLE(); 
+    __HAL_RCC_GPIOG_CLK_ENABLE(); 
+                                        
                                                                 /* Configure the GPIOF for LED1(PF10)                   */
     gpio_init.Pin   = BSP_LED1_GPIO_PIN;
     gpio_init.Mode  = GPIO_MODE_OUTPUT_PP;
@@ -91,6 +93,12 @@ void  BSP_LedInit (void)
     gpio_init.Pull  = GPIO_PULLUP;
     gpio_init.Speed = GPIO_SPEED_HIGH;
     HAL_GPIO_Init(BSP_EPROMWP_GPIO_PORT, &gpio_init);     
+
+    gpio_init.Pin   = BSP_RS485DE_GPIO_PIN;
+    gpio_init.Mode  = GPIO_MODE_OUTPUT_PP;
+    gpio_init.Pull  = GPIO_PULLUP;
+    gpio_init.Speed = GPIO_SPEED_HIGH;
+    HAL_GPIO_Init(BSP_RS485DE_GPIO_PORT, &gpio_init);
     
     /* IIC¿ªÂ©ÉÏÀ­ */
     gpio_init.Pin   = BSP_IIC0SDA_GPIO_PIN;
@@ -104,6 +112,7 @@ void  BSP_LedInit (void)
     gpio_init.Pull  = GPIO_PULLUP;
     gpio_init.Speed = GPIO_SPEED_HIGH;
     HAL_GPIO_Init(BSP_IIC0SCL_GPIO_PORT, &gpio_init); 
+    
     
     BSP_Led1Set(eLedOff);
     BSP_Led2Set(eLedOff);

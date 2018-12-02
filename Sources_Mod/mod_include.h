@@ -8,4 +8,6 @@
 
 #include "Mod_StdbusMaster.h"
 #include "Mod_StdbusSlave.h"
+#include "Mod_DisBoard.h"
+
 #endif

@@ -2495,13 +2495,16 @@
             <name>$PROJ_DIR$\..\..\Sources_Mod\mod_crc16.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\Sources_Mod\Mod_DisBoard.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\Sources_Mod\mod_gasanalysis.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\Sources_Mod\mod_greyanalysis.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\Sources_Mod\mod_stdbus.c</name>
+            <name>$PROJ_DIR$\..\..\Sources_Mod\Mod_MeasSpeed.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\Sources_Mod\Mod_StdbusM.c</name>
@@ -2534,10 +2537,16 @@
             <name>$PROJ_DIR$\..\..\Sources_Task\Task_GreyProc.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\Sources_Task\Task_MeasSpeed.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\Sources_Task\task_start.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\Sources_Task\task_stdbus.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\Sources_Task\Task_StdbusSlave.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\Sources_Task\task_usb4000.c</name>

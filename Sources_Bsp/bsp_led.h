@@ -72,7 +72,7 @@ extern  "C" {                                  /* See Note #1.                  
 *********************************************************************************************************
 */
 typedef enum {
-    eRs485Trans = GPIO_PIN_RESET, eRs485Recv =  GPIO_PIN_SET,
+    eRs485Trans = GPIO_PIN_SET, eRs485Recv =  GPIO_PIN_RESET,
 } Rs485de_t;
 
 typedef enum {

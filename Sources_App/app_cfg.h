@@ -24,22 +24,23 @@
 #include  "app_save.h"
 
 //==================================================================================
-//                                   任务优先级    
+//                                   任务优先级
 //==================================================================================
-#define  TASK_START_PRIO                OS_CFG_PRIO_MAX-4u   
+#define  TASK_START_PRIO                OS_CFG_PRIO_MAX-4u
 #define  TASK_USB_HOST_PRIO             4u
 #define  TASK_GASPROC_PRIO              5u
 #define  TASK_GREYPROC_PRIO             6u
 
-#define  TASK_STDBUS_PRIO               10u
-#define  TASK_DISBOARD_PRIO             11u
+#define  TASK_MEASSPEED_PRIO            13u
+#define  TASK_DISBOARD_PRIO             14u
+#define  TASK_STDBUSMASTER_PRIO         15u
+#define  TASK_STDBUSSLAVE_PRIO          16u
 
 #define  TASK_CML_RECV_PRIO             20u
 #define  TASK_CML_SEND_PRIO             21u
 
-
 //==================================================================================
-//                                   任务堆栈大小 
+//                                   任务堆栈大小
 //==================================================================================
 #define  TASK_START_STK_SIZE            256u
 #define  TASK_GASPROC_STK_SIZE          512u
@@ -47,9 +48,10 @@
 #define  TASK_CML_SEND_STK_SIZE         256u
 #define  TASK_CML_RECV_STK_SIZE         256u
 #define  TASK_USB_HOST_STK_SIZE         2048u
-#define  TASK_STDBUS_STK_SIZE           512u
+#define  TASK_STDBUSMASTER_STK_SIZE     512u
+#define  TASK_STDBUSSLAVE_STK_SIZE      512u
 #define  TASK_DISBOARD_STK_SIZE         256u
-
+#define  TASK_MEASSPEED_STK_SIZE        512u
 //==================================================================================
 //                                   任务控制块声明
 //==================================================================================
@@ -58,8 +60,10 @@ extern  OS_TCB       TaskGasProcTCB;         /*  紫外光处理任务    */
 extern  OS_TCB       TaskCmlSendTCB;         /*  命令行调试任务    */
 extern  OS_TCB       TaskCmlRecvTCB;         /*  命令行调试任务    */
 extern  OS_TCB       TaskUsbHostTCB;         /*  Usb光谱仪通讯任务    */
-extern  OS_TCB       TaskStdBusTCB;          /*  STDBUS任务    */
+extern  OS_TCB       TaskStdBusMasterTCB;    /*  STDBUS主机任务    */
+extern  OS_TCB       TaskStdBusSlaveTCB;     /*  STDBUS从机任务    */
 extern  OS_TCB       TaskDisBoardTCB;        /*  显示板任务    */
+extern  OS_TCB       TaskMeasSpeedTCB;       /*  测速任务    */
 //==================================================================================
 //                                   任务堆栈声明
 //==================================================================================
@@ -68,9 +72,10 @@ extern  CPU_STK      TaskGasProcStk [TASK_GASPROC_STK_SIZE];                /*  
 extern  CPU_STK      TaskCmlSendStk [TASK_CML_SEND_STK_SIZE];               /*  命令行调试任务    */
 extern  CPU_STK      TaskCmlRecvStk [TASK_CML_RECV_STK_SIZE];               /*  命令行调试任务    */
 extern  CPU_STK      TaskUsbHostStk [TASK_USB_HOST_STK_SIZE];               /*  光谱仪任务    */
-extern  CPU_STK      TaskStdBusStk  [TASK_STDBUS_STK_SIZE];                 /*  STDBUS任务    */
+extern  CPU_STK      TaskStdBusMasterStk  [TASK_STDBUSMASTER_STK_SIZE];     /*  STDBUS主机任务    */
+extern  CPU_STK      TaskStdBusSlaveStk  [TASK_STDBUSSLAVE_STK_SIZE];       /*  STDBUS从机任务    */
 extern  CPU_STK      TaskDisBoardStk[TASK_DISBOARD_STK_SIZE];               /*  显示板任务    */
-
+extern  CPU_STK      TaskMeasSpeedStk[TASK_MEASSPEED_STK_SIZE];             /*  测速任务    */
 //==================================================================================
 //                                   任务函数声明
 //==================================================================================
@@ -79,9 +84,10 @@ extern void Task_GasProc (void  *p_arg);             /*  紫外光处理任务    */
 extern void Task_TransCml (void  *p_arg);            /*  命令行调试任务    */
 extern void Task_RecvCml (void  *p_arg);             /*  命令行调试任务    */
 extern void Task_UsbHost (void  *p_arg);             /*  Usb光谱仪通讯任务 */
-extern void Task_StdBus (void  *p_arg);              /*  STDBUS总线通讯    */
+extern void Task_StdBusMaster (void  *p_arg);        /*  STDBUS总线通讯    */
+extern void Task_StdBusSlave (void  *p_arg);         /*  STDBUS总线通讯    */
 extern void Task_DisBoard (void *p_arg);             /*  显示板任务    */
-
+extern void Task_MeasSpeed (void *p_arg);            /*  测速任务    */
 //==================================================================================
 //                                   队列声明
 //==================================================================================
@@ -96,7 +102,7 @@ extern  OS_Q         QSpeTrans;
 //                                   信号量
 //==================================================================================
 #if (OS_CFG_SEM_EN > 0u)
-extern  OS_SEM       AppTaskObjSem;
+extern  OS_SEM       Sem_Rs485;
 #endif
 
 //==================================================================================
@@ -136,7 +142,7 @@ static  OS_FLAG_GRP  AppTaskObjFlag;
 #endif
 
 #define  TRACE_LEVEL                            TRACE_LEVEL_DBG
-#define  TRACE(x)                               printf(x)//Task_CmlSendMsg(x,strlen(x))  printf(x)                       
+#define  TRACE(x)                               printf(x)//Task_CmlSendMsg(x,strlen(x))  printf(x)
 
 #define  TRACE_INFO(x)                          ((TRACE_LEVEL >= TRACE_LEVEL_INFO)  ? (void)(TRACE(x)) : (void)0)
 #define  TRACE_DBG(x)                           ((TRACE_LEVEL >= TRACE_LEVEL_DBG)   ? (void)(TRACE(x)) : (void)0)

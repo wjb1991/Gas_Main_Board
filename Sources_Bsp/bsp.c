@@ -38,7 +38,7 @@ void  Bsp_Init (void)
     Bsp_UartOpen(&COM1); 
     
     /**/
-    COM2.ul_BaudRate   = 115200;
+    COM2.ul_BaudRate   = 230400;
     COM2.ul_WordLength = UART_WORDLENGTH_8B;
     COM2.ul_StopBits   = UART_STOPBITS_1;
     COM2.ul_Parity     = UART_PARITY_NONE;
