@@ -13,7 +13,7 @@ uint16_t Uint8TOUint16(uint8_t *puc_data)
 BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
 {
     BOOL res = FALSE;
-    OS_ERR os_err;
+    //OS_ERR os_err;
 
     switch(pst_Fram->uch_Cmd)
     {
@@ -381,7 +381,7 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
 
                 for(i = 0; i < 10; i++)
                 {
-                    //Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[i*4],ast_GreyChannle[i].f_Volt,FALSE);
+                    Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[i*4],st_GreyMoudle.pst_Channel[i].f_Volt,FALSE);
                 }
             }
             res = TRUE;    //应答
@@ -411,7 +411,7 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
                     double data = GasAnalysis.plf_Spectrum[i] * 100;
                     al_Buff[i] = (INT32U)data;
                 }
-                CPU_IntEn();OSSchedUnlock(&os_err);
+                CPU_IntEn();//OSSchedUnlock(&os_err);
             }
             else if(pst_Fram->uin_PayLoadLenth == 4)
             {
@@ -479,6 +479,7 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
             res = TRUE;    //应答
         }
         break;
+        
 //==================================================================================
 //                                  读取相对光谱
 //==================================================================================
@@ -554,6 +555,7 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
 
         }
         break;
+
 //==================================================================================
 //                                    读取浓度
 //==================================================================================
@@ -576,11 +578,34 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
             }
         }
         break;
+
+//==================================================================================
+//                                   继电器IO控制
+//==================================================================================
+    case 0x80:
+        if(pst_Fram->uch_SubCmd == e_StdbusWriteCmd)
+        {
+            if(pst_Fram->uin_PayLoadLenth == 2)
+            {
+                BOOL b_State = (pst_Fram->puc_PayLoad[1] == FALSE) ? FALSE : TRUE ;
+                Bsp_GpioWirte((GpioId_e)(e_IO_Relay0 + pst_Fram->puc_PayLoad[0]),b_State);
+                res = TRUE;     //应答
+            }
+        }
+        else if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
+        {
+            if(pst_Fram->uin_PayLoadLenth == 1)
+            {
+                pst_Fram->puc_PayLoad[1] = Bsp_GpioReadOut((GpioId_e)(e_IO_Relay0 + pst_Fram->puc_PayLoad[0]));
+                pst_Fram->uin_PayLoadLenth = 2;
+                res = TRUE;     //应答
+            }
+        }
+        break;
+
     default:
         break;
 
     }
-
-
     return res;
 }
