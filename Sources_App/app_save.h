@@ -1,9 +1,6 @@
 #ifndef SAVE_H
 #define SAVE_H
 
-#include "bsp.h"
-#include "app_cfg.h"
-
 #define  START_ADD    (INT32U)0x10 //起始地址
 //========================= Macro,Typestruct, & Class =====================//
 #define N_MAX_EEPROM_ARR  1024 //最大EEPROM的数组存储长度

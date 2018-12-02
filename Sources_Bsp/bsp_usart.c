@@ -12,7 +12,7 @@
 //|  V1.02   | 2018.10.31  |  wjb      | 修正数据接收到没有处理函数后一直进中断的问题
 //|  V1.03   | 2018.11.06  |  wjb      | 添加DEF_USE_COMx宏定义可以取消不用的端口
 //==================================================================================================
-#include "bsp_usart.h"
+#include "Bsp.h"
 
 #define     DEF_UART_CONFIG         115200,UART_WORDLENGTH_8B,UART_STOPBITS_1,UART_PARITY_NONE,UART_HWCONTROL_NONE,UART_MODE_TX_RX
 #define     DEF_UART_HOOK           0,0,0,0

@@ -1,5 +1,4 @@
-#include "Bsp_At24c512.h"
-#include "bsp_i2c.h"
+#include "Bsp.h"
 
 
 uint8_t Bsp_At24c512Read(uint8_t *pBuffer,uint16_t uin_Addr, uint16_t uin_Size)

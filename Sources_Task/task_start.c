@@ -1,52 +1,35 @@
-#include "app_cfg.h"
+#include "App_Include.h"
+
+void AppTaskCreate (void);
+void AppObjCreate (void);
 
 //==================================================================================
-//                                   任务控制块定义
+//                                   任务控制块声明
 //==================================================================================
-OS_TCB       TaskStartTCB;                                      /*  开始任务    */
-OS_TCB       TaskGasProcTCB;                                    /*  紫外光处理任务    */
-OS_TCB       TaskGreyProcTCB;                                   /*  灰度处理任务    */
-OS_TCB       TaskCmlSendTCB;                                    /*  命令行调试任务    */
-OS_TCB       TaskCmlRecvTCB;                                    /*  命令行调试任务    */
-OS_TCB       TaskUsbHostTCB;                                    /*  Usb光谱仪通讯任务    */
-OS_TCB       TaskStdBusMasterTCB;                               /*  STDBUS主机任务    */
-OS_TCB       TaskStdBusSlaveTCB;                                /*  STDBUS从机任务    */
-OS_TCB       TaskDisBoardTCB;                                   /*  显示板任务    */
-OS_TCB       TaskMeasSpeedTCB;                                  /*  测速任务    */
+OS_TCB       TaskStartTCB;           /*  开始任务    */
+OS_TCB       TaskGasProcTCB;         /*  紫外光处理任务    */
+OS_TCB       TaskCmlSendTCB;         /*  命令行调试任务    */
+OS_TCB       TaskCmlRecvTCB;         /*  命令行调试任务    */
+OS_TCB       TaskUsbHostTCB;         /*  Usb光谱仪通讯任务    */
+OS_TCB       TaskStdBusMasterTCB;    /*  STDBUS主机任务    */
+OS_TCB       TaskStdBusSlaveTCB;     /*  STDBUS从机任务    */
+OS_TCB       TaskDisBoardTCB;        /*  显示板任务    */
+OS_TCB       TaskMeasSpeedTCB;       /*  测速任务    */
 //==================================================================================
-//                                   任务堆栈定义
+//                                   任务堆栈声明
 //==================================================================================
-CPU_STK      TaskStartStk   [TASK_START_STK_SIZE];              /*  开始任务    */
-CPU_STK      TaskGasProcStk [TASK_GASPROC_STK_SIZE];            /*  紫外光处理任务    */
-CPU_STK      TaskGreyProcStk[TASK_GREYPROC_STK_SIZE];           /*  灰度处理任务    */
-CPU_STK      TaskCmlSendStk [TASK_CML_SEND_STK_SIZE];           /*  命令行调试任务    */
-CPU_STK      TaskCmlRecvStk [TASK_CML_RECV_STK_SIZE];           /*  命令行调试任务    */
-CPU_STK      TaskUsbHostStk [TASK_USB_HOST_STK_SIZE];           /*  光谱仪任务    */
-CPU_STK      TaskStdBusMasterStk  [TASK_STDBUSMASTER_STK_SIZE]; /*  STDBUS主机任务    */
-CPU_STK      TaskStdBusSlaveStk  [TASK_STDBUSSLAVE_STK_SIZE];   /*  STDBUS从机任务    */
-CPU_STK      TaskDisBoardStk[TASK_DISBOARD_STK_SIZE];           /*  显示板任务    */
-CPU_STK      TaskMeasSpeedStk[TASK_MEASSPEED_STK_SIZE];         /*  测速任务    */
+CPU_STK      TaskStartStk   [TASK_START_STK_SIZE];                  /*  开始任务    */
+CPU_STK      TaskGasProcStk [TASK_GASPROC_STK_SIZE];                /*  紫外光处理任务    */
+CPU_STK      TaskCmlSendStk [TASK_CML_SEND_STK_SIZE];               /*  命令行调试任务    */
+CPU_STK      TaskCmlRecvStk [TASK_CML_RECV_STK_SIZE];               /*  命令行调试任务    */
+CPU_STK      TaskUsbHostStk [TASK_USB_HOST_STK_SIZE];               /*  光谱仪任务    */
+CPU_STK      TaskStdBusMasterStk  [TASK_STDBUSMASTER_STK_SIZE];     /*  STDBUS主机任务    */
+CPU_STK      TaskStdBusSlaveStk  [TASK_STDBUSSLAVE_STK_SIZE];       /*  STDBUS从机任务    */
+CPU_STK      TaskDisBoardStk[TASK_DISBOARD_STK_SIZE];               /*  显示板任务    */
+CPU_STK      TaskMeasSpeedStk[TASK_MEASSPEED_STK_SIZE];             /*  测速任务    */
 //==================================================================================
-//                                   任务函数定义
+//                                   队列声明
 //==================================================================================
-void Task_Start (void *p_arg);                                  /*  开始任务    */
-void Task_GasProc (void  *p_arg);                               /*  紫外光处理任务    */
-void Task_GreyProc (void  *p_arg);                              /*  灰度处理任务    */
-void Task_CmlSend (void  *p_arg);                               /*  命令行调试任务    */
-void Task_CmlRecv (void  *p_arg);                               /*  命令行调试任务    */
-void Task_Host (void  *p_arg);                                  /*  Usb光谱仪通讯任务 */
-void Task_StdBusMaster (void  *p_arg);                          /*  STDBUS总线通讯    */
-void Task_StdBusSlave (void  *p_arg);                           /*  STDBUS总线通讯    */
-void Task_DisBoard (void *p_arg);                               /*  显示板任务    */
-void Task_MeasSpeed (void *p_arg);                              /*  测速任务    */
-
-/*  信号量     */
-#if (OS_CFG_SEM_EN > 0u)
-OS_SEM       Sem_Rs485;                                         /*  485串口总线互锁信号量   */
-#endif
-
-
-/*  队列声明  */
 #if (OS_CFG_Q_EN > 0u)
 OS_Q         QCmlRecv;
 OS_Q         QCmlTrans;
@@ -54,9 +37,12 @@ OS_Q         QSpeRecv;
 OS_Q         QSpeTrans;
 #endif
 
-void AppTaskCreate (void);
-void AppObjCreate (void);
-
+//==================================================================================
+//                                   信号量
+//==================================================================================
+#if (OS_CFG_SEM_EN > 0u)
+OS_SEM       Sem_Rs485;
+#endif
 
 extern  void standalone(void);
 //==================================================================================================

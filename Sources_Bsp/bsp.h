@@ -27,6 +27,18 @@ extern  "C" {                                  /* See Note #1.                  
 #include  "stm32f7xx_ll_usart.h"
 #include  "stm32f7xx_ll_spi.h"
   
+
+//#ifdef      OS_SUPPORT
+#include  "bsp_os.h"
+#include  <cpu_core.h>
+#include  <cpu.h>
+#include  <lib_math.h>
+#include  <lib_mem.h>
+#include  <os.h>
+#include  <os_app_hooks.h>
+//#endif
+  
+  
 #include  "bsp_datatype.h"
 #include  "bsp_converter.h"
 #include  "bsp_sram.h"
@@ -37,15 +49,11 @@ extern  "C" {                                  /* See Note #1.                  
 #include  "bsp_i2c.h"
 #include  "bsp_at24c512.h"
 #include  "Bsp_Gpio.h"
+#include  "Bsp_Dma.h"
   
 #include  "Bsp_W25Qxx.h"
 #include  "Bsp_LTC1867.h"
 
-#ifdef      OS_SUPPROT
-#include  "bsp_os.h"
-#include  <cpu_core.h>
-#include  <app_cfg.h>
-#endif
 
 /*__CMSIS_IAR_H__ 中有常用的宏定义 */
   

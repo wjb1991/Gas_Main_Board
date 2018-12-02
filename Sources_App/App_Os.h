@@ -1,7 +1,5 @@
-#ifndef  __APP_CFG_H__
-#define  __APP_CFG_H__
-
-#include "bsp.h"
+#ifndef     __APP_OS_H__
+#define     __APP_OS_H__
 
 #include  <cpu.h>
 #include  <lib_math.h>
@@ -10,18 +8,15 @@
 #include  <os_app_hooks.h>
 
 
-#include  "usbh_def.h"
-#include  "usbh_template.h"
-#include  "usb_host.h"
+#define  APP_OS_ALLOC   FALSE
 
-#include  "mod_gasanalysis.h"
-#include  "mod_greyanalysis.h"
+#if (APP_OS_ALLOC == FALSE)     
+    #define APP_OS_EXTERN   extern
+#else
+    #define APP_OS_EXTERN 
+#endif
 
-#include  "task_cml.h"
 
-#include  "Mod_Include.h"
-
-#include  "app_save.h"
 
 //==================================================================================
 //                                   任务优先级
@@ -55,54 +50,54 @@
 //==================================================================================
 //                                   任务控制块声明
 //==================================================================================
-extern  OS_TCB       TaskStartTCB;           /*  开始任务    */
-extern  OS_TCB       TaskGasProcTCB;         /*  紫外光处理任务    */
-extern  OS_TCB       TaskCmlSendTCB;         /*  命令行调试任务    */
-extern  OS_TCB       TaskCmlRecvTCB;         /*  命令行调试任务    */
-extern  OS_TCB       TaskUsbHostTCB;         /*  Usb光谱仪通讯任务    */
-extern  OS_TCB       TaskStdBusMasterTCB;    /*  STDBUS主机任务    */
-extern  OS_TCB       TaskStdBusSlaveTCB;     /*  STDBUS从机任务    */
-extern  OS_TCB       TaskDisBoardTCB;        /*  显示板任务    */
-extern  OS_TCB       TaskMeasSpeedTCB;       /*  测速任务    */
+APP_OS_EXTERN  OS_TCB       TaskStartTCB;           /*  开始任务    */
+APP_OS_EXTERN  OS_TCB       TaskGasProcTCB;         /*  紫外光处理任务    */
+APP_OS_EXTERN  OS_TCB       TaskCmlSendTCB;         /*  命令行调试任务    */
+APP_OS_EXTERN  OS_TCB       TaskCmlRecvTCB;         /*  命令行调试任务    */
+APP_OS_EXTERN  OS_TCB       TaskUsbHostTCB;         /*  Usb光谱仪通讯任务    */
+APP_OS_EXTERN  OS_TCB       TaskStdBusMasterTCB;    /*  STDBUS主机任务    */
+APP_OS_EXTERN  OS_TCB       TaskStdBusSlaveTCB;     /*  STDBUS从机任务    */
+APP_OS_EXTERN  OS_TCB       TaskDisBoardTCB;        /*  显示板任务    */
+APP_OS_EXTERN  OS_TCB       TaskMeasSpeedTCB;       /*  测速任务    */
 //==================================================================================
 //                                   任务堆栈声明
 //==================================================================================
-extern  CPU_STK      TaskStartStk   [TASK_START_STK_SIZE];                  /*  开始任务    */
-extern  CPU_STK      TaskGasProcStk [TASK_GASPROC_STK_SIZE];                /*  紫外光处理任务    */
-extern  CPU_STK      TaskCmlSendStk [TASK_CML_SEND_STK_SIZE];               /*  命令行调试任务    */
-extern  CPU_STK      TaskCmlRecvStk [TASK_CML_RECV_STK_SIZE];               /*  命令行调试任务    */
-extern  CPU_STK      TaskUsbHostStk [TASK_USB_HOST_STK_SIZE];               /*  光谱仪任务    */
-extern  CPU_STK      TaskStdBusMasterStk  [TASK_STDBUSMASTER_STK_SIZE];     /*  STDBUS主机任务    */
-extern  CPU_STK      TaskStdBusSlaveStk  [TASK_STDBUSSLAVE_STK_SIZE];       /*  STDBUS从机任务    */
-extern  CPU_STK      TaskDisBoardStk[TASK_DISBOARD_STK_SIZE];               /*  显示板任务    */
-extern  CPU_STK      TaskMeasSpeedStk[TASK_MEASSPEED_STK_SIZE];             /*  测速任务    */
+APP_OS_EXTERN  CPU_STK      TaskStartStk   [TASK_START_STK_SIZE];                  /*  开始任务    */
+APP_OS_EXTERN  CPU_STK      TaskGasProcStk [TASK_GASPROC_STK_SIZE];                /*  紫外光处理任务    */
+APP_OS_EXTERN  CPU_STK      TaskCmlSendStk [TASK_CML_SEND_STK_SIZE];               /*  命令行调试任务    */
+APP_OS_EXTERN  CPU_STK      TaskCmlRecvStk [TASK_CML_RECV_STK_SIZE];               /*  命令行调试任务    */
+APP_OS_EXTERN  CPU_STK      TaskUsbHostStk [TASK_USB_HOST_STK_SIZE];               /*  光谱仪任务    */
+APP_OS_EXTERN  CPU_STK      TaskStdBusMasterStk  [TASK_STDBUSMASTER_STK_SIZE];     /*  STDBUS主机任务    */
+APP_OS_EXTERN  CPU_STK      TaskStdBusSlaveStk  [TASK_STDBUSSLAVE_STK_SIZE];       /*  STDBUS从机任务    */
+APP_OS_EXTERN  CPU_STK      TaskDisBoardStk[TASK_DISBOARD_STK_SIZE];               /*  显示板任务    */
+APP_OS_EXTERN  CPU_STK      TaskMeasSpeedStk[TASK_MEASSPEED_STK_SIZE];             /*  测速任务    */
 //==================================================================================
 //                                   任务函数声明
 //==================================================================================
-extern void Task_Start (void  *p_arg);               /*  开始任务    */
-extern void Task_GasProc (void  *p_arg);             /*  紫外光处理任务    */
-extern void Task_TransCml (void  *p_arg);            /*  命令行调试任务    */
-extern void Task_RecvCml (void  *p_arg);             /*  命令行调试任务    */
-extern void Task_UsbHost (void  *p_arg);             /*  Usb光谱仪通讯任务 */
-extern void Task_StdBusMaster (void  *p_arg);        /*  STDBUS总线通讯    */
-extern void Task_StdBusSlave (void  *p_arg);         /*  STDBUS总线通讯    */
-extern void Task_DisBoard (void *p_arg);             /*  显示板任务    */
-extern void Task_MeasSpeed (void *p_arg);            /*  测速任务    */
+void Task_Start (void  *p_arg);               /*  开始任务    */
+void Task_GasProc (void  *p_arg);             /*  紫外光处理任务    */
+void Task_TransCml (void  *p_arg);            /*  命令行调试任务    */
+void Task_RecvCml (void  *p_arg);             /*  命令行调试任务    */
+void Task_UsbHost (void  *p_arg);             /*  Usb光谱仪通讯任务 */
+void Task_StdBusMaster (void  *p_arg);        /*  STDBUS总线通讯    */
+void Task_StdBusSlave (void  *p_arg);         /*  STDBUS总线通讯    */
+void Task_DisBoard (void *p_arg);             /*  显示板任务    */
+void Task_MeasSpeed (void *p_arg);            /*  测速任务    */
 //==================================================================================
 //                                   队列声明
 //==================================================================================
 #if (OS_CFG_Q_EN > 0u)
-extern  OS_Q         QCmlRecv;
-extern  OS_Q         QCmlTrans;
-extern  OS_Q         QSpeRecv;
-extern  OS_Q         QSpeTrans;
+APP_OS_EXTERN  OS_Q         QCmlRecv;
+APP_OS_EXTERN  OS_Q         QCmlTrans;
+APP_OS_EXTERN  OS_Q         QSpeRecv;
+APP_OS_EXTERN  OS_Q         QSpeTrans;
 #endif
 
 //==================================================================================
 //                                   信号量
 //==================================================================================
 #if (OS_CFG_SEM_EN > 0u)
-extern  OS_SEM       Sem_Rs485;
+APP_OS_EXTERN  OS_SEM       Sem_Rs485;
 #endif
 
 //==================================================================================

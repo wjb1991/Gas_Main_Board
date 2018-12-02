@@ -2094,9 +2094,12 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\Sources_App\app_standalone.c</name>
+            <excluded>
+                <configuration>Debug</configuration>
+            </excluded>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\Sources_App\app_stdbus.c</name>
+            <name>$PROJ_DIR$\..\..\Sources_App\App_StdbusMasterDealFram.cpp</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\Sources_App\usb_host.c</name>

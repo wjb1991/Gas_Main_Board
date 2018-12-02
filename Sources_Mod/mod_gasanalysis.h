@@ -1,8 +1,7 @@
 #ifndef __MOD_GASANALYSIS_H__
 #define __MOD_GASANALYSIS_H__
 
-#include "bsp.h"
-#include "app_cfg.h"
+#include "Mod_Include.h"
 
 #define     DEF_MAX_POINT_NUM   20
 #define     DEF_WAVE_BUFF_SIZE  3648

@@ -9,5 +9,9 @@
 #include "Mod_StdbusMaster.h"
 #include "Mod_StdbusSlave.h"
 #include "Mod_DisBoard.h"
+#include "Mod_MeasSpeed.h"
+
+#include "mod_gasanalysis.h"
+#include "mod_greyanalysis.h"
 
 #endif

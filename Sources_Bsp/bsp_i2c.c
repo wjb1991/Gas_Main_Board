@@ -1,4 +1,4 @@
-#include "bsp_i2c.h"
+#include "Bsp.h"
 
 #define  BSP_EESCK_GPIO_PIN                      GPIO_PIN_1
 #define  BSP_EESCK_GPIO_PORT                     GPIOF

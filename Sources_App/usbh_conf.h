@@ -131,7 +131,7 @@
 #define HOST_FS 		1
 
 #if (USBH_USE_OS == 1)
-#include "app_cfg.h"
+#include "App_Include.h"
   //#include "cmsis_os.h"
   //#define USBH_PROCESS_PRIO          osPriorityNormal
   //#define USBH_PROCESS_STACK_SIZE    ((uint16_t)0)

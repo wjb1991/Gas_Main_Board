@@ -13,8 +13,6 @@
 #ifndef __MOD_STDBUSM_H__
 #define __MOD_STDBUSM_H__
 
-#include "Bsp.h"
-
 #define     DEF_STDBUS_HOST_ADDR            0x10        /* 主机地址 */
 #define     DEF_STDBUS_PORTLIST_MAX         10          /* 主机所允许的最多的端口 */
 #define     DEF_STDBUS_DEV_ADDRLIST_MAX     4           /* 设备地址最大长度 */
