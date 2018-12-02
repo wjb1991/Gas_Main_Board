@@ -2123,6 +2123,9 @@
             <name>$PROJ_DIR$\..\..\Sources_Bsp\bsp_dma.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\Sources_Bsp\Bsp_Gpio.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\Sources_Bsp\bsp_i2c.c</name>
         </file>
         <file>

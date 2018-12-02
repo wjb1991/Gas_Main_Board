@@ -36,6 +36,7 @@ extern  "C" {                                  /* See Note #1.                  
 #include  "bsp_spi.h"
 #include  "bsp_i2c.h"
 #include  "bsp_at24c512.h"
+#include  "Bsp_Gpio.h"
   
 #include  "Bsp_W25Qxx.h"
 #include  "Bsp_LTC1867.h"
