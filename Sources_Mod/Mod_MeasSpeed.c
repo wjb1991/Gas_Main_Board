@@ -1,11 +1,12 @@
 #include "Mod_Include.h"
 
+BOOL Mod_MeasSpeedDealFram(StdbusFram_t* pst_Fram);
 
 StdbusDev_t st_StdbusMeasSpeed = {
     {0,0x30},                               /*地址列表*/
     2,                                      /*地址列表长度*/
     NULL,                                   /*端口句柄*/
-    NULL,                                   /*处理函数*/
+    Mod_MeasSpeedDealFram,                  /*处理函数*/
 };
 
 MeasSpeed_t st_MeasSpeed = {
@@ -21,10 +22,10 @@ void Mod_MeasSpeedPoll(void)
     Mod_StdbusWriteCmd(&st_StdbusMeasSpeed,0x30,NULL,0);
 }
 
-void Mod_MeasSpeedDealFram(StdbusFram_t* pst_Fram)
+BOOL Mod_MeasSpeedDealFram(StdbusFram_t* pst_Fram)
 {
     if (pst_Fram == NULL)
-        return;
+        return FALSE;
     switch(pst_Fram->uch_Cmd)
     {
     case 0x40:
@@ -46,4 +47,5 @@ void Mod_MeasSpeedDealFram(StdbusFram_t* pst_Fram)
 
         break;
     }
+    return FALSE;
 }

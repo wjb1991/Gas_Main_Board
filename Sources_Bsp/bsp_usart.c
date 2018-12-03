@@ -552,7 +552,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 #if (DEF_USE_COM2 == TRUE)
     if(huart->Instance == USART2)
     {
-#if 0
+#if 1
         /*##-1- Enable peripherals and GPIO Clocks #################################*/
         /* Enable GPIO TX/RX clock */
         __HAL_RCC_GPIOA_CLK_ENABLE();
@@ -578,7 +578,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
         HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 #endif
 
-#if 1
+#if 0
         /*##-1- Enable peripherals and GPIO Clocks #################################*/
         /* Enable GPIO TX/RX clock */
         __HAL_RCC_GPIOD_CLK_ENABLE();

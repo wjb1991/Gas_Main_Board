@@ -234,8 +234,7 @@ void Mod_StdbusPortSendOneByte(StdbusPort_t * pst_Port)
         {
             if( pst_Port->pv_Handle == (void *)&COM4)
             {
-                Bsp_DelayUS(1000);
-                Bsp_Rs485de(eRs485Trans);            
+                Bsp_Rs485de(eRs485Trans);
             }
 
             pst_Port->uin_BuffIndex = 0;
@@ -312,7 +311,7 @@ BOOL Mod_StdbusPortRecvOneByte(StdbusPort_t* pst_Port,INT8U uch_Byte)
     }
     else if (pst_Port->e_State == e_StdbusRecv)
     {
-        if(pst_Port->uin_BuffLenth <= pst_Port->uin_BuffSize)
+        if(pst_Port->uin_BuffLenth < pst_Port->uin_BuffSize)    //20181203 <= 改为小于
         {
             if (uch_Byte == 0x7d)                               //判断是否接受到帧尾
             {
@@ -334,6 +333,11 @@ BOOL Mod_StdbusPortRecvOneByte(StdbusPort_t* pst_Port,INT8U uch_Byte)
                     pst_Port->puc_Buff[pst_Port->uin_BuffLenth++] = uch_Byte;
                 pst_Port->uch_LastByte =uch_Byte;
             }
+        }
+        else                                                //20181203 添加尝试修复死机问题
+        {
+            Mod_StdbusRscPack(pst_Port);                  //释放本端口的数据
+            UnLockPort(pst_Port);
         }
     }
     return TRUE;

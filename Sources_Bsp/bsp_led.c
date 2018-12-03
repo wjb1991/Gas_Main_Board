@@ -59,8 +59,10 @@ void  BSP_LedInit (void)
     __HAL_RCC_GPIOE_CLK_ENABLE();
     __HAL_RCC_GPIOF_CLK_ENABLE();
     __HAL_RCC_GPIOG_CLK_ENABLE();
-
-                                                                /* Configure the GPIOF for LED1(PF10)                   */
+    __HAL_RCC_GPIOH_CLK_ENABLE();
+    __HAL_RCC_GPIOI_CLK_ENABLE();
+    
+    /* Configure the GPIOF for LED1(PF10)                   */
     gpio_init.Pin   = BSP_LED1_GPIO_PIN;
     gpio_init.Mode  = GPIO_MODE_OUTPUT_PP;
     gpio_init.Pull  = GPIO_PULLUP;

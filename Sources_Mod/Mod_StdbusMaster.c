@@ -2,7 +2,7 @@
 
 #define DEF_STDBUS_MASTER_PORT  &COM6
 #define DEF_STDBUS_MASTER_BUFF_LEN   1024
-#define DEF_STDBUS_MASTER_DEV_LEN    10
+#define DEF_STDBUS_MASTER_DEV_LEN    1
 
 static INT8U auc_Buff[DEF_STDBUS_MASTER_BUFF_LEN] = {0};
 
@@ -10,21 +10,21 @@ static StdbusDev_t* ast_DevList[DEF_STDBUS_MASTER_DEV_LEN] = {0};
 
 
 StdbusPort_t st_StdbusMaster ={
-    e_StdbusIdle,                           /* 状态 */ 
+    e_StdbusIdle,                           /* 状态 */
     NULL,                                   /* 端口占用锁  OS情况下是一个信号量 */
-    &TaskStdBusMasterTCB,                         /* 端口消息 OS情况下是一个消息队列*/   
-    DEF_STDBUS_MASTER_PORT,                 /* 串口句柄 */ 
-    NULL,                                   /* 主机句柄 */      
+    &TaskStdBusMasterTCB,                         /* 端口消息 OS情况下是一个消息队列*/
+    DEF_STDBUS_MASTER_PORT,                 /* 串口句柄 */
+    NULL,                                   /* 主机句柄 */
     ast_DevList,                                   /* 设备列表 */
     DEF_STDBUS_MASTER_DEV_LEN,                                      /* 设备列表长度 */
     0,                                      /* 已使用的设备个数 */
-                                            
+
     0,                                      /* 最后一个字节 */
     auc_Buff,                               /* 数据缓冲区 */
     1024,                                   /* 缓冲区大小 */
     0,                                      /* 有效数据的长度 */
-    0,                                      /* 发送数组索引 */  
-    
+    0,                                      /* 发送数组索引 */
+
     {
         {0,0,0,0},                          /*保留*/
         0,                                  /*地址列表长度*/
@@ -38,7 +38,7 @@ StdbusPort_t st_StdbusMaster ={
 };
 
 
-StdbusDev_t st_PC = {    
+StdbusDev_t st_PC = {
     {0,0x00},                               /*地址列表*/
     2,                                      /*地址列表长度*/
     NULL,                                   /*端口句柄*/

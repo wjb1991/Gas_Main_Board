@@ -142,15 +142,22 @@ BOOL Bsp_SpiIsBusy(Dev_SPI* pst_Dev)
 //==================================================================================
 INT8U Bsp_SpiTransByteBlock(Dev_SPI* pst_Dev,INT8U uch_Byte)
 {
+
     SPI_HandleTypeDef* SpiHandle = pst_Dev->pv_SpiHandle;
     INT8U RecvByte = 0xff;
-    /*HAL_SPI_TransmitReceive(SpiHandle,&uch_Byte,&RecvByte,1,100);*/
-    
+    /**/
+    HAL_SPI_TransmitReceive(SpiHandle,&uch_Byte,&RecvByte,1,100);
+#if 0    
+    CPU_IntDis();
     while( ! __HAL_SPI_GET_FLAG(SpiHandle, SPI_FLAG_TXE)){}
     LL_SPI_TransmitData8(SpiHandle->Instance, uch_Byte);
     while( __HAL_SPI_GET_FLAG(SpiHandle, SPI_FLAG_BSY)){}
     while( !__HAL_SPI_GET_FLAG(SpiHandle, SPI_FLAG_RXNE)){}
     RecvByte = LL_SPI_ReceiveData8(SpiHandle->Instance);
+    CPU_IntEn();
+    
+#endif
+    
     return RecvByte;
 }
 

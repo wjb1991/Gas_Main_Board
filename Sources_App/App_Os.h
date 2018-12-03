@@ -10,10 +10,10 @@
 
 #define  APP_OS_ALLOC   FALSE
 
-#if (APP_OS_ALLOC == FALSE)     
+#if (APP_OS_ALLOC == FALSE)
     #define APP_OS_EXTERN   extern
 #else
-    #define APP_OS_EXTERN 
+    #define APP_OS_EXTERN
 #endif
 
 
@@ -26,8 +26,11 @@
 #define  TASK_GASPROC_PRIO              5u
 #define  TASK_GREYPROC_PRIO             6u
 
-#define  TASK_MEASSPEED_PRIO            13u
-#define  TASK_DISBOARD_PRIO             14u
+#define  TASK_MEASSPEED_PRIO            12u
+#define  TASK_LASER_PRIO                14u
+#define  TASK_DISBOARD_PRIO             20u
+
+#define  TASK_STDBUSLASER_PRIO          14u
 #define  TASK_STDBUSMASTER_PRIO         15u
 #define  TASK_STDBUSSLAVE_PRIO          16u
 
@@ -43,20 +46,25 @@
 #define  TASK_CML_SEND_STK_SIZE         256u
 #define  TASK_CML_RECV_STK_SIZE         256u
 #define  TASK_USB_HOST_STK_SIZE         2048u
+#define  TASK_STDBUSLASER_STK_SIZE      512u
 #define  TASK_STDBUSMASTER_STK_SIZE     512u
 #define  TASK_STDBUSSLAVE_STK_SIZE      512u
 #define  TASK_DISBOARD_STK_SIZE         256u
 #define  TASK_MEASSPEED_STK_SIZE        512u
+#define  TASK_LASER_STK_SIZE            512u
 //==================================================================================
 //                                   任务控制块声明
 //==================================================================================
 APP_OS_EXTERN  OS_TCB       TaskStartTCB;           /*  开始任务    */
 APP_OS_EXTERN  OS_TCB       TaskGasProcTCB;         /*  紫外光处理任务    */
+APP_OS_EXTERN  OS_TCB       TaskGreyProcTCB;        /*  绿光光处理任务    */
 APP_OS_EXTERN  OS_TCB       TaskCmlSendTCB;         /*  命令行调试任务    */
 APP_OS_EXTERN  OS_TCB       TaskCmlRecvTCB;         /*  命令行调试任务    */
 APP_OS_EXTERN  OS_TCB       TaskUsbHostTCB;         /*  Usb光谱仪通讯任务    */
+APP_OS_EXTERN  OS_TCB       TaskStdBusLaserTCB;     /*  STDBUS激光板任务    */
 APP_OS_EXTERN  OS_TCB       TaskStdBusMasterTCB;    /*  STDBUS主机任务    */
 APP_OS_EXTERN  OS_TCB       TaskStdBusSlaveTCB;     /*  STDBUS从机任务    */
+APP_OS_EXTERN  OS_TCB       TaskLaserTCB;           /*  激光板任务    */
 APP_OS_EXTERN  OS_TCB       TaskDisBoardTCB;        /*  显示板任务    */
 APP_OS_EXTERN  OS_TCB       TaskMeasSpeedTCB;       /*  测速任务    */
 //==================================================================================
@@ -67,8 +75,10 @@ APP_OS_EXTERN  CPU_STK      TaskGasProcStk [TASK_GASPROC_STK_SIZE];             
 APP_OS_EXTERN  CPU_STK      TaskCmlSendStk [TASK_CML_SEND_STK_SIZE];               /*  命令行调试任务    */
 APP_OS_EXTERN  CPU_STK      TaskCmlRecvStk [TASK_CML_RECV_STK_SIZE];               /*  命令行调试任务    */
 APP_OS_EXTERN  CPU_STK      TaskUsbHostStk [TASK_USB_HOST_STK_SIZE];               /*  光谱仪任务    */
+APP_OS_EXTERN  CPU_STK      TaskStdBusLaserStk  [TASK_STDBUSLASER_STK_SIZE];       /*  STDBUS激光板任务    */
 APP_OS_EXTERN  CPU_STK      TaskStdBusMasterStk  [TASK_STDBUSMASTER_STK_SIZE];     /*  STDBUS主机任务    */
 APP_OS_EXTERN  CPU_STK      TaskStdBusSlaveStk  [TASK_STDBUSSLAVE_STK_SIZE];       /*  STDBUS从机任务    */
+APP_OS_EXTERN  CPU_STK      TaskLaserStk[TASK_LASER_STK_SIZE];                     /*  激光板任务    */
 APP_OS_EXTERN  CPU_STK      TaskDisBoardStk[TASK_DISBOARD_STK_SIZE];               /*  显示板任务    */
 APP_OS_EXTERN  CPU_STK      TaskMeasSpeedStk[TASK_MEASSPEED_STK_SIZE];             /*  测速任务    */
 //==================================================================================
@@ -76,11 +86,14 @@ APP_OS_EXTERN  CPU_STK      TaskMeasSpeedStk[TASK_MEASSPEED_STK_SIZE];          
 //==================================================================================
 void Task_Start (void  *p_arg);               /*  开始任务    */
 void Task_GasProc (void  *p_arg);             /*  紫外光处理任务    */
+void Task_GreyProc (void  *p_arg);            /*  绿光光处理任务    */
 void Task_TransCml (void  *p_arg);            /*  命令行调试任务    */
 void Task_RecvCml (void  *p_arg);             /*  命令行调试任务    */
 void Task_UsbHost (void  *p_arg);             /*  Usb光谱仪通讯任务 */
+void Task_StdBusLaser (void  *p_arg);         /*  STDBUS激光板任务    */
 void Task_StdBusMaster (void  *p_arg);        /*  STDBUS总线通讯    */
 void Task_StdBusSlave (void  *p_arg);         /*  STDBUS总线通讯    */
+void Task_Laser (void *p_arg);                /*  激光板任务    */
 void Task_DisBoard (void *p_arg);             /*  显示板任务    */
 void Task_MeasSpeed (void *p_arg);            /*  测速任务    */
 //==================================================================================
@@ -98,6 +111,7 @@ APP_OS_EXTERN  OS_Q         QSpeTrans;
 //==================================================================================
 #if (OS_CFG_SEM_EN > 0u)
 APP_OS_EXTERN  OS_SEM       Sem_Rs485;
+APP_OS_EXTERN  OS_SEM       Sem_Laser;
 #endif
 
 //==================================================================================

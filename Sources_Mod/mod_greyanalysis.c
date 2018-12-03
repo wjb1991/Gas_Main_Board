@@ -59,11 +59,11 @@ void Mod_GreySample(GreyChannel_t* pst_Grye)
     case 5:
     case 6:
     case 7:
-        i = Bsp_LTC1867SampleAvg(&st_LTC1867B,pst_Grye->uch_Num,50);
+        i = Bsp_LTC1867SampleAvg(&st_LTC1867B,pst_Grye->uch_Num,5);
         break;
     case 8:
     case 9:
-        i = Bsp_LTC1867SampleAvg(&st_LTC1867A,pst_Grye->uch_Num-8,50);
+        i = Bsp_LTC1867SampleAvg(&st_LTC1867A,pst_Grye->uch_Num-8,5);
         break;
     }
 

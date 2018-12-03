@@ -8,11 +8,14 @@ void AppObjCreate (void);
 //==================================================================================
 OS_TCB       TaskStartTCB;           /*  开始任务    */
 OS_TCB       TaskGasProcTCB;         /*  紫外光处理任务    */
+OS_TCB       TaskGreyProcTCB;        /*  绿光光处理任务    */
 OS_TCB       TaskCmlSendTCB;         /*  命令行调试任务    */
 OS_TCB       TaskCmlRecvTCB;         /*  命令行调试任务    */
 OS_TCB       TaskUsbHostTCB;         /*  Usb光谱仪通讯任务    */
+OS_TCB       TaskStdBusLaserTCB;     /*  STDBUS激光板任务    */
 OS_TCB       TaskStdBusMasterTCB;    /*  STDBUS主机任务    */
 OS_TCB       TaskStdBusSlaveTCB;     /*  STDBUS从机任务    */
+OS_TCB       TaskLaserTCB;           /*  激光板任务    */
 OS_TCB       TaskDisBoardTCB;        /*  显示板任务    */
 OS_TCB       TaskMeasSpeedTCB;       /*  测速任务    */
 //==================================================================================
@@ -20,11 +23,14 @@ OS_TCB       TaskMeasSpeedTCB;       /*  测速任务    */
 //==================================================================================
 CPU_STK      TaskStartStk   [TASK_START_STK_SIZE];                  /*  开始任务    */
 CPU_STK      TaskGasProcStk [TASK_GASPROC_STK_SIZE];                /*  紫外光处理任务    */
+CPU_STK      TaskGreyProcStk[TASK_GREYPROC_STK_SIZE];               /*  绿光光处理任务    */
 CPU_STK      TaskCmlSendStk [TASK_CML_SEND_STK_SIZE];               /*  命令行调试任务    */
 CPU_STK      TaskCmlRecvStk [TASK_CML_RECV_STK_SIZE];               /*  命令行调试任务    */
 CPU_STK      TaskUsbHostStk [TASK_USB_HOST_STK_SIZE];               /*  光谱仪任务    */
+CPU_STK      TaskStdBusLaserStk  [TASK_STDBUSLASER_STK_SIZE];       /*  STDBUS激光板任务    */
 CPU_STK      TaskStdBusMasterStk  [TASK_STDBUSMASTER_STK_SIZE];     /*  STDBUS主机任务    */
 CPU_STK      TaskStdBusSlaveStk  [TASK_STDBUSSLAVE_STK_SIZE];       /*  STDBUS从机任务    */
+CPU_STK      TaskLaserStk[TASK_LASER_STK_SIZE];                     /*  激光板任务    */
 CPU_STK      TaskDisBoardStk[TASK_DISBOARD_STK_SIZE];               /*  显示板任务    */
 CPU_STK      TaskMeasSpeedStk[TASK_MEASSPEED_STK_SIZE];             /*  测速任务    */
 //==================================================================================
@@ -42,6 +48,7 @@ OS_Q         QSpeTrans;
 //==================================================================================
 #if (OS_CFG_SEM_EN > 0u)
 OS_SEM       Sem_Rs485;
+OS_SEM       Sem_Laser;
 #endif
 
 extern  void standalone(void);
@@ -144,7 +151,21 @@ void AppTaskCreate (void)
 
 
 #if 1
-    /* STDBUS */
+    /* STDBUS PORT 线程 */
+    OSTaskCreate((OS_TCB       *)&TaskStdBusLaserTCB,                          /* 创建任务控制块 */
+                 (CPU_CHAR     *)"StdBus Task",                                 /* 任务名称 */
+                 (OS_TASK_PTR   )Task_StdBusLaser,                             /* 任务函数 */
+                 (void         *)0u,                                            /* 任务入参 */
+                 (OS_PRIO       )TASK_STDBUSLASER_PRIO,                        /* 任务优先级 */
+                 (CPU_STK      *)&TaskStdBusLaserStk[0u],                            /* 任务堆载地址 */
+                 (CPU_STK_SIZE  )TASK_STDBUSLASER_STK_SIZE / 10u,              /* 任务栈深限制 */
+                 (CPU_STK_SIZE  )TASK_STDBUSLASER_STK_SIZE,                    /* 任务堆栈大小 */
+                 (OS_MSG_QTY    )1u,                                          /* 内部消息队列的最大消息数目 */
+                 (OS_TICK       )0u,                                            /* 时间片轮询的时间片数 */
+                 (void         *)0u,                                            /* 用户补充存储区 */
+                 (OS_OPT        )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_SAVE_FP),
+                 (OS_ERR       *)&os_err);                                      /* 存放错误值 */
+
     OSTaskCreate((OS_TCB       *)&TaskStdBusMasterTCB,                          /* 创建任务控制块 */
                  (CPU_CHAR     *)"StdBus Task",                                 /* 任务名称 */
                  (OS_TASK_PTR   )Task_StdBusMaster,                             /* 任务函数 */
@@ -175,23 +196,6 @@ void AppTaskCreate (void)
 #endif
 
 #if 1
-    /* 显示板任务 */
-    OSTaskCreate((OS_TCB       *)&TaskDisBoardTCB,                                /* 创建任务控制块 */
-                 (CPU_CHAR     *)"DisBorad Task",                                 /* 任务名称 */
-                 (OS_TASK_PTR   )Task_DisBoard,                                   /* 任务函数 */
-                 (void         *)0u,                                            /* 任务入参 */
-                 (OS_PRIO       )TASK_DISBOARD_PRIO,                              /* 任务优先级 */
-                 (CPU_STK      *)&TaskDisBoardStk[0u],                            /* 任务堆载地址 */
-                 (CPU_STK_SIZE  )TASK_DISBOARD_STK_SIZE / 10u,                    /* 任务栈深限制 */
-                 (CPU_STK_SIZE  )TASK_DISBOARD_STK_SIZE,                          /* 任务堆栈大小 */
-                 (OS_MSG_QTY    )0u,                                           /* 内部消息队列的最大消息数目 */
-                 (OS_TICK       )0u,                                            /* 时间片轮询的时间片数 */
-                 (void         *)0u,                                            /* 用户补充存储区 */
-                 (OS_OPT        )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_SAVE_FP),
-                 (OS_ERR       *)&os_err);                                      /* 存放错误值 */
-
-#endif
-#if 1
     /* 测速任务 */
     OSTaskCreate((OS_TCB       *)&TaskMeasSpeedTCB,                                /* 创建任务控制块 */
                  (CPU_CHAR     *)"MeasSpeed Task",                                 /* 任务名称 */
@@ -206,7 +210,39 @@ void AppTaskCreate (void)
                  (void         *)0u,                                            /* 用户补充存储区 */
                  (OS_OPT        )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_SAVE_FP),
                  (OS_ERR       *)&os_err);                                      /* 存放错误值 */
+#endif
+#if 1
+     /* 轮询激光板任务 */
+     OSTaskCreate((OS_TCB       *)&TaskLaserTCB,                                /* 创建任务控制块 */
+                  (CPU_CHAR     *)"Laser Task",                                 /* 任务名称 */
+                  (OS_TASK_PTR   )Task_Laser,                                   /* 任务函数 */
+                  (void         *)0u,                                            /* 任务入参 */
+                  (OS_PRIO       )TASK_LASER_PRIO,                              /* 任务优先级 */
+                  (CPU_STK      *)&TaskMeasSpeedStk[0u],                            /* 任务堆载地址 */
+                  (CPU_STK_SIZE  )TASK_LASER_STK_SIZE / 10u,                    /* 任务栈深限制 */
+                  (CPU_STK_SIZE  )TASK_LASER_STK_SIZE,                          /* 任务堆栈大小 */
+                  (OS_MSG_QTY    )10u,                                           /* 内部消息队列的最大消息数目 */
+                  (OS_TICK       )0u,                                            /* 时间片轮询的时间片数 */
+                  (void         *)0u,                                            /* 用户补充存储区 */
+                  (OS_OPT        )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_SAVE_FP),
+                  (OS_ERR       *)&os_err);                                      /* 存放错误值 */
 
+#endif
+#if 1
+    /* 显示板任务 */
+    OSTaskCreate((OS_TCB       *)&TaskDisBoardTCB,                                /* 创建任务控制块 */
+                 (CPU_CHAR     *)"DisBorad Task",                                 /* 任务名称 */
+                 (OS_TASK_PTR   )Task_DisBoard,                                   /* 任务函数 */
+                 (void         *)0u,                                            /* 任务入参 */
+                 (OS_PRIO       )TASK_DISBOARD_PRIO,                              /* 任务优先级 */
+                 (CPU_STK      *)&TaskDisBoardStk[0u],                            /* 任务堆载地址 */
+                 (CPU_STK_SIZE  )TASK_DISBOARD_STK_SIZE / 10u,                    /* 任务栈深限制 */
+                 (CPU_STK_SIZE  )TASK_DISBOARD_STK_SIZE,                          /* 任务堆栈大小 */
+                 (OS_MSG_QTY    )0u,                                           /* 内部消息队列的最大消息数目 */
+                 (OS_TICK       )0u,                                            /* 时间片轮询的时间片数 */
+                 (void         *)0u,                                            /* 用户补充存储区 */
+                 (OS_OPT        )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_SAVE_FP),
+                 (OS_ERR       *)&os_err);                                      /* 存放错误值 */
 #endif
 
 
@@ -226,7 +262,7 @@ void AppTaskCreate (void)
                  (OS_OPT        )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_SAVE_FP),
                  (OS_ERR       *)&os_err);                                      /* 存放错误值 */
 #endif
-#if 0
+#if 1
     /* 灰度处理 */
     OSTaskCreate((OS_TCB       *)&TaskGreyProcTCB,                              /* 创建任务控制块 */
                  (CPU_CHAR     *)"Grey Process",                                /* 任务名称 */
@@ -275,9 +311,14 @@ void AppObjCreate (void)
     OS_ERR  os_err;
 #if (OS_CFG_SEM_EN > 0u)
     OSSemCreate(&Sem_Rs485,
-                "RS485 Port Lock",
-                 1u,
-                 &os_err);
+            "RS485 Port Lock",
+             1u,
+             &os_err);
+
+    OSSemCreate(&Sem_Laser,
+             "Laser Port Lock",
+              1u,
+              &os_err);
 #endif
 
 #if (OS_CFG_Q_EN > 0u)
