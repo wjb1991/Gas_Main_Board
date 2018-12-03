@@ -21,6 +21,12 @@ typedef enum {
     e_IO_Relay1,
     e_IO_Relay2,
     e_IO_Relay3,
+    e_IO_245OE,  
+    e_IO_245DIR, 
+    e_IO_Sync0,  
+    e_IO_Sync1,  
+    e_IO_Sync2,  
+    
 }GpioId_e;
 
 BOOL Bsp_GpioInit(void);

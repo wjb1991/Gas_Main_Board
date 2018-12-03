@@ -26,13 +26,20 @@ typedef struct {
 
 }GpioConfig_t;
 
-
-const GpioConfig_t ast_GpioConfig[] = {
+GpioConfig_t ast_GpioConfig[] = {
 /*|-------使用编号-------|--别名字符串--|--输入--|--输出--|--端口--|------引脚------|--------模式-------|----上下拉----|-------速度-------|*/
-    {e_IO_Relay0,          "继电器0",   FALSE,   FALSE,   GPIOG,  GPIO_PIN_0,    GPIO_MODE_OUTPUT_PP, GPIO_PULLUP,  GPIO_SPEED_HIGH},
-    {e_IO_Relay1,          "继电器1",   FALSE,   FALSE,   GPIOG,  GPIO_PIN_0,    GPIO_MODE_OUTPUT_PP, GPIO_PULLUP,  GPIO_SPEED_HIGH},
-    {e_IO_Relay2,          "继电器2",   FALSE,   FALSE,   GPIOG,  GPIO_PIN_0,    GPIO_MODE_OUTPUT_PP, GPIO_PULLUP,  GPIO_SPEED_HIGH},
-    {e_IO_Relay3,          "继电器3",   FALSE,   FALSE,   GPIOG,  GPIO_PIN_0,    GPIO_MODE_OUTPUT_PP, GPIO_PULLUP,  GPIO_SPEED_HIGH},
+    {e_IO_Relay0,          "继电器0",   FALSE,   FALSE,   GPIOH,  GPIO_PIN_15,    GPIO_MODE_OUTPUT_PP, GPIO_PULLUP,  GPIO_SPEED_HIGH},
+    {e_IO_Relay1,          "继电器1",   FALSE,   FALSE,   GPIOH,  GPIO_PIN_13,    GPIO_MODE_OUTPUT_PP, GPIO_PULLUP,  GPIO_SPEED_HIGH},
+    {e_IO_Relay2,          "继电器2",   FALSE,   FALSE,   GPIOH,  GPIO_PIN_11,    GPIO_MODE_OUTPUT_PP, GPIO_PULLUP,  GPIO_SPEED_HIGH},
+    {e_IO_Relay3,          "继电器3",   FALSE,   FALSE,   GPIOH,  GPIO_PIN_14,    GPIO_MODE_OUTPUT_PP, GPIO_PULLUP,  GPIO_SPEED_HIGH},
+    
+    {e_IO_245OE,         "74HC245 OE",  FALSE,   FALSE,   GPIOF,  GPIO_PIN_11,    GPIO_MODE_OUTPUT_PP, GPIO_PULLUP,  GPIO_SPEED_HIGH},
+    {e_IO_245DIR,        "74HC245 DIR", FALSE,   FALSE,   GPIOF,  GPIO_PIN_15,    GPIO_MODE_OUTPUT_PP, GPIO_PULLUP,  GPIO_SPEED_HIGH},
+    {e_IO_Sync0,         "同步信号0",   FALSE,   FALSE,   GPIOF,  GPIO_PIN_12,    GPIO_MODE_IT_RISING, GPIO_PULLUP,  GPIO_SPEED_HIGH},
+    {e_IO_Sync1,         "同步信号0",   FALSE,   FALSE,   GPIOF,  GPIO_PIN_13,    GPIO_MODE_IT_RISING, GPIO_PULLUP,  GPIO_SPEED_HIGH},
+    {e_IO_Sync2,         "同步信号0",   FALSE,   FALSE,   GPIOF,  GPIO_PIN_14,    GPIO_MODE_IT_RISING, GPIO_PULLUP,  GPIO_SPEED_HIGH},
+
+
 };
 
 static INT32U  ul_UsePinNum = sizeof(ast_GpioConfig)/sizeof(GpioConfig_t);     /*计算使用的引脚数*/
@@ -48,7 +55,8 @@ BOOL Bsp_GpioInit(void)
     __HAL_RCC_GPIOE_CLK_ENABLE();
     __HAL_RCC_GPIOF_CLK_ENABLE();
     __HAL_RCC_GPIOG_CLK_ENABLE();
-
+    __HAL_RCC_GPIOH_CLK_ENABLE();
+    
     for(i = 0; i < ul_UsePinNum; i++)
     {
         GPIO_InitTypeDef  gpio_init;
@@ -84,7 +92,8 @@ void Bsp_GpioWirte(GpioId_e e_GpioId,BOOL b_State)
     }
 #endif
     pst_Gpio->b_OutState = b_State;
-    HAL_GPIO_WritePin((GPIO_TypeDef*)pst_Gpio->ul_Pin, pst_Gpio->ul_Pin,
+    
+    HAL_GPIO_WritePin((GPIO_TypeDef*)pst_Gpio->ul_Port, pst_Gpio->ul_Pin,
                       (GPIO_PinState)pst_Gpio->b_OutState);
 }
 
@@ -127,6 +136,6 @@ BOOL Bsp_GpioReadIn(GpioId_e e_GpioId)
         }
     }
 #endif
-    pst_Gpio->b_InState = HAL_GPIO_ReadPin((GPIO_TypeDef*)pst_Gpio->ul_Pin, pst_Gpio->ul_Pin);
+    pst_Gpio->b_InState = HAL_GPIO_ReadPin((GPIO_TypeDef*)pst_Gpio->ul_Port, pst_Gpio->ul_Pin);
     return pst_Gpio->b_InState;
 }

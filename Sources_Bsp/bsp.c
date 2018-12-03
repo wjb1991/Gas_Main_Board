@@ -23,6 +23,8 @@ void  Bsp_Init (void)
     HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_2);         /* 2Bit抢占优先级 2Bit响应优先级 数字越小响应级越高 */
     
     BSP_LedInit(); 
+    Bsp_GpioInit();
+    
     Bsp_I2cInit(&Bsp_At24c512);
     
     Bsp_DMAInit();
