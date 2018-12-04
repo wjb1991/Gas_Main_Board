@@ -24,7 +24,7 @@ void Task_GreyProc(void  *p_arg)
               OS_OPT_TIME_HMSM_STRICT | OS_OPT_TIME_PERIODIC,/* 周期模式 */
               &os_err);
         
-        //Mod_GreyProc(&st_GreyMoudle);
+        Mod_GreyProc(&st_GreyMoudle);
         
         //TRACE_DBG(">>DBG:       灰度处理\r\n");
     }

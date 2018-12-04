@@ -6,7 +6,7 @@ void Task_MeasSpeed (void *p_arg)
 
     while(1)
     {
-        OSTimeDlyHMSM(0u, 0u, 0u, 500,
+        OSTimeDlyHMSM(0u, 0u, 5u, 500,
                       OS_OPT_TIME_HMSM_STRICT | OS_OPT_TIME_PERIODIC,/* 周期模式 */
                       &os_err);
         Mod_MeasSpeedPoll();

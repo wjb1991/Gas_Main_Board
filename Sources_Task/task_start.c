@@ -152,7 +152,6 @@ void AppTaskCreate (void)
                  (OS_ERR       *)&os_err);                                      /* 存放错误值 */
 #endif
 
-
 #if 1
     /* STDBUS PORT 线程 */
     OSTaskCreate((OS_TCB       *)&TaskStdBusLaserTCB,                          /* 创建任务控制块 */
@@ -183,19 +182,19 @@ void AppTaskCreate (void)
                  (OS_OPT        )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_SAVE_FP),
                  (OS_ERR       *)&os_err);                                      /* 存放错误值 */
 
-     OSTaskCreate((OS_TCB       *)&TaskStdBusSlaveTCB,                          /* 创建任务控制块 */
-                  (CPU_CHAR     *)"StdBus Slave Task",                                 /* 任务名称 */
-                  (OS_TASK_PTR   )Task_StdBusSlave,                             /* 任务函数 */
-                  (void         *)0u,                                            /* 任务入参 */
-                  (OS_PRIO       )TASK_STDBUSSLAVE_PRIO,                        /* 任务优先级 */
-                  (CPU_STK      *)&TaskStdBusSlaveStk[0u],                            /* 任务堆载地址 */
-                  (CPU_STK_SIZE  )TASK_STDBUSSLAVE_STK_SIZE / 10u,              /* 任务栈深限制 */
-                  (CPU_STK_SIZE  )TASK_STDBUSSLAVE_STK_SIZE,                    /* 任务堆栈大小 */
-                  (OS_MSG_QTY    )100u,                                          /* 内部消息队列的最大消息数目 */
-                  (OS_TICK       )0u,                                            /* 时间片轮询的时间片数 */
-                  (void         *)0u,                                            /* 用户补充存储区 */
-                  (OS_OPT        )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_SAVE_FP),
-                  (OS_ERR       *)&os_err);                                      /* 存放错误值 */
+    OSTaskCreate((OS_TCB       *)&TaskStdBusSlaveTCB,                          /* 创建任务控制块 */
+                 (CPU_CHAR     *)"StdBus Slave Task",                                 /* 任务名称 */
+                 (OS_TASK_PTR   )Task_StdBusSlave,                             /* 任务函数 */
+                 (void         *)0u,                                            /* 任务入参 */
+                 (OS_PRIO       )TASK_STDBUSSLAVE_PRIO,                        /* 任务优先级 */
+                 (CPU_STK      *)&TaskStdBusSlaveStk[0u],                            /* 任务堆载地址 */
+                 (CPU_STK_SIZE  )TASK_STDBUSSLAVE_STK_SIZE / 10u,              /* 任务栈深限制 */
+                 (CPU_STK_SIZE  )TASK_STDBUSSLAVE_STK_SIZE,                    /* 任务堆栈大小 */
+                 (OS_MSG_QTY    )100u,                                          /* 内部消息队列的最大消息数目 */
+                 (OS_TICK       )0u,                                            /* 时间片轮询的时间片数 */
+                 (void         *)0u,                                            /* 用户补充存储区 */
+                 (OS_OPT        )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_SAVE_FP),
+                 (OS_ERR       *)&os_err);                                      /* 存放错误值 */
 #endif
 
 #if 0
@@ -231,7 +230,7 @@ void AppTaskCreate (void)
                   (OS_ERR       *)&os_err);                                      /* 存放错误值 */
 
 #endif
-#if 0
+#if 1
     /* 显示板任务 */
     OSTaskCreate((OS_TCB       *)&TaskDisBoardTCB,                                /* 创建任务控制块 */
                  (CPU_CHAR     *)"DisBorad Task",                                 /* 任务名称 */
@@ -265,7 +264,7 @@ void AppTaskCreate (void)
                  (OS_OPT        )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_SAVE_FP),
                  (OS_ERR       *)&os_err);                                      /* 存放错误值 */
 #endif
-#if 0
+#if 1
     /* 灰度处理 */
     OSTaskCreate((OS_TCB       *)&TaskGreyProcTCB,                              /* 创建任务控制块 */
                  (CPU_CHAR     *)"Grey Process",                                /* 任务名称 */

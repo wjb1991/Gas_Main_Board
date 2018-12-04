@@ -357,10 +357,10 @@ BOOL Mod_StdbusPortRecvOneByte(StdbusPort_t* pst_Port,INT8U uch_Byte)
     {
         if (uch_Byte == 0x7b)
         {
-            Mod_StdbusRscPack(pst_Port);                  //释放本端口的数据
+            Mod_StdbusRscPack(pst_Port);                    //释放本端口的数据
             pst_Port->e_State = e_StdbusRecv;
             pst_Port->puc_Buff[pst_Port->uin_BuffLenth++] = uch_Byte;
-            //LockPort(pst_Port);                         /*占用总线 */
+            LockPort(pst_Port);                             //占用总线
         }
     }
     else if (pst_Port->e_State == e_StdbusRecv)
@@ -371,15 +371,13 @@ BOOL Mod_StdbusPortRecvOneByte(StdbusPort_t* pst_Port,INT8U uch_Byte)
             {
                 pst_Port->e_State = e_StdbusRecved;
                 pst_Port->puc_Buff[pst_Port->uin_BuffLenth++] = uch_Byte;
-                STDBUS_DBG("3\n");
                 PostMsg(pst_Port);
             }
             else if (uch_Byte == 0x7b)                          //再次接收到帧头
             {
-                Mod_StdbusRscPack(pst_Port);                  //释放本端口的数据
+                Mod_StdbusRscPack(pst_Port);                    //释放本端口的数据
                 pst_Port->e_State = e_StdbusRecv;
                 pst_Port->puc_Buff[pst_Port->uin_BuffLenth++] = uch_Byte;
-                STDBUS_DBG("r\n");
             }
             else                                                //其他情况
             {
@@ -392,7 +390,6 @@ BOOL Mod_StdbusPortRecvOneByte(StdbusPort_t* pst_Port,INT8U uch_Byte)
         }
         else                                                //20181203 添加尝试修复死机问题
         {
-            STDBUS_DBG("r\n");
             Mod_StdbusRscPack(pst_Port);                  //释放本端口的数据
             UnLockPort(pst_Port);
         }
@@ -712,6 +709,9 @@ void Mod_StdbusDealPack(StdbusPort_t* pst_Port)
     if(pst_Port->pst_Fram.puc_AddrList[pst_Port->pst_Fram.uch_AddrIndex] !=
        pst_Host->uch_Addr )
     {
+        STDBUS_DBG(">>STDBUS DBG:   通过 %s 当前地址非本设备地址\r\n",pst_Port->pch_Name);
+        Mod_StdbusRscPack(pst_Port);                    //释放本端口的数据
+        UnLockPort(pst_Port);                           //释放总线 
         return;
     }
 
@@ -720,18 +720,17 @@ void Mod_StdbusDealPack(StdbusPort_t* pst_Port)
        pst_Host->uch_Addr )
     {
         //转发到其他端口
-        STDBUS_DBG(">>STDBUS DBG:   %s不是最后节点 通过其他端口转发\r\n",pst_Port->pch_Name);
+        STDBUS_DBG(">>STDBUS DBG:   %s 本设备不是最后节点 通过其他端口转发\r\n",pst_Port->pch_Name);
         Mod_StdbusSend_Other(pst_Port);
-        STDBUS_DBG(">>STDBUS DBG:   转发完成\r\n");
         Mod_StdbusRscPack(pst_Port);                    //释放本端口的数据
-        UnLockPort(pst_Port);                           /* 释放总线 */ 
+        UnLockPort(pst_Port);                           // 释放总线 
         STDBUS_DBG(">>STDBUS DBG:   %s 转发完成 释放总线\r\n",pst_Port->pch_Name);
     }
     else
     {
         //其他设备访问本设备 到App层去解析
-        STDBUS_DBG(">>STDBUS DBG:   %s 其他设备访问本设备 到App层去解析\r\n",pst_Port->pch_Name);
- /*     20181204 临时删除  
+        STDBUS_DBG(">>STDBUS DBG:   通过 %s 访问本设备 到App层去解析\r\n",pst_Port->pch_Name);
+
         if(TRUE == Mod_StdbusDealFram(pst_Port))
         {
             int i = 0;
@@ -747,12 +746,12 @@ void Mod_StdbusDealPack(StdbusPort_t* pst_Port)
             Mod_StdbusMakePack(pst_Port);
             STDBUS_DBG(">>STDBUS DBG:   处理完成发送应答\r\n");
         }
-        else*/
+        else
         {
             //不需要回复
             STDBUS_DBG(">>STDBUS DBG:   处理完成不需要应答释放总线\r\n");
             Mod_StdbusRscPack(pst_Port);                    //释放本端口的数据
-            UnLockPort(pst_Port);                           /* 释放总线 */
+            UnLockPort(pst_Port);                           //释放总线 
         }
     }
 }
@@ -776,7 +775,7 @@ void Mod_StdbusPortPoll(StdbusPort_t * pst_Port)
     {
         case e_StdbusRecved:
             STDBUS_DBG(">>STDBUS DBG:   %s 接受完成\r\n",pst_Port->pch_Name);
-            /*
+            
             if(GetCrc16Bit(pst_Port->puc_Buff + 1,pst_Port->uin_BuffLenth - 2,&uin_crc16) != TRUE )
             {
                 STDBUS_DBG(">>STDBUS DBG:   CRC校验不通过释放总线\r\n");
@@ -790,11 +789,11 @@ void Mod_StdbusPortPoll(StdbusPort_t * pst_Port)
                 //CRC校验通过
                 Mod_StdbusDealPack(pst_Port);
             }
-            else*/
+            else
             {
                 STDBUS_DBG(">>STDBUS DBG:   CRC校验不通过释放总线\r\n");
                 Mod_StdbusRscPack(pst_Port);                  //释放本端口的数据
-                //UnLockPort(pst_Port);                         /* 释放总线 */
+                UnLockPort(pst_Port);                         /* 释放总线 */
             }
 
             break;

@@ -20,7 +20,7 @@ MeasSpeed_t st_MeasSpeed = {
 
 void Mod_MeasSpeedPoll(void)
 {
-    //Mod_StdbusWriteCmd(&st_StdbusMeasSpeed,0x30,NULL,0);
+    Mod_StdbusWriteCmd(&st_StdbusMeasSpeed,0x30,NULL,0);
 }
 
 BOOL Mod_MeasSpeedDealFram(StdbusFram_t* pst_Fram)

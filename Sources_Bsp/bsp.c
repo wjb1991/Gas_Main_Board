@@ -58,7 +58,7 @@ void  Bsp_Init (void)
     Bsp_UartOpen(&COM3);*/
     
     /* COM4->RS485 */
-    COM4.ul_BaudRate   = 115200;
+    COM4.ul_BaudRate   = 230400;
     COM4.ul_WordLength = UART_WORDLENGTH_8B;
     COM4.ul_StopBits   = UART_STOPBITS_1;
     COM4.ul_Parity     = UART_PARITY_NONE;

@@ -27,7 +27,7 @@
 #define  TASK_GREYPROC_PRIO             6u
 
 #define  TASK_MEASSPEED_PRIO            12u
-#define  TASK_LASER_PRIO                14u
+#define  TASK_LASER_PRIO                13u
 #define  TASK_DISBOARD_PRIO             20u
 
 #define  TASK_STDBUSLASER_PRIO          14u
