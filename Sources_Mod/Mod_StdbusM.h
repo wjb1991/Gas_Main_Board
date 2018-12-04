@@ -49,6 +49,7 @@ typedef struct {
 
 /* STDBUS设备(从机)结构体 */
 typedef struct {
+    INT8U*          pch_Name;                                       /*设备名称*/
     INT8U           puc_AddrList[DEF_STDBUS_DEV_ADDRLIST_MAX + 1];  /*地址列表*/
     INT8U           uch_AddrLen;                            /*地址列表长度*/
     void*           pv_PortHandle;                          /*端口句柄*/
@@ -58,6 +59,7 @@ typedef struct {
 
 /* 端口结构体 */
 typedef struct {
+    INT8U*          pch_Name;                           /* 端口名称 */
     StdbusState_e   e_State;                            /* 状态 */
     void*           pv_Lock;                            /* 端口占用锁  OS情况下是一个信号量 */
     void*           pv_Msg;                             /* 端口消息 OS情况下是一个消息队列*/

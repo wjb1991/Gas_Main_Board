@@ -112,6 +112,7 @@ APP_OS_EXTERN  OS_Q         QSpeTrans;
 #if (OS_CFG_SEM_EN > 0u)
 APP_OS_EXTERN  OS_SEM       Sem_Rs485;
 APP_OS_EXTERN  OS_SEM       Sem_Laser;
+APP_OS_EXTERN  OS_SEM       Sem_Maser;
 #endif
 
 //==================================================================================

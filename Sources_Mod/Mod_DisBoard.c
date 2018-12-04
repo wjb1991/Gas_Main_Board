@@ -1,7 +1,8 @@
 
 #include "Mod_Include.h"
 
-StdbusDev_t st_StdbusDis = {    
+StdbusDev_t st_StdbusDis = {   
+    "显示板设备",
     {0,0x40},                               /*地址列表*/
     2,                                      /*地址列表长度*/
     NULL,                                   /*端口句柄*/
@@ -21,5 +22,5 @@ void Mod_DisBoardPoll(void)
     auch_Buff[0] = st_DisBoard.uch_DisUnit1;
     auch_Buff[1] = st_DisBoard.uch_DisUnit2;
     auch_Buff[2] = st_DisBoard.uch_DisUnit3++;
-    Mod_StdbusWriteCmd(&st_StdbusDis,0x10,auch_Buff,3);
+    //Mod_StdbusWriteCmd(&st_StdbusDis,0x10,auch_Buff,3);
 }

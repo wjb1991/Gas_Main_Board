@@ -3,6 +3,7 @@
 BOOL Mod_MeasSpeedDealFram(StdbusFram_t* pst_Fram);
 
 StdbusDev_t st_StdbusMeasSpeed = {
+    "测速版",                               /* 设备名称 */
     {0,0x30},                               /*地址列表*/
     2,                                      /*地址列表长度*/
     NULL,                                   /*端口句柄*/
@@ -19,7 +20,7 @@ MeasSpeed_t st_MeasSpeed = {
 
 void Mod_MeasSpeedPoll(void)
 {
-    Mod_StdbusWriteCmd(&st_StdbusMeasSpeed,0x30,NULL,0);
+    //Mod_StdbusWriteCmd(&st_StdbusMeasSpeed,0x30,NULL,0);
 }
 
 BOOL Mod_MeasSpeedDealFram(StdbusFram_t* pst_Fram)

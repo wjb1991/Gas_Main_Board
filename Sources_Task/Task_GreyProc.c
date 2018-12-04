@@ -26,6 +26,6 @@ void Task_GreyProc(void  *p_arg)
         
         //Mod_GreyProc(&st_GreyMoudle);
         
-        TRACE_DBG(">>DBG:       灰度处理\r\n");
+        //TRACE_DBG(">>DBG:       灰度处理\r\n");
     }
 }

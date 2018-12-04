@@ -3,6 +3,7 @@
 BOOL Mod_MeasLaserDealFram(StdbusFram_t* pst_Fram);
 
 StdbusDev_t st_LaserBoard = {
+    "激光板",                               /* 设备名称 */
     {0,0x20},                               /*地址列表*/
     2,                                      /*地址列表长度*/
     NULL,                                   /*端口句柄*/

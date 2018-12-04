@@ -10,6 +10,7 @@ static INT8U auc_Buff[DEF_STDBUS_SLAVE_BUFF_LEN] = {0};
 static StdbusDev_t* ast_DevList[DEF_STDBUS_SLAVE_DEV_LEN] = {0};
 
 StdbusPort_t st_StdbusSlave ={
+    "从机端口",                             /* 端口名称 */
     e_StdbusIdle,                           /* 状态 */
     &Sem_Rs485,                             /* 端口占用锁  OS情况下是一个信号量 */
     &TaskStdBusSlaveTCB,                    /* 端口消息 OS情况下是一个消息队列*/

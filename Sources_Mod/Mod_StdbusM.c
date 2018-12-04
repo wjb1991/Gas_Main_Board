@@ -12,8 +12,18 @@
 //==================================================================================================
 #include "App_Include.h"
 
+#define DEF_STDBUS_DBG_EN           TRUE
 
-#define STDBUS_DBG(x)                   printf(x)
+#if (DEF_STDBUS_DBG_EN == TRUE)
+    #define STDBUS_DBG(...)             do {                                \
+                                            OS_ERR os_err;                  \
+                                            OSSchedLock(&os_err);           \
+                                            printf(__VA_ARGS__);            \
+                                            OSSchedUnlock(&os_err);         \
+                                        }while(0)
+#else
+    #define STDBUS_DBG(...)             
+#endif
 
 StdbusPort_t*   ast_PortList[DEF_STDBUS_PORTLIST_MAX];
 
@@ -41,7 +51,26 @@ void PostMsg(StdbusPort_t* pst_Port)
     OSTaskQPost(pst_Port->pv_Msg,(void*)pst_Port->e_State,1,OS_OPT_POST_FIFO ,&os_err);
     if(os_err != OS_ERR_NONE)
     {
-
+        switch( os_err )
+        {
+        case OS_ERR_MSG_POOL_EMPTY:
+            STDBUS_DBG(">>STDBUS DBG:   %s OS_ERR_MSG_POOL_EMPTY\r\n",pst_Port->pch_Name);
+            break;
+        case OS_ERR_OPT_INVALID:
+            STDBUS_DBG(">>STDBUS DBG:   %s OS_ERR_OPT_INVALID\r\n",pst_Port->pch_Name);
+            break;
+        case OS_ERR_OS_NOT_RUNNING:
+            STDBUS_DBG(">>STDBUS DBG:   %s OS_ERR_OS_NOT_RUNNING\r\n",pst_Port->pch_Name); 
+            break;
+        case OS_ERR_Q_MAX:
+            STDBUS_DBG(">>STDBUS DBG:   %s OS_ERR_Q_MAX\r\n",pst_Port->pch_Name);
+            break;
+        case OS_ERR_STATE_INVALID:
+            STDBUS_DBG(">>STDBUS DBG:   %s OS_ERR_STATE_INVALID\r\n",pst_Port->pch_Name);
+            break;
+        default:
+            break;
+        }
     }
 }
 
@@ -79,6 +108,29 @@ BOOL UnLockPort(StdbusPort_t* pst_Port)
     if(pst_Port->pv_Lock == NULL)                                       /*总线上只有一个设备不需要锁 */
         return TRUE;
     OSSemPost(pst_Port->pv_Lock,OS_OPT_POST_1,&os_err);                /* 解除总线占用 */
+    if(os_err != OS_ERR_NONE)
+    {
+        switch( os_err )
+        {
+        case OS_ERR_OBJ_PTR_NULL:
+            STDBUS_DBG(">>STDBUS DBG:   %s OS_ERR_OBJ_PTR_NULL\r\n",pst_Port->pch_Name);
+            break;
+        case OS_ERR_OBJ_TYPE:
+            STDBUS_DBG(">>STDBUS DBG:   %s OS_ERR_OBJ_TYPE\r\n",pst_Port->pch_Name);
+            break;
+        case OS_ERR_OPT_INVALID:
+            STDBUS_DBG(">>STDBUS DBG:   %s OS_ERR_OPT_INVALID\r\n",pst_Port->pch_Name);
+            break;
+        case OS_ERR_OS_NOT_RUNNING:
+            STDBUS_DBG(">>STDBUS DBG:   %s OS_ERR_OS_NOT_RUNNING\r\n",pst_Port->pch_Name); 
+            break;
+        case OS_ERR_SEM_OVF:
+            STDBUS_DBG(">>STDBUS DBG:   %s OS_ERR_SEM_OVF\r\n",pst_Port->pch_Name);
+            break;
+        default:
+            break;
+        }
+    }
     return TRUE;
 #else
     pst_Port->pv_Lock = (void*)FALSE;
@@ -194,6 +246,9 @@ BOOL Mod_StdbusRegDev(StdbusPort_t* pst_Port,StdbusDev_t* pst_Dev)
 //==================================================================================
 void Mod_StdbusRscPack(StdbusPort_t* pst_Port )
 {
+    if(pst_Port == NULL)
+        return;
+    
     pst_Port->pst_Fram.uch_Resv[0] = 0;
     pst_Port->pst_Fram.uch_Resv[1] = 0;
     pst_Port->pst_Fram.uch_Resv[2] = 0;
@@ -305,8 +360,7 @@ BOOL Mod_StdbusPortRecvOneByte(StdbusPort_t* pst_Port,INT8U uch_Byte)
             Mod_StdbusRscPack(pst_Port);                  //释放本端口的数据
             pst_Port->e_State = e_StdbusRecv;
             pst_Port->puc_Buff[pst_Port->uin_BuffLenth++] = uch_Byte;
-
-            LockPort(pst_Port);                         /*占用总线 */
+            //LockPort(pst_Port);                         /*占用总线 */
         }
     }
     else if (pst_Port->e_State == e_StdbusRecv)
@@ -317,6 +371,7 @@ BOOL Mod_StdbusPortRecvOneByte(StdbusPort_t* pst_Port,INT8U uch_Byte)
             {
                 pst_Port->e_State = e_StdbusRecved;
                 pst_Port->puc_Buff[pst_Port->uin_BuffLenth++] = uch_Byte;
+                STDBUS_DBG("3\n");
                 PostMsg(pst_Port);
             }
             else if (uch_Byte == 0x7b)                          //再次接收到帧头
@@ -324,6 +379,7 @@ BOOL Mod_StdbusPortRecvOneByte(StdbusPort_t* pst_Port,INT8U uch_Byte)
                 Mod_StdbusRscPack(pst_Port);                  //释放本端口的数据
                 pst_Port->e_State = e_StdbusRecv;
                 pst_Port->puc_Buff[pst_Port->uin_BuffLenth++] = uch_Byte;
+                STDBUS_DBG("r\n");
             }
             else                                                //其他情况
             {
@@ -336,6 +392,7 @@ BOOL Mod_StdbusPortRecvOneByte(StdbusPort_t* pst_Port,INT8U uch_Byte)
         }
         else                                                //20181203 添加尝试修复死机问题
         {
+            STDBUS_DBG("r\n");
             Mod_StdbusRscPack(pst_Port);                  //释放本端口的数据
             UnLockPort(pst_Port);
         }
@@ -453,7 +510,7 @@ void Mod_StdbusMakePack(StdbusPort_t* pst_Port)
 {
     /* 改变puc_AddrList的长度可能出现数据覆盖需注意！！*/
     uint16_t i = 0,j = 0 ,crc16 = 0;
-
+    STDBUS_DBG(">>STDBUS DBG:   组包开始\r\n");
     pst_Port->puc_Buff[i++] = 0x7b;
 
     pst_Port->puc_Buff[i++] = pst_Port->pst_Fram.uch_Resv[0];
@@ -464,16 +521,23 @@ void Mod_StdbusMakePack(StdbusPort_t* pst_Port)
     pst_Port->puc_Buff[i++] = pst_Port->pst_Fram.uch_AddrLen;
     pst_Port->puc_Buff[i++] = pst_Port->pst_Fram.uch_AddrIndex;
 
-    for( j = 0; j < pst_Port->pst_Fram.uch_AddrLen; j++)
-        pst_Port->puc_Buff[i++] = pst_Port->pst_Fram.puc_AddrList[j];
+    if(pst_Port->pst_Fram.uch_AddrLen != 0 && pst_Port->pst_Fram.puc_AddrList != NULL)
+    {
+        for( j = 0; j < pst_Port->pst_Fram.uch_AddrLen; j++)
+            pst_Port->puc_Buff[i++] = pst_Port->pst_Fram.puc_AddrList[j];
+    }
 
     pst_Port->puc_Buff[i++] = pst_Port->pst_Fram.uch_Cmd;
     pst_Port->puc_Buff[i++] = pst_Port->pst_Fram.uch_SubCmd;
     pst_Port->puc_Buff[i++] = (uint8_t)(pst_Port->pst_Fram.uin_PayLoadLenth>>8);
     pst_Port->puc_Buff[i++] = (uint8_t)(pst_Port->pst_Fram.uin_PayLoadLenth&0xff);
 
-    for( j = 0; j < pst_Port->pst_Fram.uin_PayLoadLenth; j++)
-        pst_Port->puc_Buff[i++] = pst_Port->pst_Fram.puc_PayLoad[j];
+    
+    if(pst_Port->pst_Fram.uin_PayLoadLenth != 0 && pst_Port->pst_Fram.puc_PayLoad != NULL)
+    {
+        for( j = 0; j < pst_Port->pst_Fram.uin_PayLoadLenth; j++)
+            pst_Port->puc_Buff[i++] = pst_Port->pst_Fram.puc_PayLoad[j];
+    }
 
     GetCrc16Bit(pst_Port->puc_Buff + 1,i-1, &crc16);
     pst_Port->puc_Buff[i++] = (uint8_t)(crc16 >> 8);
@@ -484,6 +548,7 @@ void Mod_StdbusMakePack(StdbusPort_t* pst_Port)
 
     pst_Port->e_State = e_StdbusSend;
     pst_Port->uin_BuffIndex = 0;
+    STDBUS_DBG(">>STDBUS DBG:   组包完成\r\n");
     Mod_StdbusPortSendOneByte(pst_Port);
 }
 
@@ -512,6 +577,8 @@ BOOL Mod_StdbusSend_Other(StdbusPort_t * pst_Port)
     if( LockPort(pst_OtherPort) == FALSE)                                    /* 如果端口被占用就退出 使用OS情况下一直阻塞 */
         return FALSE;
 
+    STDBUS_DBG(">>STDBUS DBG:   通过%s转发\r\n",pst_OtherPort->pch_Name);
+    
     pst_OtherPort->pst_Fram.uch_Resv[0]      = pst_Port->pst_Fram.uch_Resv[0];      /*保留*/
     pst_OtherPort->pst_Fram.uch_Resv[1]      = pst_Port->pst_Fram.uch_Resv[1];
     pst_OtherPort->pst_Fram.uch_Resv[2]      = pst_Port->pst_Fram.uch_Resv[2];
@@ -549,6 +616,8 @@ BOOL Mod_StdbusWriteCmd(StdbusDev_t* pst_Dev,INT8U uch_Cmd,INT8U* puc_Payload, I
     if( LockPort(pst_Port) == FALSE)                         /* 如果端口被占用就退出 使用OS情况下一直阻塞 */
         return FALSE;
 
+    STDBUS_DBG(">>STDBUS DBG:   %s 发送\r\n",pst_Port->pch_Name);
+    
     pst_Port->pst_Fram.uch_Resv[0] = 0;                             /*保留*/
     pst_Port->pst_Fram.uch_Resv[1] = 0;
     pst_Port->pst_Fram.uch_Resv[2] = 0;
@@ -651,15 +720,18 @@ void Mod_StdbusDealPack(StdbusPort_t* pst_Port)
        pst_Host->uch_Addr )
     {
         //转发到其他端口
-        STDBUS_DBG(">>STDBUS DBG:   不是最末节点转发到下一个节点\r\n");
+        STDBUS_DBG(">>STDBUS DBG:   %s不是最后节点 通过其他端口转发\r\n",pst_Port->pch_Name);
         Mod_StdbusSend_Other(pst_Port);
+        STDBUS_DBG(">>STDBUS DBG:   转发完成\r\n");
         Mod_StdbusRscPack(pst_Port);                    //释放本端口的数据
-        UnLockPort(pst_Port);                           /* 释放总线 */
+        UnLockPort(pst_Port);                           /* 释放总线 */ 
+        STDBUS_DBG(">>STDBUS DBG:   %s 转发完成 释放总线\r\n",pst_Port->pch_Name);
     }
     else
     {
         //其他设备访问本设备 到App层去解析
-        STDBUS_DBG(">>STDBUS DBG:   其他设备访问本设备 到App层去解析\r\n");
+        STDBUS_DBG(">>STDBUS DBG:   %s 其他设备访问本设备 到App层去解析\r\n",pst_Port->pch_Name);
+ /*     20181204 临时删除  
         if(TRUE == Mod_StdbusDealFram(pst_Port))
         {
             int i = 0;
@@ -675,7 +747,7 @@ void Mod_StdbusDealPack(StdbusPort_t* pst_Port)
             Mod_StdbusMakePack(pst_Port);
             STDBUS_DBG(">>STDBUS DBG:   处理完成发送应答\r\n");
         }
-        else
+        else*/
         {
             //不需要回复
             STDBUS_DBG(">>STDBUS DBG:   处理完成不需要应答释放总线\r\n");
@@ -698,31 +770,38 @@ void Mod_StdbusDealPack(StdbusPort_t* pst_Port)
 //==================================================================================
 void Mod_StdbusPortPoll(StdbusPort_t * pst_Port)
 {
-    INT16U  uin_crc16;
+    INT16U  uin_crc16 = 0xFFFF;
     StdbusState_e pv_Msg = (StdbusState_e)PendMsg(pst_Port);
     switch (pv_Msg)
     {
         case e_StdbusRecved:
-            STDBUS_DBG(">>STDBUS DBG:   接受完成\r\n");
-            GetCrc16Bit(pst_Port->puc_Buff + 1,pst_Port->uin_BuffLenth - 2,&uin_crc16);
+            STDBUS_DBG(">>STDBUS DBG:   %s 接受完成\r\n",pst_Port->pch_Name);
+            /*
+            if(GetCrc16Bit(pst_Port->puc_Buff + 1,pst_Port->uin_BuffLenth - 2,&uin_crc16) != TRUE )
+            {
+                STDBUS_DBG(">>STDBUS DBG:   CRC校验不通过释放总线\r\n");
+                Mod_StdbusRscPack(pst_Port);                  //释放本端口的数据
+                UnLockPort(pst_Port);                         // 释放总线 
+            }
+  
             if (uin_crc16 == 0)
             {
                 STDBUS_DBG(">>STDBUS DBG:   CRC校验通过\r\n");
                 //CRC校验通过
                 Mod_StdbusDealPack(pst_Port);
             }
-            else
+            else*/
             {
                 STDBUS_DBG(">>STDBUS DBG:   CRC校验不通过释放总线\r\n");
                 Mod_StdbusRscPack(pst_Port);                  //释放本端口的数据
-                UnLockPort(pst_Port);                         /* 释放总线 */
+                //UnLockPort(pst_Port);                         /* 释放总线 */
             }
 
             break;
         case e_StdbusSended:
-            Mod_StdbusRscPack(pst_Port);                  //释放本端口的数据
-            UnLockPort(pst_Port);                         /* 释放总线 */
-            STDBUS_DBG(">>STDBUS DBG:   发送完成释放总线\r\n");
+            Mod_StdbusRscPack(pst_Port);                  // 释放本端口的数据
+            UnLockPort(pst_Port);                         // 释放总线 
+            STDBUS_DBG(">>STDBUS DBG:   %s 发送完成\r\n",pst_Port->pch_Name);
             break;
         default:
             break;
