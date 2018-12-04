@@ -77,17 +77,17 @@ INT16U Bsp_LTC1867SampleOne(void* pv_Dev,INT16U uin_CH)
     if(pst_Ltc1867->CS != NULL)
         pst_Ltc1867->CS(0);
     
-    Bsp_DelayUS(1);
+    Bsp_DelayUs(1);
     uin_Msb = Bsp_SpiTransByteBlock(pst_Ltc1867->pv_SpiHandle, Channel>>8);
     uin_Lsb = Bsp_SpiTransByteBlock(pst_Ltc1867->pv_SpiHandle, Channel&0xff);
-    Bsp_DelayUS(1);
+    Bsp_DelayUs(1);
     
     if(pst_Ltc1867->CS != NULL)
         pst_Ltc1867->CS(1);
     
     Bsp_IntEn();
     
-    Bsp_DelayUS(4);
+    Bsp_DelayUs(4);
     
     return ((uin_Msb << 8) | uin_Lsb);
 }

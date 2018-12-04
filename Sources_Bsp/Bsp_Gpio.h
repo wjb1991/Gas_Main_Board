@@ -29,6 +29,15 @@ typedef enum {
     
 }GpioId_e;
 
+
+typedef struct {
+    void * vp_GpioPort;     /* 端口 */
+    INT16U  uin_GpioPin;    /* 引脚 */
+    BOOL  b_IsRising;       /* 边沿 */
+    TimeSample_t st_Ts;     /* 时间戳 */
+}GpioEvent_t;
+
+
 BOOL Bsp_GpioInit(void);
 
 void Bsp_GpioWirte(GpioId_e e_GpioId,BOOL b_State);
@@ -36,5 +45,7 @@ void Bsp_GpioWirte(GpioId_e e_GpioId,BOOL b_State);
 BOOL Bsp_GpioReadOut(GpioId_e e_GpioId);
 
 BOOL Bsp_GpioReadIn(GpioId_e e_GpioId);
+
+__weak void Bsp_GpioEventHandle(GpioEvent_t* pst_Event);
 
 #endif

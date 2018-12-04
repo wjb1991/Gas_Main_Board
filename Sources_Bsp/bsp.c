@@ -106,46 +106,4 @@ void  Bsp_Init (void)
     }
 
 }
-void Bsp_DelayUS(uint32_t us)
-{
-    uint32_t ticks;
-    uint32_t told;
-    uint32_t tnow;
-    uint32_t tcnt = 0;
-    uint32_t reload;
-       
-    reload = SysTick->LOAD;                
-    ticks = us * (SystemCoreClock / 1000000);	 
-
-    tcnt = 0;
-    told = SysTick->VAL;             
-
-    while (tcnt < ticks)             
-    {
-        tnow = SysTick->VAL;    
-        if (tnow != told)
-        {
-              if (tnow < told)
-              {
-                  tcnt += told - tnow;    
-              }
-              else
-              {
-                  tcnt += reload - tnow + told;    
-              }        
-              told = tnow;
-        }  
-    }
-} 
-
-void Bsp_DelayMs(INT32U ms)
-{
-    while(ms--)
-        Bsp_DelayUS(1000);
-}
-
-void HAL_Delay(INT32U Delay)
-{
-    Bsp_DelayMs(Delay);
-}
 

@@ -7,6 +7,7 @@ void AppObjCreate (void);
 //                                   任务控制块声明
 //==================================================================================
 OS_TCB       TaskStartTCB;           /*  开始任务    */
+OS_TCB       TaskMeasureTCB;         /*  综合测量任务    */
 OS_TCB       TaskGasProcTCB;         /*  紫外光处理任务    */
 OS_TCB       TaskGreyProcTCB;        /*  绿光光处理任务    */
 OS_TCB       TaskCmlSendTCB;         /*  命令行调试任务    */
@@ -27,6 +28,7 @@ CPU_STK      TaskStdBusLaserStk  [TASK_STDBUSLASER_STK_SIZE];       /*  STDBUS激
 CPU_STK      TaskStdBusMasterStk  [TASK_STDBUSMASTER_STK_SIZE];     /*  STDBUS主机任务    */
 CPU_STK      TaskStdBusSlaveStk  [TASK_STDBUSSLAVE_STK_SIZE];       /*  STDBUS从机任务    */
 
+CPU_STK      TaskMeasureStk[TASK_MEASURE_STK_SIZE];                 /*  综合测量任务    */
 CPU_STK      TaskGasProcStk [TASK_GASPROC_STK_SIZE];                /*  紫外光处理任务    */
 CPU_STK      TaskGreyProcStk[TASK_GREYPROC_STK_SIZE];               /*  绿光光处理任务    */
 CPU_STK      TaskLaserStk[TASK_LASER_STK_SIZE];                     /*  激光板任务    */
@@ -98,9 +100,9 @@ void Task_Start (void *p_arg)
         OSTimeDlyHMSM(0u, 0u, 1u, 0u,
                       OS_OPT_TIME_HMSM_STRICT,
                       &os_err);
-        OSSchedLock(&os_err);
+        
         TRACE_DBG(">>DBG:       开始任务\r\n");
-        OSSchedUnlock(&os_err);
+        
         BSP_Led1Toggle();
     }
 }
@@ -200,7 +202,22 @@ void AppTaskCreate (void)
                  (OS_ERR       *)&os_err);                                      /* 存放错误值 */
 #endif
 
-#if 0
+    /* 综合测量任务 */
+    OSTaskCreate((OS_TCB       *)&TaskMeasureTCB,                                /* 创建任务控制块 */
+                 (CPU_CHAR     *)"Measure Task",                                 /* 任务名称 */
+                 (OS_TASK_PTR   )Task_Measure,                                   /* 任务函数 */
+                 (void         *)0u,                                             /* 任务入参 */
+                 (OS_PRIO       )TASK_MEASURE_PRIO,                              /* 任务优先级 */
+                 (CPU_STK      *)&TaskMeasureStk[0u],                            /* 任务堆载地址 */
+                 (CPU_STK_SIZE  )TASK_MEASURE_STK_SIZE / 10u,                    /* 任务栈深限制 */
+                 (CPU_STK_SIZE  )TASK_MEASURE_STK_SIZE,                          /* 任务堆栈大小 */
+                 (OS_MSG_QTY    )10u,                                            /* 内部消息队列的最大消息数目 */
+                 (OS_TICK       )0u,                                             /* 时间片轮询的时间片数 */
+                 (void         *)0u,                                             /* 用户补充存储区 */
+                 (OS_OPT        )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_SAVE_FP),
+                 (OS_ERR       *)&os_err);                                       /* 存放错误值 */
+    
+#if 1
     /* 测速任务 */
     OSTaskCreate((OS_TCB       *)&TaskMeasSpeedTCB,                                /* 创建任务控制块 */
                  (CPU_CHAR     *)"MeasSpeed Task",                                 /* 任务名称 */

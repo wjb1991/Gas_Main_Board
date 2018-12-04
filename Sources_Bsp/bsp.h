@@ -43,11 +43,13 @@ extern  "C" {                                  /* See Note #1.                  
 #include  "bsp_converter.h"
 #include  "bsp_sram.h"
 #include  "bsp_led.h"
+
 #include  "bsp_clock.h"
 #include  "bsp_usart.h"
 #include  "bsp_spi.h"
 #include  "bsp_i2c.h"
 #include  "bsp_at24c512.h"
+#include  "Bsp_Timer.h"
 #include  "Bsp_Gpio.h"
 #include  "Bsp_Dma.h"
   
@@ -64,9 +66,6 @@ void Bsp_Init(void);
 __STATIC_INLINE void Bsp_Nop(void){;}
 __STATIC_INLINE void Bsp_IntDis(void){ __disable_irq(); }
 __STATIC_INLINE void Bsp_IntEn(void){ __enable_irq(); }
-
-void Bsp_DelayUS(INT32U us);
-void Bsp_DelayMs(INT32U ms);
 
 #define	Bsp_Printf		Bsp_UartPrintf
 

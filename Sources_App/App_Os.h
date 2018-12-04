@@ -30,12 +30,13 @@
 #define  TASK_STDBUSSLAVE_PRIO          7u
 
 /* Èí¼þÏà¹ØÈÎÎñ */
+
+#define  TASK_MEASURE_PRIO              9u
 #define  TASK_GASPROC_PRIO              10u
 #define  TASK_GREYPROC_PRIO             11u
 #define  TASK_LASER_PRIO                12u
 #define  TASK_MEASSPEED_PRIO            13u
 
-#define  TASK_MEASURE_PRIO              14u
 #define  TASK_DISBOARD_PRIO             20u
 
 
@@ -51,6 +52,7 @@
 #define  TASK_STDBUSMASTER_STK_SIZE     512u
 #define  TASK_STDBUSSLAVE_STK_SIZE      512u
 
+#define  TASK_MEASURE_STK_SIZE          512u
 #define  TASK_GASPROC_STK_SIZE          512u
 #define  TASK_GREYPROC_STK_SIZE         512u
 #define  TASK_LASER_STK_SIZE            512u
@@ -71,7 +73,8 @@ APP_OS_EXTERN  CPU_STK      TaskUsbHostStk [TASK_USB_HOST_STK_SIZE];            
 APP_OS_EXTERN  CPU_STK      TaskStdBusLaserStk  [TASK_STDBUSLASER_STK_SIZE];       /*  STDBUS¼¤¹â°åÈÎÎñ    */
 APP_OS_EXTERN  CPU_STK      TaskStdBusMasterStk  [TASK_STDBUSMASTER_STK_SIZE];     /*  STDBUSÖ÷»úÈÎÎñ    */
 APP_OS_EXTERN  CPU_STK      TaskStdBusSlaveStk  [TASK_STDBUSSLAVE_STK_SIZE];       /*  STDBUS´Ó»úÈÎÎñ    */
-               
+ 
+APP_OS_EXTERN  CPU_STK      TaskMeasureStk[TASK_MEASURE_STK_SIZE];                 /*  ×ÛºÏ²âÁ¿ÈÎÎñ    */
 APP_OS_EXTERN  CPU_STK      TaskGasProcStk [TASK_GASPROC_STK_SIZE];                /*  ×ÏÍâ¹â´¦ÀíÈÎÎñ    */
 APP_OS_EXTERN  CPU_STK      TaskGreyProcStk[TASK_GREYPROC_STK_SIZE];               /*  ÂÌ¹â¹â´¦ÀíÈÎÎñ    */
 APP_OS_EXTERN  CPU_STK      TaskLaserStk[TASK_LASER_STK_SIZE];                     /*  ¼¤¹â°åÈÎÎñ    */
@@ -89,6 +92,7 @@ APP_OS_EXTERN  OS_TCB       TaskStdBusLaserTCB;     /*  STDBUS¼¤¹â°åÈÎÎñ    */
 APP_OS_EXTERN  OS_TCB       TaskStdBusMasterTCB;    /*  STDBUSÖ÷»úÈÎÎñ    */
 APP_OS_EXTERN  OS_TCB       TaskStdBusSlaveTCB;     /*  STDBUS´Ó»úÈÎÎñ    */
 
+APP_OS_EXTERN  OS_TCB       TaskMeasureTCB;        /*  ×ÛºÏ²âÁ¿ÈÎÎñ    */
 APP_OS_EXTERN  OS_TCB       TaskGasProcTCB;         /*  ×ÏÍâ¹â´¦ÀíÈÎÎñ    */
 APP_OS_EXTERN  OS_TCB       TaskGreyProcTCB;        /*  ÂÌ¹â¹â´¦ÀíÈÎÎñ    */
 APP_OS_EXTERN  OS_TCB       TaskLaserTCB;           /*  ¼¤¹â°åÈÎÎñ    */
@@ -106,6 +110,7 @@ APP_OS_EXTERN  void Task_StdBusLaser (void  *p_arg);         /*  STDBUS¼¤¹â°åÈÎÎ
 APP_OS_EXTERN  void Task_StdBusMaster (void  *p_arg);        /*  STDBUS×ÜÏßÍ¨Ñ¶    */
 APP_OS_EXTERN  void Task_StdBusSlave (void  *p_arg);         /*  STDBUS×ÜÏßÍ¨Ñ¶    */
 
+APP_OS_EXTERN  void Task_Measure (void *p_arg);              /*  ×ÛºÏ²âÁ¿ÈÎÎñ    */
 APP_OS_EXTERN  void Task_GasProc (void  *p_arg);             /*  ×ÏÍâ¹â´¦ÀíÈÎÎñ    */
 APP_OS_EXTERN  void Task_GreyProc (void  *p_arg);            /*  ÂÌ¹â¹â´¦ÀíÈÎÎñ    */
 APP_OS_EXTERN  void Task_Laser (void *p_arg);                /*  ¼¤¹â°åÈÎÎñ    */
@@ -170,10 +175,21 @@ static  OS_FLAG_GRP  AppTaskObjFlag;
 #define  TRACE_LEVEL_DBG                        2u
 #endif
 
+/*
 #define  TRACE_LEVEL                            TRACE_LEVEL_DBG
 #define  TRACE(x)                               printf(x)//Task_CmlSendMsg(x,strlen(x))  printf(x)
 
+
 #define  TRACE_INFO(x)                          ((TRACE_LEVEL >= TRACE_LEVEL_INFO)  ? (void)(TRACE(x)) : (void)0)
 #define  TRACE_DBG(x)                           ((TRACE_LEVEL >= TRACE_LEVEL_DBG)   ? (void)(TRACE(x)) : (void)0)
+*/
+
+#define  TRACE_DBG(...)                             do {                                \
+                                                        OS_ERR os_err;                  \
+                                                        OSSchedLock(&os_err);           \
+                                                        printf(__VA_ARGS__);            \
+                                                        OSSchedUnlock(&os_err);         \
+                                                    }while(0)
+
 
 #endif

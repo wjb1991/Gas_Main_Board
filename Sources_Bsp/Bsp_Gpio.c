@@ -167,32 +167,35 @@ void EXTI15_10_IRQHandler(void)
 #ifdef  OS_SUPPORT
     OSIntExit();
 #endif
-    
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-
-    BOOL b_IsRising = HAL_GPIO_ReadPin(GPIOF,GPIO_Pin);     //读取一次电平
-
-    if(HAL_GPIO_ReadPin(GPIOF,GPIO_Pin) != b_IsRising)      //读取第二次电平作为消抖
-        return;
-   
-    if(b_IsRising != TRUE)
-        return;
-
-    if(GPIO_Pin == GPIO_PIN_13)
-        printf("GPIO_PIN_13\r\n");
-    else if(GPIO_Pin == GPIO_PIN_14)
-        printf("GPIO_PIN_14\r\n");
-
+    //16个中断线
+    static GpioEvent_t st_Event[16];
+    static INT8U uch_Index = 0;
+    BOOL b_IsRising = HAL_GPIO_ReadPin(GPIOD,GPIO_Pin);     //读取一次电平
     
-    /* 两次消抖都通过才发送消息 单边沿适用 双边沿不适用 */
-#ifdef  OS_SUPPORT
-
-#else
+    Bsp_GetTimeSample(&st_Event[uch_Index].st_Ts);  //获取时间戳
+    st_Event[uch_Index].uin_GpioPin = GPIO_Pin;
+    st_Event[uch_Index].vp_GpioPort = GPIOD;
+    st_Event[uch_Index].b_IsRising = b_IsRising;
     
-#endif 
+    if(HAL_GPIO_ReadPin(GPIOD,GPIO_Pin) != b_IsRising)      //读取第二次电平作为消抖
+        return;
+    
+    /* 两次消抖都通过才发送消息 单双边沿都适合 */
+    Bsp_GpioEventHandle(&st_Event[uch_Index]);
+    if(++uch_Index >= 16)
+        uch_Index = 0;
 
 }
+
+__weak void Bsp_GpioEventHandle(GpioEvent_t* pst_Event)
+{
+
+}
+
+
+
 

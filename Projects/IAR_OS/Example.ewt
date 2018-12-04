@@ -2435,6 +2435,9 @@
             <name>$PROJ_DIR$\..\..\Sources_Bsp\bsp_spi.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\Sources_Bsp\bsp_timer.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\Sources_Bsp\bsp_usart.c</name>
         </file>
         <file>
@@ -2513,6 +2516,9 @@
             <name>$PROJ_DIR$\..\..\Sources_Mod\Mod_MeasSpeed.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\Sources_Mod\Mod_Measure.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\Sources_Mod\Mod_StdbusLaser.c</name>
         </file>
         <file>
@@ -2550,6 +2556,9 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\Sources_Task\Task_MeasSpeed.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\Sources_Task\Task_Measure.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\Sources_Task\task_start.c</name>

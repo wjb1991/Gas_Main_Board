@@ -18,4 +18,10 @@ typedef struct {
 
 extern MeasSpeed_t st_MeasSpeed;
 
+void Mod_MeasSpeedInit(void);
+void Mod_MeasSpeedPoll(void);
+
+void Mod_MeasSpeedRequest(MeasSpeed_t* pst_Meas);
+__weak void Mod_MeasSpeedReply(MeasSpeed_t* pst_Meas);
+
 #endif
