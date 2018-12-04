@@ -36,8 +36,8 @@ GpioConfig_t ast_GpioConfig[] = {
     {e_IO_245OE,         "74HC245 OE",  FALSE,   FALSE,   GPIOF,  GPIO_PIN_11,    GPIO_MODE_OUTPUT_PP, GPIO_PULLUP,  GPIO_SPEED_HIGH},
     {e_IO_245DIR,        "74HC245 DIR", FALSE,   TRUE,    GPIOF,  GPIO_PIN_15,    GPIO_MODE_OUTPUT_PP, GPIO_PULLUP,  GPIO_SPEED_HIGH},
     {e_IO_Sync0,         "同步信号0",   FALSE,   FALSE,   GPIOF,  GPIO_PIN_12,    GPIO_MODE_IT_RISING, GPIO_PULLUP,  GPIO_SPEED_HIGH},
-    {e_IO_Sync1,         "同步信号0",   FALSE,   FALSE,   GPIOF,  GPIO_PIN_13,    GPIO_MODE_IT_RISING, GPIO_PULLUP,  GPIO_SPEED_HIGH},
-    {e_IO_Sync2,         "同步信号0",   FALSE,   FALSE,   GPIOF,  GPIO_PIN_14,    GPIO_MODE_IT_RISING, GPIO_PULLUP,  GPIO_SPEED_HIGH},
+    {e_IO_Sync1,         "测量结束",   FALSE,   FALSE,   GPIOF,  GPIO_PIN_13,    GPIO_MODE_IT_RISING, GPIO_PULLUP,  GPIO_SPEED_HIGH},
+    {e_IO_Sync2,         "测量开始",   FALSE,   FALSE,   GPIOF,  GPIO_PIN_14,    GPIO_MODE_IT_RISING, GPIO_PULLUP,  GPIO_SPEED_HIGH},
 
 
 };
@@ -67,10 +67,18 @@ BOOL Bsp_GpioInit(void)
         gpio_init.Pull  = ast_GpioConfig[i].ul_Pull;
         gpio_init.Speed = ast_GpioConfig[i].ul_Speed;
         HAL_GPIO_Init(ast_GpioConfig[i].ul_Port, &gpio_init);
-
-        HAL_GPIO_WritePin((GPIO_TypeDef*)ast_GpioConfig[i].ul_Port,ast_GpioConfig[i].ul_Pin,
-                          (GPIO_PinState)ast_GpioConfig[i].b_OutState);
+        
+        if(ast_GpioConfig[i].ul_Mode == GPIO_MODE_OUTPUT_PP)
+        {
+            HAL_GPIO_WritePin((GPIO_TypeDef*)ast_GpioConfig[i].ul_Port,ast_GpioConfig[i].ul_Pin,
+                              (GPIO_PinState)ast_GpioConfig[i].b_OutState);        
+        }
     }
+    
+    /* EXTI interrupt init*/
+    HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+    
     return TRUE;
 }
 
@@ -140,3 +148,51 @@ BOOL Bsp_GpioReadIn(GpioId_e e_GpioId)
     pst_Gpio->b_InState = HAL_GPIO_ReadPin((GPIO_TypeDef*)pst_Gpio->ul_Port, pst_Gpio->ul_Pin);
     return pst_Gpio->b_InState;
 }
+
+
+void EXTI15_10_IRQHandler(void)
+{
+#ifdef  OS_SUPPORT
+    CPU_SR_ALLOC();
+
+    CPU_CRITICAL_ENTER();
+    OSIntEnter();
+    CPU_CRITICAL_EXIT();
+#endif
+    
+    HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_12);
+    HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_13);
+    HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_14);
+    
+#ifdef  OS_SUPPORT
+    OSIntExit();
+#endif
+    
+}
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+
+    BOOL b_IsRising = HAL_GPIO_ReadPin(GPIOF,GPIO_Pin);     //读取一次电平
+
+    if(HAL_GPIO_ReadPin(GPIOF,GPIO_Pin) != b_IsRising)      //读取第二次电平作为消抖
+        return;
+   
+    if(b_IsRising != TRUE)
+        return;
+
+    if(GPIO_Pin == GPIO_PIN_13)
+        printf("GPIO_PIN_13\r\n");
+    else if(GPIO_Pin == GPIO_PIN_14)
+        printf("GPIO_PIN_14\r\n");
+
+    
+    /* 两次消抖都通过才发送消息 单边沿适用 双边沿不适用 */
+#ifdef  OS_SUPPORT
+
+#else
+    
+#endif 
+
+}
+

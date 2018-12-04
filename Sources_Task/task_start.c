@@ -22,17 +22,20 @@ OS_TCB       TaskMeasSpeedTCB;       /*  测速任务    */
 //                                   任务堆栈声明
 //==================================================================================
 CPU_STK      TaskStartStk   [TASK_START_STK_SIZE];                  /*  开始任务    */
-CPU_STK      TaskGasProcStk [TASK_GASPROC_STK_SIZE];                /*  紫外光处理任务    */
-CPU_STK      TaskGreyProcStk[TASK_GREYPROC_STK_SIZE];               /*  绿光光处理任务    */
-CPU_STK      TaskCmlSendStk [TASK_CML_SEND_STK_SIZE];               /*  命令行调试任务    */
-CPU_STK      TaskCmlRecvStk [TASK_CML_RECV_STK_SIZE];               /*  命令行调试任务    */
 CPU_STK      TaskUsbHostStk [TASK_USB_HOST_STK_SIZE];               /*  光谱仪任务    */
 CPU_STK      TaskStdBusLaserStk  [TASK_STDBUSLASER_STK_SIZE];       /*  STDBUS激光板任务    */
 CPU_STK      TaskStdBusMasterStk  [TASK_STDBUSMASTER_STK_SIZE];     /*  STDBUS主机任务    */
 CPU_STK      TaskStdBusSlaveStk  [TASK_STDBUSSLAVE_STK_SIZE];       /*  STDBUS从机任务    */
+
+CPU_STK      TaskGasProcStk [TASK_GASPROC_STK_SIZE];                /*  紫外光处理任务    */
+CPU_STK      TaskGreyProcStk[TASK_GREYPROC_STK_SIZE];               /*  绿光光处理任务    */
 CPU_STK      TaskLaserStk[TASK_LASER_STK_SIZE];                     /*  激光板任务    */
-CPU_STK      TaskDisBoardStk[TASK_DISBOARD_STK_SIZE];               /*  显示板任务    */
 CPU_STK      TaskMeasSpeedStk[TASK_MEASSPEED_STK_SIZE];             /*  测速任务    */
+CPU_STK      TaskDisBoardStk[TASK_DISBOARD_STK_SIZE];               /*  显示板任务    */
+
+CPU_STK      TaskCmlSendStk [TASK_CML_SEND_STK_SIZE];               /*  命令行调试任务    */
+CPU_STK      TaskCmlRecvStk [TASK_CML_RECV_STK_SIZE];               /*  命令行调试任务    */
+
 //==================================================================================
 //                                   队列声明
 //==================================================================================
