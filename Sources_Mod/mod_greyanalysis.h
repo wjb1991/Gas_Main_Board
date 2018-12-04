@@ -14,17 +14,22 @@
 
 #include "bsp.h"
 
+#define     DEF_GREY_SAMPLEDOT_MAX      10
+
 typedef enum   __GreyAnalysisStaus {
     e_GreyIdle = 0,e_GreyMeas,e_GreyCalib,
 }GreyAnalysisStaus_t;
 
 typedef struct __GreyChannel {
     INT8U                   uch_Num;            //通道编号
+    void*                   pv_Manage;          //管理结构体
     FP32                    f_Volt;             //当前电压
     FP32                    f_BkVolt;           //背景电压
     FP32                    f_AbsTransVolt;     //绝对透过率电压
     FP32                    f_Trans;            //透过率
     FP32                    f_Grey;             //灰度
+    INT8U                   uch_SampleLen;      //结果数组长度
+    FP32                    af_SampleBuff[DEF_GREY_SAMPLEDOT_MAX];      //结果数组
 }GreyChannel_t;
 
 typedef struct __GreyAnalysis
@@ -32,16 +37,17 @@ typedef struct __GreyAnalysis
     GreyAnalysisStaus_t     e_Status;           //状态
     INT8U                   uch_ChannelNum;     //通道数量
     GreyChannel_t*          pst_Channel;        //10个通道
-    FP32                    f_TransThreshold;   //传送率阈值 
-    FP32                    f_Trans;            //传送率         
+    FP32                    f_TransThreshold;   //传送率阈值
+    FP32                    f_Trans;            //传送率
     FP32                    f_Grey;             //灰度
     INT16U                  uin_CalibCnt;       //标定计数
     INT16U                  uin_CalibTimeCnt;   //标定时间
 }GreyAnalysis_t;
 
-extern GreyAnalysis_t st_GreyMoudle;
+extern GreyChannel_t ast_GreyChannle[10];
+extern GreyAnalysis_t st_Grey;
 
-void Mod_GreyProc(GreyAnalysis_t* pst_Grye);
+void Mod_GreyPoll(GreyAnalysis_t* pst_Grye);
 
 void Mod_GreyGotoCalib(GreyAnalysis_t* pst_Grye);
 

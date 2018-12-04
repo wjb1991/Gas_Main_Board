@@ -381,13 +381,133 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
 
                 for(i = 0; i < 10; i++)
                 {
-                    Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[i*4],st_GreyMoudle.pst_Channel[i].f_Volt,FALSE);
+                    Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[i*4],st_Grey.pst_Channel[i].f_Volt,FALSE);
                 }
             }
             res = TRUE;    //应答
         }
         break;
+//==================================================================================
+//                                   读取10路绿光幅值标定电压
+//==================================================================================
+    case 0x31:
+        if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
+        {
+            if(pst_Fram->uin_PayLoadLenth == 0)
+            {
+                uint16_t i = 0;
+                pst_Fram->uin_PayLoadLenth = 40;
 
+                for(i = 0; i < 10; i++)
+                {
+                    Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[i*4],st_Grey.pst_Channel[i].f_AbsTransVolt,FALSE);
+                }
+            }
+            res = TRUE;    //应答
+        }
+        break;
+//==================================================================================
+//                                   读取10路绿光背景电压
+//==================================================================================
+    case 0x32:
+        if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
+        {
+            if(pst_Fram->uin_PayLoadLenth == 0)
+            {
+                uint16_t i = 0;
+                pst_Fram->uin_PayLoadLenth = 40;
+
+                for(i = 0; i < 10; i++)
+                {
+                    Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[i*4],st_Grey.pst_Channel[i].f_BkVolt,FALSE);
+                }
+            }
+            res = TRUE;    //应答
+        }
+        break;
+//==================================================================================
+//                                   读取10路绿光透过率
+//==================================================================================
+    case 0x33:
+        if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
+        {
+            if(pst_Fram->uin_PayLoadLenth == 0)
+            {
+                uint16_t i = 0;
+                pst_Fram->uin_PayLoadLenth = 40;
+
+                for(i = 0; i < 10; i++)
+                {
+                    Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[i*4],st_Grey.pst_Channel[i].f_Trans,FALSE);
+                }
+            }
+            res = TRUE;    //应答
+        }
+        break;
+//==================================================================================
+//                                   读取10路绿光灰度
+//==================================================================================
+    case 0x34:
+        if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
+        {
+            if(pst_Fram->uin_PayLoadLenth == 0)
+            {
+                uint16_t i = 0;
+                pst_Fram->uin_PayLoadLenth = 40;
+
+                for(i = 0; i < 10; i++)
+                {
+                    Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[i*4],st_Grey.pst_Channel[i].f_Grey,FALSE);
+                }
+            }
+            res = TRUE;    //应答
+        }
+        break;
+//==================================================================================
+//                                   设置绿光工作状态
+//==================================================================================
+    case 0x3a:
+        if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
+        {
+            pst_Fram->uin_PayLoadLenth = 1;
+            pst_Fram->puc_PayLoad[0] = st_Grey.e_Status;
+            res = TRUE;
+        }
+        else if(pst_Fram->uch_SubCmd == e_StdbusWriteCmd)
+        {
+            if(pst_Fram->uin_PayLoadLenth == 1)
+            {
+                switch(pst_Fram->puc_PayLoad[0])
+                {
+                case 0:
+                    Mod_GreyGotoIdle(&st_Grey);
+                    break;
+                case 1:
+                    Mod_GreyGotoMeas(&st_Grey);
+                    break;
+                case 2:
+                    Mod_GreyGotoCalib(&st_Grey);
+                    break;
+                default:
+                    return FALSE;
+                }
+            }
+            res = TRUE;    //应答
+        }
+        break;
+//==================================================================================
+//                                   获取绿光工作状态/总透过率/总灰度
+//==================================================================================
+    case 0x3b:
+        if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
+        {
+            pst_Fram->uin_PayLoadLenth = 9;
+            pst_Fram->puc_PayLoad[0] = st_Grey.e_Status;
+            Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[1],st_Grey.f_Trans,FALSE);
+            Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[5],st_Grey.f_Grey,FALSE);
+            res = TRUE; 
+        }
+        break;
 //==================================================================================
 //                                   读取光谱
 //==================================================================================

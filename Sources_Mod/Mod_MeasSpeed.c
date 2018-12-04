@@ -66,7 +66,6 @@ BOOL Mod_MeasSpeedDealFram(StdbusFram_t* pst_Fram)
             st_MeasSpeed.uch_Dirction = pst_Fram->puc_PayLoad[4];
             st_MeasSpeed.f_Speed_mph = Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[5],FALSE);
             st_MeasSpeed.f_Acc_mps2 = Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[9],FALSE);
-            PostSem();
             Mod_MeasSpeedReply(&st_MeasSpeed);
 
         }

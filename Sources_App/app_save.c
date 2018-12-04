@@ -57,6 +57,19 @@ START_ADD+0x9000 + 0x08, (uint32_t)(&USB4000.b_EdcEnable),          KIND_INT8U, 
 START_ADD+0x9000 + 0x0C, (uint32_t)(&USB4000.b_NlcEnable),          KIND_INT8U,   1,     LIMIT_RANGE,       0,          1,          0,
 START_ADD+0x9000 + 0x10, (uint32_t)(&USB4000.ul_SetIntegralTime),   KIND_INT32U,  1,     LIMIT_RANGE,       1,      65000000,    50000,
 
+
+START_ADD+0x9100 + 0x00, (uint32_t)(&ast_GreyChannle[0].f_AbsTransVolt),   KIND_FP32,  1,     LIMIT_RANGE,       0.0,      4.1f,    4.1f,
+START_ADD+0x9100 + 0x04, (uint32_t)(&ast_GreyChannle[1].f_AbsTransVolt),   KIND_FP32,  1,     LIMIT_RANGE,       0.0,      4.1f,    4.1f,
+START_ADD+0x9100 + 0x08, (uint32_t)(&ast_GreyChannle[2].f_AbsTransVolt),   KIND_FP32,  1,     LIMIT_RANGE,       0.0,      4.1f,    4.1f,
+START_ADD+0x9100 + 0x0C, (uint32_t)(&ast_GreyChannle[3].f_AbsTransVolt),   KIND_FP32,  1,     LIMIT_RANGE,       0.0,      4.1f,    4.1f,
+START_ADD+0x9100 + 0x10, (uint32_t)(&ast_GreyChannle[4].f_AbsTransVolt),   KIND_FP32,  1,     LIMIT_RANGE,       0.0,      4.1f,    4.1f,
+START_ADD+0x9100 + 0x14, (uint32_t)(&ast_GreyChannle[5].f_AbsTransVolt),   KIND_FP32,  1,     LIMIT_RANGE,       0.0,      4.1f,    4.1f,
+START_ADD+0x9100 + 0x18, (uint32_t)(&ast_GreyChannle[6].f_AbsTransVolt),   KIND_FP32,  1,     LIMIT_RANGE,       0.0,      4.1f,    4.1f,
+START_ADD+0x9100 + 0x1C, (uint32_t)(&ast_GreyChannle[7].f_AbsTransVolt),   KIND_FP32,  1,     LIMIT_RANGE,       0.0,      4.1f,    4.1f,
+START_ADD+0x9100 + 0x20, (uint32_t)(&ast_GreyChannle[8].f_AbsTransVolt),   KIND_FP32,  1,     LIMIT_RANGE,       0.0,      4.1f,    4.1f,
+START_ADD+0x9100 + 0x24, (uint32_t)(&ast_GreyChannle[9].f_AbsTransVolt),   KIND_FP32,  1,     LIMIT_RANGE,       0.0,      4.1f,    4.1f,
+
+
 }; 
  
 //==================================================================================================

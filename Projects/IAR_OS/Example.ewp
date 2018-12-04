@@ -2249,9 +2249,6 @@
     <group>
         <name>Sources_Task</name>
         <file>
-            <name>$PROJ_DIR$\..\..\Sources_Task\task_cml.c</name>
-        </file>
-        <file>
             <name>$PROJ_DIR$\..\..\Sources_Task\Task_DisBoard.c</name>
         </file>
         <file>
