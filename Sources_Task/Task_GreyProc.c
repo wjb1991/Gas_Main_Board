@@ -25,7 +25,5 @@ void Task_GreyProc(void  *p_arg)
               &os_err);
         
         Mod_GreyPoll(&st_Grey);
-        
-        //TRACE_DBG(">>DBG:       ª“∂»¥¶¿Ì\r\n");
     }
 }
