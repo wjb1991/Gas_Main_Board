@@ -111,12 +111,12 @@ void Mod_GreyCalculate(GreyChannel_t* pst_Channel)
 void Mod_GreyProc(GreyChannel_t* pst_Channel)
 {
     GreyAnalysis_t* pst_Manage = pst_Channel->pv_Manage;
-
+    FP32 f;
     switch (pst_Manage->e_Status)
     {
         case e_GreyIdle:
             /* 空闲时不停更新背景电压 */
-            FP32 f = pst_Channel->f_Volt / pst_Channel->f_AbsTransVolt * 100;  //更新当前单路的透过率
+            f = pst_Channel->f_Volt / pst_Channel->f_AbsTransVolt * 100;  //更新当前单路的透过率
             pst_Channel->f_Trans = (f > 100) ? 100:f;
 
 

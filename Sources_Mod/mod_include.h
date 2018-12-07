@@ -15,6 +15,10 @@
 #include "Mod_Laser.h"
 #include "Mod_Measure.h"
 
+
+#include "Mod_CalibPoint.h"
+#include "Mod_Spectrum.h"
+
 #include "mod_gasanalysis.h"
 #include "mod_greyanalysis.h"
 

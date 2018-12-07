@@ -2498,6 +2498,9 @@
     <group>
         <name>Sources_Mod</name>
         <file>
+            <name>$PROJ_DIR$\..\..\Sources_Mod\Mod_CalibPoint.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\Sources_Mod\mod_crc16.c</name>
         </file>
         <file>
@@ -2517,6 +2520,9 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\Sources_Mod\Mod_Measure.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\Sources_Mod\Mod_Spectrum.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\Sources_Mod\Mod_StdbusLaser.c</name>

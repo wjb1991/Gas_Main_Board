@@ -7,46 +7,22 @@ static const MYSAVEPARA st_Save[N_MAX_SAVE]=
 //存储地址|-----------------变量地址---------------|-----类型------|-长度-|-----限定方-----|---最小值--|---最大值---|--默认值---//
   
 /*  0    3670个点的背景光谱  4096*4个点的空间预留  */  
-START_ADD+0x0000,         (uint32_t)alf_BkSpectrum, KIND_FP64,    3648,    LIMIT_RANGE,      0,        65536,        0,
+START_ADD+0x0000,         (uint32_t)alf_BkgSpectrum, KIND_FP64,    3648,    LIMIT_RANGE,      0,        65536,        0,
 
-/*  4096    20个校准点数据 每个20字节 400字节  512个字节空间   */ 
-START_ADD+0x8000+sizeof(CaliPoint_t)*0, (uint32_t)(&ast_CPortBuff[0]),KIND_INT8U, sizeof(CaliPoint_t), LIMIT_NULL, 0, 255, 0,    
-START_ADD+0x8000+sizeof(CaliPoint_t)*1, (uint32_t)(&ast_CPortBuff[1]),KIND_INT8U, sizeof(CaliPoint_t), LIMIT_NULL, 0, 255, 0,    
-START_ADD+0x8000+sizeof(CaliPoint_t)*2, (uint32_t)(&ast_CPortBuff[2]),KIND_INT8U, sizeof(CaliPoint_t), LIMIT_NULL, 0, 255, 0,    
-START_ADD+0x8000+sizeof(CaliPoint_t)*3, (uint32_t)(&ast_CPortBuff[3]),KIND_INT8U, sizeof(CaliPoint_t), LIMIT_NULL, 0, 255, 0,
-START_ADD+0x8000+sizeof(CaliPoint_t)*4, (uint32_t)(&ast_CPortBuff[4]),KIND_INT8U, sizeof(CaliPoint_t), LIMIT_NULL, 0, 255, 0,    
-START_ADD+0x8000+sizeof(CaliPoint_t)*5, (uint32_t)(&ast_CPortBuff[5]),KIND_INT8U, sizeof(CaliPoint_t), LIMIT_NULL, 0, 255, 0,    
-START_ADD+0x8000+sizeof(CaliPoint_t)*6, (uint32_t)(&ast_CPortBuff[6]),KIND_INT8U, sizeof(CaliPoint_t), LIMIT_NULL, 0, 255, 0,    
-START_ADD+0x8000+sizeof(CaliPoint_t)*7, (uint32_t)(&ast_CPortBuff[7]),KIND_INT8U, sizeof(CaliPoint_t), LIMIT_NULL, 0, 255, 0,    
-START_ADD+0x8000+sizeof(CaliPoint_t)*8, (uint32_t)(&ast_CPortBuff[8]),KIND_INT8U, sizeof(CaliPoint_t), LIMIT_NULL, 0, 255, 0,    
-START_ADD+0x8000+sizeof(CaliPoint_t)*9, (uint32_t)(&ast_CPortBuff[9]),KIND_INT8U, sizeof(CaliPoint_t), LIMIT_NULL, 0, 255, 0,    
-START_ADD+0x8000+sizeof(CaliPoint_t)*10, (uint32_t)(&ast_CPortBuff[10]),KIND_INT8U, sizeof(CaliPoint_t), LIMIT_NULL, 0, 255, 0,    
-START_ADD+0x8000+sizeof(CaliPoint_t)*11, (uint32_t)(&ast_CPortBuff[11]),KIND_INT8U, sizeof(CaliPoint_t), LIMIT_NULL, 0, 255, 0,    
-START_ADD+0x8000+sizeof(CaliPoint_t)*12, (uint32_t)(&ast_CPortBuff[12]),KIND_INT8U, sizeof(CaliPoint_t), LIMIT_NULL, 0, 255, 0,    
-START_ADD+0x8000+sizeof(CaliPoint_t)*13, (uint32_t)(&ast_CPortBuff[13]),KIND_INT8U, sizeof(CaliPoint_t), LIMIT_NULL, 0, 255, 0,    
-START_ADD+0x8000+sizeof(CaliPoint_t)*14, (uint32_t)(&ast_CPortBuff[14]),KIND_INT8U, sizeof(CaliPoint_t), LIMIT_NULL, 0, 255, 0,    
-START_ADD+0x8000+sizeof(CaliPoint_t)*15, (uint32_t)(&ast_CPortBuff[15]),KIND_INT8U, sizeof(CaliPoint_t), LIMIT_NULL, 0, 255, 0,    
-START_ADD+0x8000+sizeof(CaliPoint_t)*16, (uint32_t)(&ast_CPortBuff[16]),KIND_INT8U, sizeof(CaliPoint_t), LIMIT_NULL, 0, 255, 0,    
-START_ADD+0x8000+sizeof(CaliPoint_t)*17, (uint32_t)(&ast_CPortBuff[17]),KIND_INT8U, sizeof(CaliPoint_t), LIMIT_NULL, 0, 255, 0,    
-START_ADD+0x8000+sizeof(CaliPoint_t)*18, (uint32_t)(&ast_CPortBuff[18]),KIND_INT8U, sizeof(CaliPoint_t), LIMIT_NULL, 0, 255, 0,
-START_ADD+0x8000+sizeof(CaliPoint_t)*19, (uint32_t)(&ast_CPortBuff[19]),KIND_INT8U, sizeof(CaliPoint_t), LIMIT_NULL, 0, 255, 0,    
-   
+/*  4096    20个校准点数据 每个12字节 360字节  512个字节空间   */ 
+START_ADD+0x8000 + 0x00, (uint32_t)(&ast_CalibPoint_GasNO[0]),   KIND_INT8U,   sizeof(CalibPoint_t),     LIMIT_NULL,       0,          0,        0,
+START_ADD+0x8000 + 0x10, (uint32_t)(&ast_CalibPoint_GasNO[1]),   KIND_INT8U,   sizeof(CalibPoint_t),     LIMIT_NULL,       0,          0,        0,
+START_ADD+0x8000 + 0x20, (uint32_t)(&ast_CalibPoint_GasNO[2]),   KIND_INT8U,   sizeof(CalibPoint_t),     LIMIT_NULL,       0,          0,        0,
+START_ADD+0x8000 + 0x30, (uint32_t)(&ast_CalibPoint_GasNO[3]),   KIND_INT8U,   sizeof(CalibPoint_t),     LIMIT_NULL,       0,          0,        0,
+START_ADD+0x8000 + 0x40, (uint32_t)(&ast_CalibPoint_GasNO[4]),   KIND_INT8U,   sizeof(CalibPoint_t),     LIMIT_NULL,       0,          0,        0,
+START_ADD+0x8000 + 0x50, (uint32_t)(&ast_CalibPoint_GasNO[5]),   KIND_INT8U,   sizeof(CalibPoint_t),     LIMIT_NULL,       0,          0,        0,
+START_ADD+0x8000 + 0x60, (uint32_t)(&ast_CalibPoint_GasNO[6]),   KIND_INT8U,   sizeof(CalibPoint_t),     LIMIT_NULL,       0,          0,        0,
+START_ADD+0x8000 + 0x70, (uint32_t)(&ast_CalibPoint_GasNO[7]),   KIND_INT8U,   sizeof(CalibPoint_t),     LIMIT_NULL,       0,          0,        0,
+START_ADD+0x8000 + 0x80, (uint32_t)(&ast_CalibPoint_GasNO[8]),   KIND_INT8U,   sizeof(CalibPoint_t),     LIMIT_NULL,       0,          0,        0,
+START_ADD+0x8000 + 0x90, (uint32_t)(&ast_CalibPoint_GasNO[9]),   KIND_INT8U,   sizeof(CalibPoint_t),     LIMIT_NULL,       0,          0,        0,
 //存储地址|-----------------变量地址---------------|-----类型------|-长度-|-----限定方-----|---最小值--|---最大值---|--默认值---//
 /*  4096 + 512  128个字节预留  */
-START_ADD+0x8200 + 0x00, (uint32_t)(&alf_WorkLine[0][0]), KIND_FP32,   1,     LIMIT_NULL,       0,          99,        0,
-START_ADD+0x8200 + 0x04, (uint32_t)(&alf_WorkLine[0][1]), KIND_FP32,   1,     LIMIT_NULL,       0,          99,        0,
-START_ADD+0x8200 + 0x08, (uint32_t)(&alf_WorkLine[0][2]), KIND_FP32,   1,     LIMIT_NULL,       0,          99,        0,
-START_ADD+0x8200 + 0x0c, (uint32_t)(&alf_WorkLine[0][3]), KIND_FP32,   1,     LIMIT_NULL,       0,          99,        0,
-                                                                      
-START_ADD+0x8200 + 0x10, (uint32_t)(&alf_WorkLine[1][0]), KIND_FP32,   1,     LIMIT_NULL,       0,          99,        0,
-START_ADD+0x8200 + 0x14, (uint32_t)(&alf_WorkLine[1][1]), KIND_FP32,   1,     LIMIT_NULL,       0,          99,        0,
-START_ADD+0x8200 + 0x18, (uint32_t)(&alf_WorkLine[1][2]), KIND_FP32,   1,     LIMIT_NULL,       0,          99,        0,
-START_ADD+0x8200 + 0x1c, (uint32_t)(&alf_WorkLine[1][3]), KIND_FP32,   1,     LIMIT_NULL,       0,          99,        0,
-                                                                      
-START_ADD+0x8200 + 0x20, (uint32_t)(&alf_WorkLine[2][0]), KIND_FP32,   1,     LIMIT_NULL,       0,          99,        0,
-START_ADD+0x8200 + 0x24, (uint32_t)(&alf_WorkLine[2][1]), KIND_FP32,   1,     LIMIT_NULL,       0,          99,        0,
-START_ADD+0x8200 + 0x28, (uint32_t)(&alf_WorkLine[2][2]), KIND_FP32,   1,     LIMIT_NULL,       0,          99,        0,
-START_ADD+0x8200 + 0x2c, (uint32_t)(&alf_WorkLine[2][3]), KIND_FP32,   1,     LIMIT_NULL,       0,          99,        0,
+
             
 
 //存储地址|-----------------变量地址---------------|-----类型------|-长度-|-----限定方-----|---最小值--|---最大值---|--默认值---//

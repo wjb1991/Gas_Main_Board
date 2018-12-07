@@ -1173,14 +1173,9 @@ static USBH_StatusTypeDef USBH_USB4000_ProcessSpectrum(USBH_HandleTypeDef *phost
                 smoothed[k] = procSpectrum[i+boxcar];     
             }
         }  
-    
-        /* 通知上层 其他模块*/
-        OS_ERR  os_err;
-        OSTaskQPost (&TaskGasProcTCB,
-                     (void*)USB4000_Handle,
-                     sizeof(USB4000_Handle),
-                     OS_OPT_POST_FIFO,
-                     &os_err);
+        USB4000_EvnetHandle(USB4000_Handle);
+          
+
     }
     
     return USBH_OK;
@@ -1191,6 +1186,12 @@ void USB4000_SetIntegTime(USB4000_HandleTypeDef *USB4000_Handle, INT32U IntegTim
     USB4000_Handle->b_SetFlag = TRUE;
     USB4000_Handle->ul_SetIntegralTime = IntegTime;
 }
+
+__weak void USB4000_EvnetHandle(USB4000_HandleTypeDef *USB4000_Handle)
+{
+
+}
+
 
 /* 调试用 获取各个通道的状态  */
 /**

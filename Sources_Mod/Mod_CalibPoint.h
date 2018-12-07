@@ -1,3 +1,5 @@
+#ifndef __MOD_CALIBPOINT_H__
+#define __MOD_CALIBPOINT_H__
 
 #define     DEF_CALIBPOINT_MAX          10      /* 最大校准点点数 */
 
@@ -28,3 +30,5 @@ BOOL Mod_CalibPointListAddOnePoint(CalibPointList_t* pst_CpointList, CalibPoint_
 BOOL Mod_CalibPointListDeleteOnePoint(CalibPointList_t* pst_CpointList, INT32U ul_Index);
 
 BOOL Mod_CalibPointListNihe(CalibPointList_t* pst_CpointList,INT8U uch_NiheOrder,FP32* pf_NiheCoeff);
+
+#endif

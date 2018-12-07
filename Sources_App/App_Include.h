@@ -14,6 +14,7 @@
 #include  "App_Os.h"
 #include  "app_save.h"
 
+#include  "Pub_Nihe.h"
 
 
 #endif

@@ -13,11 +13,11 @@ void Task_GasProc (void  *p_arg)
 {
     OS_ERR  os_err;
     
-    Mod_SpectrumInit();
+    Mod_SpectrumInit(&st_GasMeasure);
     
     while(TRUE)
     {
-        Mod_SpectrumPoll();
+        Mod_GasMeasurePoll(&st_GasMeasure);
     }
 }
 #if 0

@@ -1,6 +1,6 @@
 #include "App_Include.h"
 
-static INT32U al_Buff[3800] = {0};//临时
+static FP64 lf_Buff[3840] = {0};//临时
 
 uint16_t Uint8TOUint16(uint8_t *puc_data)
 {
@@ -109,7 +109,7 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
         }
         break;
 //==================================================================================
-//                              设置光谱仪是否开启EDC(电子暗电流补偿)
+//                              设置光谱仪是否开启EDC(暗噪声补偿)
 //==================================================================================
     case 0x14:
         if(pst_Fram->uch_SubCmd == e_StdbusWriteCmd)
@@ -158,19 +158,20 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
         if(pst_Fram->uch_SubCmd == e_StdbusWriteCmd)
         {
             //byte0: 0:切换到调零状态
-            //       1:切换到工作状态
-            //       2:切换到标定状态
+            //       1:切换到标定状态
+            //       2:切换到工作状态
+            //       3:切换到差分测量状态
             //byte1-5 float :切换到标定状态是时下发的标定浓度
             if(pst_Fram->uin_PayLoadLenth == 1)
             {
                 if(pst_Fram->puc_PayLoad[0] == 0)
                 {
-                    Mod_GasAnalysisGoAdjZero(&GasAnalysis);            //切换到调0状态
+                    Mod_GasMeasureGotoAdjZero(&st_GasMeasure);            //切换到调0状态
                     res = TRUE;    //应答
                 }
-                else if(pst_Fram->puc_PayLoad[0] == 1)
+                else if(pst_Fram->puc_PayLoad[0] == 2)
                 {
-                    Mod_GasAnalysisGoAnalysis(&GasAnalysis);        //切换到工作状态
+                    Mod_GasMeasureGotoAbsMeasure(&st_GasMeasure);        //切换到工作状态
                     res = TRUE;    //应答
                 }
             }
@@ -182,9 +183,9 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
                 {
                     TRACE_DBG(">>DBG>>      接收到标定命令\n\r");
 
-                    f = Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[1],FALSE);
-                    GasAnalysis.f_RefConcentration = f;            //给定浓度
-                    Mod_GasAnalysisGoCalibration(&GasAnalysis);
+                    //f = Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[1],FALSE);
+                    //GasAnalysis.f_RefConcentration = f;            //给定浓度
+                    //Mod_GasAnalysisGoCalibration(&GasAnalysis);
                     res = TRUE;    //应答
                 }
             }
@@ -194,11 +195,11 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
         {
             //读命令是返回是否在调零
             pst_Fram->uin_PayLoadLenth = 1;
-            pst_Fram->puc_PayLoad[0] = GasAnalysis.e_Ops;
+            pst_Fram->puc_PayLoad[0] = st_GasMeasure.e_State;
             res = TRUE;    //应答
         }
         break;
-
+#if 0
 //==================================================================================
 //                          修改一个标定点/读取一个标定点
 //==================================================================================
@@ -367,7 +368,7 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
             }
         }
         break;
-
+#endif
 //==================================================================================
 //                                   读取10路绿光电压
 //==================================================================================
@@ -505,7 +506,7 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
             pst_Fram->puc_PayLoad[0] = st_Grey.e_Status;
             Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[1],st_Grey.f_Trans,FALSE);
             Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[5],st_Grey.f_Grey,FALSE);
-            res = TRUE; 
+            res = TRUE;
         }
         break;
 //==================================================================================
@@ -514,144 +515,158 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
     case 0x40:
         if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
         {
-             //第一个字节是PageIndex  第二三个字节是ReadAddress 第四五个字节是ReadLenth
-
             if(pst_Fram->uin_PayLoadLenth == 0)
             {
-                uint16_t i = 0;
-                //读取第一页返回数组长度
-                pst_Fram->puc_PayLoad[0] = (uint8_t)(GasAnalysis.uin_Pixels>>8);
-                pst_Fram->puc_PayLoad[1] = (uint8_t)(GasAnalysis.uin_Pixels&0x00ff);
-                pst_Fram->uin_PayLoadLenth = 2;
+                INT16U i = 0;
+                INT16U len = 0;
+                OS_ERR os_err;
 
-                /* 加载光谱到 缓冲区 确保不会再传输一半中 更新光谱*/
-                CPU_IntDis();//OSSchedLock(&os_err);
-                for(i = 0; i < GasAnalysis.uin_Pixels; i++)
-                {
-                    double data = GasAnalysis.plf_Spectrum[i] * 100;
-                    al_Buff[i] = (INT32U)data;
-                }
-                CPU_IntEn();//OSSchedUnlock(&os_err);
+                /* 加载光谱到 缓冲区 确保不会再传输一半中 更新光谱 */
+                OSSchedLock(&os_err);
+                for(i = st_GasMeasure.ul_UseLeftDot; i < st_GasMeasure.ul_UseRightDot; i++)
+                    lf_Buff[len++] = st_GasMeasure.plf_Spectrum[i];
+                OSSchedUnlock(&os_err);
+
+                //读取第一页返回数组长度
+                Bsp_CnvINT16UToArr(&pst_Fram->puc_PayLoad[0], len, FALSE);
+                pst_Fram->uin_PayLoadLenth = 2;
+                res = TRUE;    //应答
             }
             else if(pst_Fram->uin_PayLoadLenth == 4)
             {
-                uint16_t i = 0;
-                uint16_t uin_Offset = Uint8TOUint16(pst_Fram->puc_PayLoad);
-                uint16_t uin_Lenth = Uint8TOUint16(pst_Fram->puc_PayLoad + 2);
+                //第一二个字节是ReadAddress 第二三个字节是ReadLenth
+                INT16U i = 0;
+                INT16U uin_Offset = Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[0], FALSE);
+                INT16U uin_Lenth = Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[2], FALSE);
 
-                pst_Fram->uin_PayLoadLenth = 4 + uin_Lenth * 4;
+                pst_Fram->uin_PayLoadLenth = 4 + uin_Lenth * 8;
                 for(i = 0; i<uin_Lenth;i++)
                 {
-                    int32_t j = al_Buff[uin_Offset + i];
-
-                    pst_Fram->puc_PayLoad[i * 4 + 0 + 4] = (uint8_t)(j>>24);
-                    pst_Fram->puc_PayLoad[i * 4 + 1 + 4] = (uint8_t)(j>>16);
-                    pst_Fram->puc_PayLoad[i * 4 + 2 + 4] = (uint8_t)(j>>8);
-                    pst_Fram->puc_PayLoad[i * 4 + 3 + 4] = (uint8_t)(j&0xff);
+                    Bsp_CnvFP64ToArr(&pst_Fram->puc_PayLoad[i*8+4],lf_Buff[uin_Offset+i],FALSE);
                 }
+                res = TRUE;    //应答
             }
-            res = TRUE;    //应答
+        }
+        break;
+
+//==================================================================================
+//                                  读取标定光谱
+//==================================================================================
+    case 0x41:
+        if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
+        {
+            if(pst_Fram->uin_PayLoadLenth == 0)
+            {
+                INT16U i = 0;
+                INT16U len = 0;
+                OS_ERR os_err;
+
+                /* 加载光谱到 缓冲区 确保不会再传输一半中 更新光谱 */
+                OSSchedLock(&os_err);
+                for(i = st_GasMeasure.ul_UseLeftDot; i < st_GasMeasure.ul_UseRightDot; i++)
+                    lf_Buff[len++] = st_GasMeasure.plf_AbsSpectrum[i];
+                OSSchedUnlock(&os_err);
+
+                //读取第一页返回数组长度
+                Bsp_CnvINT16UToArr(&pst_Fram->puc_PayLoad[0], len, FALSE);
+                pst_Fram->uin_PayLoadLenth = 2;
+                res = TRUE;    //应答
+            }
+            else if(pst_Fram->uin_PayLoadLenth == 4)
+            {
+                //第一二个字节是ReadAddress 第二三个字节是ReadLenth
+                INT16U i = 0;
+                INT16U uin_Offset = Uint8TOUint16(pst_Fram->puc_PayLoad);
+                INT16U uin_Lenth = Uint8TOUint16(pst_Fram->puc_PayLoad + 2);
+
+                pst_Fram->uin_PayLoadLenth = 4 + uin_Lenth * 8;
+                for(i = 0; i<uin_Lenth;i++)
+                {
+                    Bsp_CnvFP64ToArr(&pst_Fram->puc_PayLoad[i*8+4],lf_Buff[uin_Offset+i],FALSE);
+                }
+                res = TRUE;    //应答
+            }
         }
         break;
 
 //==================================================================================
 //                                  读取背景光谱
 //==================================================================================
-    case 0x41:
-        if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
-        {
-             //第一个字节是PageIndex  第二三个字节是ReadAddress 第四五个字节是ReadLenth
-
-            if(pst_Fram->uin_PayLoadLenth == 0)
-            {
-                uint16_t i = 0;
-                //读取第一页返回数组长度
-                pst_Fram->puc_PayLoad[0] = (uint8_t)(GasAnalysis.uin_Pixels>>8);
-                pst_Fram->puc_PayLoad[1] = (uint8_t)(GasAnalysis.uin_Pixels&0x00ff);
-                pst_Fram->uin_PayLoadLenth = 2;
-
-                /* 加载光谱到 缓冲区 确保不会再传输一半中 更新光谱*/
-                CPU_IntDis();//OSSchedLock(&os_err);
-                for(i = 0; i < GasAnalysis.uin_Pixels; i++)
-                {
-                    double data = GasAnalysis.plf_BkSpectrum[i] * 100;
-                    al_Buff[i] = (INT32U)data;
-                }
-                CPU_IntEn();//OSSchedUnlock(&os_err);
-            }
-            else if(pst_Fram->uin_PayLoadLenth == 4)
-            {
-                uint16_t i = 0;
-                uint16_t uin_Offset = Uint8TOUint16(pst_Fram->puc_PayLoad);
-                uint16_t uin_Lenth = Uint8TOUint16(pst_Fram->puc_PayLoad + 2);
-
-                pst_Fram->uin_PayLoadLenth = 4 + uin_Lenth * 4;
-                for(i = 0; i<uin_Lenth;i++)
-                {
-                    int32_t j = al_Buff[uin_Offset + i];
-
-                    pst_Fram->puc_PayLoad[i * 4 + 0 + 4] = (uint8_t)(j>>24);
-                    pst_Fram->puc_PayLoad[i * 4 + 1 + 4] = (uint8_t)(j>>16);
-                    pst_Fram->puc_PayLoad[i * 4 + 2 + 4] = (uint8_t)(j>>8);
-                    pst_Fram->puc_PayLoad[i * 4 + 3 + 4] = (uint8_t)(j&0xff);
-                }
-            }
-            res = TRUE;    //应答
-        }
-        break;
-        
-//==================================================================================
-//                                  读取相对光谱
-//==================================================================================
     case 0x42:
         if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
         {
-             //第一个字节是PageIndex  第二三个字节是ReadAddress 第四五个字节是ReadLenth
-
             if(pst_Fram->uin_PayLoadLenth == 0)
             {
-                uint16_t i = 0;
-
-                //读取第一页返回数组长度
-                pst_Fram->puc_PayLoad[0] = (uint8_t)(GasAnalysis.uin_Pixels>>8);
-                pst_Fram->puc_PayLoad[1] = (uint8_t)(GasAnalysis.uin_Pixels&0x00ff);
-                pst_Fram->uin_PayLoadLenth = 2;
+                INT16U i = 0;
+                INT16U len = 0;
+                OS_ERR os_err;
 
                 /* 加载光谱到 缓冲区 确保不会再传输一半中 更新光谱 */
-                CPU_IntDis();//OSSchedLock(&os_err);
-                for(i = 0; i < GasAnalysis.uin_Pixels; i++)
-                {
-                    double data = GasAnalysis.plf_AbsSpectrum[i] * 100;
-                    al_Buff[i] = (INT32U)data;
-                }
-                CPU_IntEn();//OSSchedUnlock(&os_err);
+                OSSchedLock(&os_err);
+                for(i = st_GasMeasure.ul_UseLeftDot; i < st_GasMeasure.ul_UseRightDot; i++)
+                    lf_Buff[len++] = st_GasMeasure.plf_BkgSpectrum[i];
+                OSSchedUnlock(&os_err);
 
-                pst_Fram->puc_PayLoad[0] = (uint8_t)(i>>8);
-                pst_Fram->puc_PayLoad[1] = (uint8_t)(i&0x00ff);
+                //读取第一页返回数组长度
+                Bsp_CnvINT16UToArr(&pst_Fram->puc_PayLoad[0], len, FALSE);
                 pst_Fram->uin_PayLoadLenth = 2;
-
+                res = TRUE;    //应答
             }
             else if(pst_Fram->uin_PayLoadLenth == 4)
             {
-                uint16_t i = 0;
-                uint16_t uin_Offset = Uint8TOUint16(pst_Fram->puc_PayLoad);
-                uint16_t uin_Lenth = Uint8TOUint16(pst_Fram->puc_PayLoad + 2);
+                //第一二个字节是ReadAddress 第二三个字节是ReadLenth
+                INT16U i = 0;
+                INT16U uin_Offset = Uint8TOUint16(pst_Fram->puc_PayLoad);
+                INT16U uin_Lenth = Uint8TOUint16(pst_Fram->puc_PayLoad + 2);
 
-                pst_Fram->uin_PayLoadLenth = 4 + uin_Lenth * 4;
+                pst_Fram->uin_PayLoadLenth = 4 + uin_Lenth * 8;
                 for(i = 0; i<uin_Lenth;i++)
                 {
-                    uint32_t j = al_Buff[uin_Offset + i];
-
-                    pst_Fram->puc_PayLoad[i * 4 + 0 + 4] = (uint8_t)(j>>24);
-                    pst_Fram->puc_PayLoad[i * 4 + 1 + 4] = (uint8_t)(j>>16);
-                    pst_Fram->puc_PayLoad[i * 4 + 2 + 4] = (uint8_t)(j>>8);
-                    pst_Fram->puc_PayLoad[i * 4 + 3 + 4] = (uint8_t)(j&0xff);
+                    Bsp_CnvFP64ToArr(&pst_Fram->puc_PayLoad[i*8+4],lf_Buff[uin_Offset+i],FALSE);
                 }
+                res = TRUE;    //应答
             }
-            res = TRUE;    //应答
         }
         break;
+//==================================================================================
+//                                  读取背景光谱
+//==================================================================================
+    case 0x43:
+        if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
+        {
+            if(pst_Fram->uin_PayLoadLenth == 0)
+            {
+                INT16U i = 0;
+                INT16U len = 0;
+                OS_ERR os_err;
 
+                /* 加载光谱到 缓冲区 确保不会再传输一半中 更新光谱 */
+                OSSchedLock(&os_err);
+                for(i = st_GasMeasure.ul_UseLeftDot; i < st_GasMeasure.ul_UseRightDot; i++)
+                    lf_Buff[len++] = st_GasMeasure.plf_DiffSpectrum[i];
+                OSSchedUnlock(&os_err);
+
+                //读取第一页返回数组长度
+                Bsp_CnvINT16UToArr(&pst_Fram->puc_PayLoad[0], len, FALSE);
+                pst_Fram->uin_PayLoadLenth = 2;
+                res = TRUE;    //应答
+            }
+            else if(pst_Fram->uin_PayLoadLenth == 4)
+            {
+                //第一二个字节是ReadAddress 第二三个字节是ReadLenth
+                INT16U i = 0;
+                INT16U uin_Offset = Uint8TOUint16(pst_Fram->puc_PayLoad);
+                INT16U uin_Lenth = Uint8TOUint16(pst_Fram->puc_PayLoad + 2);
+
+                pst_Fram->uin_PayLoadLenth = 4 + uin_Lenth * 8;
+                for(i = 0; i<uin_Lenth;i++)
+                {
+                    Bsp_CnvFP64ToArr(&pst_Fram->puc_PayLoad[i*8+4],lf_Buff[uin_Offset+i],FALSE);
+                }
+                res = TRUE;    //应答
+            }
+        }
+        break;
 //==================================================================================
 //                                 读取吸收峰高度
 //==================================================================================
@@ -662,9 +677,9 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
             {
                 //返回三个吸收峰的高度
                 pst_Fram->puc_PayLoad[0] = 3;
-                Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[1],GasAnalysis.f_Hi204_4,FALSE);
-                Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[5],GasAnalysis.f_Hi214_8,FALSE);
-                Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[9],GasAnalysis.f_Hi226_0,FALSE);
+                //Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[1],GasAnalysis.f_Hi204_4,FALSE);
+                //Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[5],GasAnalysis.f_Hi214_8,FALSE);
+                //Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[9],GasAnalysis.f_Hi226_0,FALSE);
                 pst_Fram->uin_PayLoadLenth = 13;
                 res = TRUE;    //应答
             }
@@ -686,9 +701,9 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
             {
                 //返回三个吸收峰的高度
                 pst_Fram->puc_PayLoad[0] = 3;
-                Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[1],GasAnalysis.f_Concentration_204,FALSE);
-                Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[5],GasAnalysis.f_Concentration_214,FALSE);
-                Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[9],GasAnalysis.f_Concentration_226,FALSE);
+                //Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[1],GasAnalysis.f_Concentration_204,FALSE);
+                //Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[5],GasAnalysis.f_Concentration_214,FALSE);
+                //Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[9],GasAnalysis.f_Concentration_226,FALSE);
                 pst_Fram->uin_PayLoadLenth = 13;
                 res = TRUE;    //应答
             }

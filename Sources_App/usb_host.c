@@ -156,8 +156,8 @@ static void USBH_UserProcess  (USBH_HandleTypeDef *phost, uint8_t id)
         break;
 
     case HOST_USER_CONNECTION:
-        HAL_Delay(3000);
         printf("HOST_USER_CONNECTION\r\n");
+        HAL_Delay(4000);
         Appli_state = APPLICATION_START;
         break;
 
