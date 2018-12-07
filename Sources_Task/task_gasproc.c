@@ -12,6 +12,18 @@
 void Task_GasProc (void  *p_arg)
 {
     OS_ERR  os_err;
+    
+    Mod_SpectrumInit();
+    
+    while(TRUE)
+    {
+        Mod_SpectrumPoll();
+    }
+}
+#if 0
+void Task_GasProc (void  *p_arg)
+{
+    OS_ERR  os_err;
     (void)p_arg;
 
     Mod_GasAnalysisInit(&GasAnalysis);
@@ -30,3 +42,4 @@ void Task_GasProc (void  *p_arg)
         Mod_GasAnalysisPoll(&GasAnalysis);
     }
 }
+#endif

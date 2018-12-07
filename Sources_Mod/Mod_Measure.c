@@ -16,7 +16,7 @@
                                             OSSchedUnlock(&os_err);         \
                                         }while(0)
 #else
-    #define MEASURE_DBG(...)             
+    #define MEASURE_DBG(...)
 #endif
 
 Measure_t st_Measure = {
@@ -35,7 +35,7 @@ Measure_t st_Measure = {
 static void InitSem(void)
 {
     OS_ERR os_err;
-    OSTaskSemSet(&TaskMeasSpeedTCB,0U,&os_err);
+    OSTaskSemSet(&TaskMeasureTCB,0U,&os_err);
 }
 
 static void PostSem(void)
@@ -93,23 +93,23 @@ void Mod_MeasurePoll(Measure_t* pst_Meas)
     case DEF_MEASURE_START:
         /* 开启超时检测 开启测量模式 */
         MEASURE_DBG(">>MEASURE DBG:   测量任务开始\r\n");
-        
+
         StartTimeOutCheck();
         break;
     case DEF_MEASURE_END:
         /* 恢复正常模式 并取出数据计算 浓度 */
-      
+
         MEASURE_DBG(">>MEASURE DBG:   请求读取一次测速结果\r\n");
-        
+
         Mod_MeasSpeedRequest(&st_MeasSpeed);
         if(PendSem() != TRUE)
             break;
-      
+
         MEASURE_DBG(">>MEASURE DBG:   一次测量完成\r\n");
-        MEASURE_DBG(">>MEASURE DBG:   车辆速度:     %f\r\n",pst_Meas->f_Speed);    
-        MEASURE_DBG(">>MEASURE DBG:   车辆加速度:   %f\r\n",pst_Meas->f_Acc); 
+        MEASURE_DBG(">>MEASURE DBG:   车辆速度:     %f\r\n",pst_Meas->f_Speed);
+        MEASURE_DBG(">>MEASURE DBG:   车辆加速度:   %f\r\n",pst_Meas->f_Acc);
         MEASURE_DBG(">>MEASURE DBG:   测量任务结束\r\n");
-        break;     
+        break;
     case DEF_MEASURE_TIMEOUT:
         /* 恢复正常模式  */
         MEASURE_DBG(">>MEASURE DBG:   测量任务超时\r\n");
@@ -136,4 +136,3 @@ void Bsp_GpioEventHandle(GpioEvent_t* pst_Event)
         PostMsg((void*)DEF_MEASURE_END);
     }
 }
-

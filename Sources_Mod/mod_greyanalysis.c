@@ -7,11 +7,12 @@
 //|----------|--------------------------------------------------------------------------------------
 //|  版本    |  时间       |  作者     | 描述
 //|--------- |-------------|-----------|------------------------------------------------------------
-//|  V1.0    | 2018.11.02  |  wjb      | 初版 先验证是否能用DMA连续读取LT1867
+//|  V1.0    | 2018.12.05  |  wjb      | 初版 后续需要把绿光一阶滤波系数 单独做一个变量
+//                                        然后在标定的时候不覆盖AbsVolt 标定完成再写入 中途取消标定也不会覆盖数据 不用重启
 //==================================================================================================
 #include "App_Include.h"
 
-     
+
 #define DEF_GREYCHANNEL_DEFAULT         &st_Grey,0,0,0,0,0,0,{0}
 
 
@@ -37,7 +38,7 @@ typedef struct __GreenCalibPoint {
     #define GREY_DBG(...)
 #endif
 
-                                          
+
 GreyChannel_t ast_GreyChannle[10] = {
     {0,DEF_GREYCHANNEL_DEFAULT},
     {1,DEF_GREYCHANNEL_DEFAULT},
@@ -117,8 +118,8 @@ void Mod_GreyProc(GreyChannel_t* pst_Channel)
             /* 空闲时不停更新背景电压 */
             FP32 f = pst_Channel->f_Volt / pst_Channel->f_AbsTransVolt * 100;  //更新当前单路的透过率
             pst_Channel->f_Trans = (f > 100) ? 100:f;
-          
-          
+
+
             if(pst_Channel->f_Trans >= pst_Manage->f_TransThreshold)      //透过率大于10%时才更新背景
             {
                 //一阶滤波 空闲时的电压是背景
