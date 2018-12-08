@@ -87,6 +87,8 @@ BOOL Mod_GasMeasureGotoDiffMeasure(GasMeasure_t* pst_Meas);
 
 BOOL Mod_GasMeasureGotoAbsMeasure(GasMeasure_t* pst_Meas);
 
+void Mod_GasMeasureInit(GasMeasure_t* pst_Meas);
+
 void Mod_GasMeasurePoll(GasMeasure_t* pst_Meas);
 
 #endif

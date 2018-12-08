@@ -44,18 +44,18 @@ GasMeasure_t st_GasMeasure = {
 
     0,                              /* 光谱长度 */
     100,                            /* 使用的光谱范围左边界 */
-    1500,                           /* 使用的光谱范围右边界 */
+    1300,                           /* 使用的光谱范围右边界 */
                                     
     0.0,                            /* 透过率 */
     10.0,                           /* 透过率下限值 */   
-    1000,                           /* 透过率左边点 */
+    1200,                           /* 透过率左边点 */
     1300,                           /* 透过率右边点 */
                                     
 
     0.5,                            /* 光谱一阶滤波系数 */
     0,                              /* 计数值 */
-    20,                             /* 调零计数值 */
-    20,                             /* 校准计数值 */
+    50,                             /* 调零计数值 */
+    50,                             /* 校准计数值 */
                                     
     &st_GasN0,                      /* 气体1 */
     NULL,                           /* 气体2 */
@@ -152,7 +152,7 @@ FP32 Mod_GasMeasureCalSpectrumTrans(GasMeasure_t* pst_Meas)
     for(i = pst_Meas->ul_TransLeftDot; i< pst_Meas->ul_TransRightDot; i++)
     {
         lf_Sum1 += pst_Meas->plf_AbsSpectrum[i];
-        lf_Sum2 += pst_Meas->plf_BkgSpectrum[i];
+        lf_Sum2 += pst_Meas->plf_Spectrum[i];
     }
 
     f_Trans = lf_Sum2 / lf_Sum1;
@@ -169,10 +169,10 @@ FP64 Mod_GasMeasureGetPeakHight(FP64* plf_Spectrum, GasInfo_t* pst_Gas)
     INT32U   i,j;
     Peak_t* pst_Peak = &pst_Gas->st_PeakMeasure;
 
-#if 0
     /* 直接根据 坐标来计算吸收峰高度 */
-    memcpy(&pst_Gas->st_PeakMeasure, &pst_Gas->st_Peakref, sizeof(Peak_t));
-#else
+    memcpy(&pst_Gas->st_PeakMeasure, &pst_Gas->st_PeakRef, sizeof(Peak_t));
+    
+#if 0
     /* 搜索中心范围内的最高点吸收峰*/
     for(i = pst_Peak->ul_PeakLeftDot; i <=pst_Peak->ul_PeakRightDot; i++)
     {
@@ -215,8 +215,8 @@ void Mod_GasMeasurePoll(GasMeasure_t* pst_Meas)
     FP32 k;
     if(pv_Msg == NULL)
         return;
-
-    USB4000_HandleTypeDef* USB4000_Handle =  (USB4000_HandleTypeDef *) pst_Meas->pst_Dev;
+    pst_Meas->pst_Dev = pv_Msg;
+    USB4000_HandleTypeDef* USB4000_Handle = (USB4000_HandleTypeDef *) pst_Meas->pst_Dev;
     pst_Meas->ul_SpectrumLen = USB4000_Handle->uin_Pixels;
 
     /* 拷贝光谱到当前光谱 */
@@ -224,7 +224,7 @@ void Mod_GasMeasurePoll(GasMeasure_t* pst_Meas)
     {
         pst_Meas->plf_Spectrum[i] = USB4000_Handle->plf_ProcessSpectrum[i];
     }
-
+#if 1
     switch (pst_Meas->e_State)
     {
     case eGasAdjZero:
@@ -416,7 +416,7 @@ void Mod_GasMeasurePoll(GasMeasure_t* pst_Meas)
     default:
         break;
     }
-
+#endif
 }
 
 BOOL Mod_GasMeasureGotoAdjZero(GasMeasure_t* pst_Meas)

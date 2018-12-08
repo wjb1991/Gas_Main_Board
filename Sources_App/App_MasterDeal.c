@@ -151,54 +151,7 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
         }
         break;
 
-//==================================================================================
-//                                  切换工作模式
-//==================================================================================
-    case 0x20:
-        if(pst_Fram->uch_SubCmd == e_StdbusWriteCmd)
-        {
-            //byte0: 0:切换到调零状态
-            //       1:切换到标定状态
-            //       2:切换到工作状态
-            //       3:切换到差分测量状态
-            //byte1-5 float :切换到标定状态是时下发的标定浓度
-            if(pst_Fram->uin_PayLoadLenth == 1)
-            {
-                if(pst_Fram->puc_PayLoad[0] == 0)
-                {
-                    Mod_GasMeasureGotoAdjZero(&st_GasMeasure);            //切换到调0状态
-                    res = TRUE;    //应答
-                }
-                else if(pst_Fram->puc_PayLoad[0] == 2)
-                {
-                    Mod_GasMeasureGotoAbsMeasure(&st_GasMeasure);        //切换到工作状态
-                    res = TRUE;    //应答
-                }
-            }
-            else if(pst_Fram->uin_PayLoadLenth == 5)
-            {
-                FP32 f;
 
-                if(pst_Fram->puc_PayLoad[0] == 2)
-                {
-                    TRACE_DBG(">>DBG>>      接收到标定命令\n\r");
-
-                    //f = Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[1],FALSE);
-                    //GasAnalysis.f_RefConcentration = f;            //给定浓度
-                    //Mod_GasAnalysisGoCalibration(&GasAnalysis);
-                    res = TRUE;    //应答
-                }
-            }
-
-        }
-        else if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
-        {
-            //读命令是返回是否在调零
-            pst_Fram->uin_PayLoadLenth = 1;
-            pst_Fram->puc_PayLoad[0] = st_GasMeasure.e_State;
-            res = TRUE;    //应答
-        }
-        break;
 #if 0
 //==================================================================================
 //                          修改一个标定点/读取一个标定点
@@ -667,6 +620,68 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
             }
         }
         break;
+//==================================================================================
+//                                  切换工作模式
+//==================================================================================
+    case 0x4a:
+        if(pst_Fram->uch_SubCmd == e_StdbusWriteCmd)
+        {
+            //byte0: 0:切换到调零状态
+            //       1:切换到标定状态
+            //       2:切换到工作状态
+            //       3:切换到差分测量状态
+            //byte1-5 float :切换到标定状态是时下发的标定浓度
+            if(pst_Fram->uin_PayLoadLenth == 1)
+            {
+                if(pst_Fram->puc_PayLoad[0] == 0)
+                {
+                    Mod_GasMeasureGotoAdjZero(&st_GasMeasure);            //切换到调0状态
+                    res = TRUE;    //应答
+                }
+                else if(pst_Fram->puc_PayLoad[0] == 2)
+                {
+                    Mod_GasMeasureGotoAbsMeasure(&st_GasMeasure);        //切换到工作状态
+                    res = TRUE;    //应答
+                }
+            }
+            else if(pst_Fram->uin_PayLoadLenth == 17)
+            {
+                FP32 f;
+
+                if(pst_Fram->puc_PayLoad[0] == 2)
+                {
+                    TRACE_DBG(">>DBG>>      接收到标定命令\n\r");
+
+                    //f = Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[1],FALSE);
+                    //GasAnalysis.f_RefConcentration = f;            //给定浓度
+                    //Mod_GasAnalysisGoCalibration(&GasAnalysis);
+                    res = TRUE;    //应答
+                }
+            }
+
+        }
+        else if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
+        {
+            //读命令是返回是否在调零
+            pst_Fram->uin_PayLoadLenth = 1;
+            pst_Fram->puc_PayLoad[0] = st_GasMeasure.e_State;
+            res = TRUE;    //应答
+        }
+        break;  
+//==================================================================================
+//                                  读取紫外状态
+//==================================================================================
+    case 0x4b:
+        if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
+        {
+            pst_Fram->uin_PayLoadLenth = 21;
+            pst_Fram->puc_PayLoad[0] = st_GasMeasure.e_State;
+            Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[1],st_GasMeasure.f_Trans,FALSE);
+            Bsp_CnvFP64ToArr(&pst_Fram->puc_PayLoad[5],st_GasMeasure.pst_Gas1->lf_Concentration,FALSE);
+            Bsp_CnvFP64ToArr(&pst_Fram->puc_PayLoad[13],0.0,FALSE);
+            res = TRUE;
+        }
+        break;  
 //==================================================================================
 //                                 读取吸收峰高度
 //==================================================================================
