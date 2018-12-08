@@ -3,7 +3,7 @@
 
 #define  START_ADD    (INT32U)0x10 //起始地址
 //========================= Macro,Typestruct, & Class =====================//
-#define N_MAX_EEPROM_ARR  1024 //最大EEPROM的数组存储长度
+#define N_MAX_EEPROM_ARR  4096 //最大EEPROM的数组存储长度
 
 #define MW1  1  //INT8U 占用1个字节的最小存储单元
 #define MW2  2  //INT16U占用2个字节的最小存储单元

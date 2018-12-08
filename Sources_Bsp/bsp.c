@@ -81,6 +81,7 @@ void  Bsp_Init (void)
     Bsp_LTC1867Init(&st_LTC1867A);
     Bsp_LTC1867Init(&st_LTC1867B);
     //Bsp_W25QxxInit(&st_W25Q128);
+    
     while(0)
     {
         SPI_HandleTypeDef* SpiHandle = st_SPI1.pv_SpiHandle;

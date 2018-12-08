@@ -92,10 +92,10 @@ uint8_t Bsp_At24c512Write(uint8_t *pBuffer,uint16_t uin_Addr, uint16_t uin_Size)
     
 	//¿ªÖÐ¶Ï
 	__enable_irq();  
-
-    OSTimeDlyHMSM(0u, 0u, 0u, 15u,
-                  OS_OPT_TIME_HMSM_STRICT,
-                  &os_err);
+    Bsp_DelayMs(15);
+    //OSTimeDlyHMSM(0u, 0u, 0u, 20u,
+    //              OS_OPT_TIME_HMSM_STRICT,
+    //              &os_err);
 
     return 1;   
 }

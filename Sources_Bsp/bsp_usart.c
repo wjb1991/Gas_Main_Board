@@ -544,7 +544,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 
         /*##-3- Configure the NVIC for UART ########################################*/
         /* NVIC for USARTx */
-        HAL_NVIC_SetPriority(USART1_IRQn, 3, 1);
+        HAL_NVIC_SetPriority(USART1_IRQn, 0, 1);
         HAL_NVIC_EnableIRQ(USART1_IRQn);
 
     }
@@ -605,7 +605,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 #endif
         /*##-3- Configure the NVIC for UART ########################################*/
         /* NVIC for USARTx */
-        HAL_NVIC_SetPriority(USART2_IRQn, 3, 1);
+        HAL_NVIC_SetPriority(USART2_IRQn, 0, 1);
         HAL_NVIC_EnableIRQ(USART2_IRQn);
 
     }
@@ -639,7 +639,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 
         /*##-3- Configure the NVIC for UART ########################################*/
         /* NVIC for USARTx */
-        HAL_NVIC_SetPriority(USART3_IRQn, 3, 1);
+        HAL_NVIC_SetPriority(USART3_IRQn, 0, 1);
         HAL_NVIC_EnableIRQ(USART3_IRQn);
 
     }
@@ -673,7 +673,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 
         /*##-3- Configure the NVIC for UART ########################################*/
         /* NVIC for USARTx */
-        HAL_NVIC_SetPriority(UART4_IRQn, 3, 1);
+        HAL_NVIC_SetPriority(UART4_IRQn, 0, 1);
         HAL_NVIC_EnableIRQ(UART4_IRQn);
 
     }
@@ -707,7 +707,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 
         /*##-3- Configure the NVIC for UART ########################################*/
         /* NVIC for USARTx */
-        HAL_NVIC_SetPriority(UART5_IRQn, 3, 1);
+        HAL_NVIC_SetPriority(UART5_IRQn, 0, 1);
         HAL_NVIC_EnableIRQ(UART5_IRQn);
 
     }
@@ -740,7 +740,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 
         /*##-3- Configure the NVIC for UART ########################################*/
         /* NVIC for USARTx */
-        HAL_NVIC_SetPriority(USART6_IRQn, 3, 1);
+        HAL_NVIC_SetPriority(USART6_IRQn, 0, 1);
         HAL_NVIC_EnableIRQ(USART6_IRQn);
 
     }

@@ -1,5 +1,6 @@
 #include "App_Include.h"
 
+
 #define N_MAX_SAVE   100   //最大变量个数
 //---------------------------------变量地址---------------------------------//
 static const MYSAVEPARA st_Save[N_MAX_SAVE]=
@@ -7,7 +8,7 @@ static const MYSAVEPARA st_Save[N_MAX_SAVE]=
 //存储地址|-----------------变量地址---------------|-----类型------|-长度-|-----限定方-----|---最小值--|---最大值---|--默认值---//
   
 /*  0    3670个点的背景光谱  4096*4个点的空间预留  */  
-START_ADD+0x0000,         (uint32_t)alf_BkgSpectrum, KIND_FP64,    3648,    LIMIT_RANGE,      0,        65536,        0,
+START_ADD+0x0000,         (uint32_t)alf_AbsSpectrum, KIND_FP64,    3648,    LIMIT_NULL,      0,        65536,        0,
 
 /*  4096    20个校准点数据 每个12字节 360字节  512个字节空间   */ 
 START_ADD+0x8000 + 0x00, (uint32_t)(&ast_CalibPoint_GasNO[0]),   KIND_INT8U,   sizeof(CalibPoint_t),     LIMIT_NULL,       0,          0,        0,
@@ -194,7 +195,7 @@ void InitParaFromEeprom(INT8U uch_InitFlag)
         	    }
         	    else
         	    {
-        	        lf_Temp = ReadFloatFromEeprom(ul_SaveAddr+k*MW8);
+        	        lf_Temp = ReadDoubleFromEeprom(ul_SaveAddr+k*MW8);
         	        if(p->uch_LimitFlag == LIMIT_RANGE && !(lf_Temp >= (FP64)p->f_Min && lf_Temp <= (FP64)p->f_Max))
         	        {
         	            lf_Temp = (FP64)p->f_Default;
@@ -574,7 +575,7 @@ FP32 ReadFloatFromEeprom(INT32U uin_Addr)
     Bsp_At24c512Read(auch_Data,uin_Addr,4);
     return(*(FP32*)auch_Data);
 }
-FP64 ReadDouleFromEeprom(INT32U uin_Addr)
+FP64 ReadDoubleFromEeprom(INT32U uin_Addr)
 {
     INT8U auch_Data[8]={0};
     Bsp_At24c512Read(auch_Data,uin_Addr,8);

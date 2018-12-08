@@ -2096,12 +2096,6 @@
             <name>$PROJ_DIR$\..\..\Sources_App\app_save.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\Sources_App\app_standalone.c</name>
-            <excluded>
-                <configuration>Debug</configuration>
-            </excluded>
-        </file>
-        <file>
             <name>$PROJ_DIR$\..\..\Sources_App\usb_host.c</name>
         </file>
         <file>

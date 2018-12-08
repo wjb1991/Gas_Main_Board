@@ -75,7 +75,7 @@ typedef struct {
     GasInfo_t*   pst_Gas2;                      /* ÆøÌå2 */
 }GasMeasure_t;
 
-extern FP64 alf_BkgSpectrum[3840];
+extern FP64 alf_AbsSpectrum[3840];
 
 extern GasMeasure_t st_GasMeasure;
 

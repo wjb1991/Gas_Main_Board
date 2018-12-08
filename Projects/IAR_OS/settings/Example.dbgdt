@@ -1053,7 +1053,7 @@
                     <item>pst_Meas</item>
                     <item>pst_Gas</item>
                     <item>pst_Peak</item>
-                    <item></item>
+                    <item />
                 </expressions>
                 <col-names>
                     <item>Expression</item>
