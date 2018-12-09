@@ -2210,12 +2210,6 @@
             <name>$PROJ_DIR$\..\..\Sources_Mod\Mod_DisBoard.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\Sources_Mod\mod_gasanalysis.c</name>
-            <excluded>
-                <configuration>Debug</configuration>
-            </excluded>
-        </file>
-        <file>
             <name>$PROJ_DIR$\..\..\Sources_Mod\mod_greyanalysis.c</name>
         </file>
         <file>

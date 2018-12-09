@@ -7,45 +7,39 @@ static const MYSAVEPARA st_Save[N_MAX_SAVE]=
 {
 //存储地址|-----------------变量地址---------------|-----类型------|-长度-|-----限定方-----|---最小值--|---最大值---|--默认值---//
   
-/*  0    3670个点的背景光谱  4096*4个点的空间预留  */  
+/*  0    3670个点的背景光谱  3648*8个点的空间预留  */  
 START_ADD+0x0000,         (uint32_t)alf_AbsSpectrum, KIND_FP64,    3648,    LIMIT_NULL,      0,        65536,        0,
 
 /*  4096    20个校准点数据 每个12字节 360字节  512个字节空间   */ 
-START_ADD+0x8000 + 0x00, (uint32_t)(&ast_CalibPoint_GasNO[0]),   KIND_INT8U,   sizeof(CalibPoint_t),     LIMIT_NULL,       0,          0,        0,
-START_ADD+0x8000 + 0x10, (uint32_t)(&ast_CalibPoint_GasNO[1]),   KIND_INT8U,   sizeof(CalibPoint_t),     LIMIT_NULL,       0,          0,        0,
-START_ADD+0x8000 + 0x20, (uint32_t)(&ast_CalibPoint_GasNO[2]),   KIND_INT8U,   sizeof(CalibPoint_t),     LIMIT_NULL,       0,          0,        0,
-START_ADD+0x8000 + 0x30, (uint32_t)(&ast_CalibPoint_GasNO[3]),   KIND_INT8U,   sizeof(CalibPoint_t),     LIMIT_NULL,       0,          0,        0,
-START_ADD+0x8000 + 0x40, (uint32_t)(&ast_CalibPoint_GasNO[4]),   KIND_INT8U,   sizeof(CalibPoint_t),     LIMIT_NULL,       0,          0,        0,
-START_ADD+0x8000 + 0x50, (uint32_t)(&ast_CalibPoint_GasNO[5]),   KIND_INT8U,   sizeof(CalibPoint_t),     LIMIT_NULL,       0,          0,        0,
-START_ADD+0x8000 + 0x60, (uint32_t)(&ast_CalibPoint_GasNO[6]),   KIND_INT8U,   sizeof(CalibPoint_t),     LIMIT_NULL,       0,          0,        0,
-START_ADD+0x8000 + 0x70, (uint32_t)(&ast_CalibPoint_GasNO[7]),   KIND_INT8U,   sizeof(CalibPoint_t),     LIMIT_NULL,       0,          0,        0,
-START_ADD+0x8000 + 0x80, (uint32_t)(&ast_CalibPoint_GasNO[8]),   KIND_INT8U,   sizeof(CalibPoint_t),     LIMIT_NULL,       0,          0,        0,
-START_ADD+0x8000 + 0x90, (uint32_t)(&ast_CalibPoint_GasNO[9]),   KIND_INT8U,   sizeof(CalibPoint_t),     LIMIT_NULL,       0,          0,        0,
-//存储地址|-----------------变量地址---------------|-----类型------|-长度-|-----限定方-----|---最小值--|---最大值---|--默认值---//
-/*  4096 + 512  128个字节预留  */
-
-            
+START_ADD+0xE800 + 0x00, (uint32_t)(&ast_CalibPoint_GasNO[0]),   KIND_INT8U,   sizeof(CalibPoint_t),     LIMIT_NULL,       0,          0,        0,
+START_ADD+0xE800 + 0x10, (uint32_t)(&ast_CalibPoint_GasNO[1]),   KIND_INT8U,   sizeof(CalibPoint_t),     LIMIT_NULL,       0,          0,        0,
+START_ADD+0xE800 + 0x20, (uint32_t)(&ast_CalibPoint_GasNO[2]),   KIND_INT8U,   sizeof(CalibPoint_t),     LIMIT_NULL,       0,          0,        0,
+START_ADD+0xE800 + 0x30, (uint32_t)(&ast_CalibPoint_GasNO[3]),   KIND_INT8U,   sizeof(CalibPoint_t),     LIMIT_NULL,       0,          0,        0,
+START_ADD+0xE800 + 0x40, (uint32_t)(&ast_CalibPoint_GasNO[4]),   KIND_INT8U,   sizeof(CalibPoint_t),     LIMIT_NULL,       0,          0,        0,
+START_ADD+0xE800 + 0x50, (uint32_t)(&ast_CalibPoint_GasNO[5]),   KIND_INT8U,   sizeof(CalibPoint_t),     LIMIT_NULL,       0,          0,        0,
+START_ADD+0xE800 + 0x60, (uint32_t)(&ast_CalibPoint_GasNO[6]),   KIND_INT8U,   sizeof(CalibPoint_t),     LIMIT_NULL,       0,          0,        0,
+START_ADD+0xE800 + 0x70, (uint32_t)(&ast_CalibPoint_GasNO[7]),   KIND_INT8U,   sizeof(CalibPoint_t),     LIMIT_NULL,       0,          0,        0,
+START_ADD+0xE800 + 0x80, (uint32_t)(&ast_CalibPoint_GasNO[8]),   KIND_INT8U,   sizeof(CalibPoint_t),     LIMIT_NULL,       0,          0,        0,
+START_ADD+0xE800 + 0x90, (uint32_t)(&ast_CalibPoint_GasNO[9]),   KIND_INT8U,   sizeof(CalibPoint_t),     LIMIT_NULL,       0,          0,        0,
 
 //存储地址|-----------------变量地址---------------|-----类型------|-长度-|-----限定方-----|---最小值--|---最大值---|--默认值---//
 /*  4096 + 512  128个字节预留  */
-START_ADD+0x9000 + 0x00, (uint32_t)(&USB4000.uch_ScansToAverage),   KIND_INT8U,   1,     LIMIT_RANGE,       1,          99,        10,
-START_ADD+0x9000 + 0x04, (uint32_t)(&USB4000.uch_Boxcar),           KIND_INT8U,   1,     LIMIT_RANGE,       1,          99,        32,
-START_ADD+0x9000 + 0x08, (uint32_t)(&USB4000.b_EdcEnable),          KIND_INT8U,   1,     LIMIT_RANGE,       0,          1,          1,
-START_ADD+0x9000 + 0x0C, (uint32_t)(&USB4000.b_NlcEnable),          KIND_INT8U,   1,     LIMIT_RANGE,       0,          1,          0,
-START_ADD+0x9000 + 0x10, (uint32_t)(&USB4000.ul_SetIntegralTime),   KIND_INT32U,  1,     LIMIT_RANGE,       1,      65000000,    50000,
+START_ADD+0xF000 + 0x00, (uint32_t)(&USB4000.uch_ScansToAverage),   KIND_INT8U,   1,     LIMIT_RANGE,       1,          99,        10,
+START_ADD+0xF000 + 0x04, (uint32_t)(&USB4000.uch_Boxcar),           KIND_INT8U,   1,     LIMIT_RANGE,       1,          99,        32,
+START_ADD+0xF000 + 0x08, (uint32_t)(&USB4000.b_EdcEnable),          KIND_INT8U,   1,     LIMIT_RANGE,       0,          1,          1,
+START_ADD+0xF000 + 0x0C, (uint32_t)(&USB4000.b_NlcEnable),          KIND_INT8U,   1,     LIMIT_RANGE,       0,          1,          0,
+START_ADD+0xF000 + 0x10, (uint32_t)(&USB4000.ul_SetIntegralTime),   KIND_INT32U,  1,     LIMIT_RANGE,       1,      65000000,    50000,
 
-
-START_ADD+0x9100 + 0x00, (uint32_t)(&ast_GreyChannle[0].f_AbsTransVolt),   KIND_FP32,  1,     LIMIT_RANGE,       0.0,      4.1f,    4.1f,
-START_ADD+0x9100 + 0x04, (uint32_t)(&ast_GreyChannle[1].f_AbsTransVolt),   KIND_FP32,  1,     LIMIT_RANGE,       0.0,      4.1f,    4.1f,
-START_ADD+0x9100 + 0x08, (uint32_t)(&ast_GreyChannle[2].f_AbsTransVolt),   KIND_FP32,  1,     LIMIT_RANGE,       0.0,      4.1f,    4.1f,
-START_ADD+0x9100 + 0x0C, (uint32_t)(&ast_GreyChannle[3].f_AbsTransVolt),   KIND_FP32,  1,     LIMIT_RANGE,       0.0,      4.1f,    4.1f,
-START_ADD+0x9100 + 0x10, (uint32_t)(&ast_GreyChannle[4].f_AbsTransVolt),   KIND_FP32,  1,     LIMIT_RANGE,       0.0,      4.1f,    4.1f,
-START_ADD+0x9100 + 0x14, (uint32_t)(&ast_GreyChannle[5].f_AbsTransVolt),   KIND_FP32,  1,     LIMIT_RANGE,       0.0,      4.1f,    4.1f,
-START_ADD+0x9100 + 0x18, (uint32_t)(&ast_GreyChannle[6].f_AbsTransVolt),   KIND_FP32,  1,     LIMIT_RANGE,       0.0,      4.1f,    4.1f,
-START_ADD+0x9100 + 0x1C, (uint32_t)(&ast_GreyChannle[7].f_AbsTransVolt),   KIND_FP32,  1,     LIMIT_RANGE,       0.0,      4.1f,    4.1f,
-START_ADD+0x9100 + 0x20, (uint32_t)(&ast_GreyChannle[8].f_AbsTransVolt),   KIND_FP32,  1,     LIMIT_RANGE,       0.0,      4.1f,    4.1f,
-START_ADD+0x9100 + 0x24, (uint32_t)(&ast_GreyChannle[9].f_AbsTransVolt),   KIND_FP32,  1,     LIMIT_RANGE,       0.0,      4.1f,    4.1f,
-
+START_ADD+0xF100 + 0x00, (uint32_t)(&ast_GreyChannle[0].f_AbsTransVolt),   KIND_FP32,  1,     LIMIT_RANGE,       0.0,      4.1f,    4.1f,
+START_ADD+0xF100 + 0x04, (uint32_t)(&ast_GreyChannle[1].f_AbsTransVolt),   KIND_FP32,  1,     LIMIT_RANGE,       0.0,      4.1f,    4.1f,
+START_ADD+0xF100 + 0x08, (uint32_t)(&ast_GreyChannle[2].f_AbsTransVolt),   KIND_FP32,  1,     LIMIT_RANGE,       0.0,      4.1f,    4.1f,
+START_ADD+0xF100 + 0x0C, (uint32_t)(&ast_GreyChannle[3].f_AbsTransVolt),   KIND_FP32,  1,     LIMIT_RANGE,       0.0,      4.1f,    4.1f,
+START_ADD+0xF100 + 0x10, (uint32_t)(&ast_GreyChannle[4].f_AbsTransVolt),   KIND_FP32,  1,     LIMIT_RANGE,       0.0,      4.1f,    4.1f,
+START_ADD+0xF100 + 0x14, (uint32_t)(&ast_GreyChannle[5].f_AbsTransVolt),   KIND_FP32,  1,     LIMIT_RANGE,       0.0,      4.1f,    4.1f,
+START_ADD+0xF100 + 0x18, (uint32_t)(&ast_GreyChannle[6].f_AbsTransVolt),   KIND_FP32,  1,     LIMIT_RANGE,       0.0,      4.1f,    4.1f,
+START_ADD+0xF100 + 0x1C, (uint32_t)(&ast_GreyChannle[7].f_AbsTransVolt),   KIND_FP32,  1,     LIMIT_RANGE,       0.0,      4.1f,    4.1f,
+START_ADD+0xF100 + 0x20, (uint32_t)(&ast_GreyChannle[8].f_AbsTransVolt),   KIND_FP32,  1,     LIMIT_RANGE,       0.0,      4.1f,    4.1f,
+START_ADD+0xF100 + 0x24, (uint32_t)(&ast_GreyChannle[9].f_AbsTransVolt),   KIND_FP32,  1,     LIMIT_RANGE,       0.0,      4.1f,    4.1f,
 
 }; 
  

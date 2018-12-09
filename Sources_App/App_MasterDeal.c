@@ -2,14 +2,6 @@
 
 static FP64 lf_Buff[3840] = {0};//临时
 
-uint16_t Uint8TOUint16(uint8_t *puc_data)
-{
-    uint16_t * p = (uint16_t*)puc_data;
-    uint16_t tmp = *p;
-
-    return __REV16(tmp);
-}
-
 BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
 {
     BOOL res = FALSE;
@@ -152,51 +144,22 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
         break;
 
 
-#if 0
+
 //==================================================================================
 //                          修改一个标定点/读取一个标定点
 //==================================================================================
     case 0x22:
         if(pst_Fram->uch_SubCmd == e_StdbusWriteCmd)
         {
-            //写命令是修改一个标定点   byte0 点索引 byte1参数索引 byte2-byte9 double 参数
-            if(pst_Fram->uin_PayLoadLenth == 10)
+            //写命令是修改一个标定点   byte0 byte0 点索引 byte1参数索引 byte2-byte9 double 参数
+            if(pst_Fram->uin_PayLoadLenth == 11)
             {
-                CaliPoint_t* p = GasAnalysis.pst_CaliPointList;
-                INT8U i = pst_Fram->puc_PayLoad[0];
-                INT8U uch_ParamType = pst_Fram->puc_PayLoad[1];
-                FP32  f_Param = 0;
-                f_Param = Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[2],FALSE);
-
-                if(i < DEF_MAX_POINT_NUM)
-                {
-                    switch(uch_ParamType)
-                    {
-                    case 0:
-                        p[i].b_Use = (BOOL)f_Param;
-                        SaveToEepromExt((uint32_t)(&p[i]),sizeof(CaliPoint_t));
-                        break;
-                    case 1:
-                        p[i].f_Concentration = f_Param;
-                        SaveToEepromExt((uint32_t)(&p[i]),sizeof(CaliPoint_t));
-                        break;
-                    case 2:
-                        p[i].f_Hi204_4 = f_Param;
-                        SaveToEepromExt((uint32_t)(&p[i]),sizeof(CaliPoint_t));
-                        break;
-                    case 3:
-                        p[i].f_Hi214_8 = f_Param;
-                        SaveToEepromExt((uint32_t)(&p[i]),sizeof(CaliPoint_t));
-                        break;
-                    case 4:
-                        p[i].f_Hi226_0 = f_Param;
-                        SaveToEepromExt((uint32_t)(&p[i]),sizeof(CaliPoint_t));
-                        break;
-                    default:
-                        break;
-                    }
-                    res = TRUE;            //应答 不修改数据原始数据返回
-                }
+                CalibPoint_t point;
+                point.b_Use = pst_Fram->puc_PayLoad[2];
+                point.f_X = Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[3],FALSE);
+                point.f_Y = Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[7],FALSE);
+                
+                Mod_CalibPointListEditOnePoint(&st_CPList_GasNO,pst_Fram->puc_PayLoad[1],&point);
             }
         }
         else if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
@@ -208,7 +171,7 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
             {
                 uint16_t i = 0;
                 //读取第一页返回数组长度
-                pst_Fram->puc_PayLoad[0] = (uint8_t)(GasAnalysis.uc_CaliPointSize);
+                pst_Fram->puc_PayLoad[0] = (uint8_t)(sizeof(st_CPList_GasNO)/sizeof(CalibPoint_t));
                 pst_Fram->uin_PayLoadLenth = 1;
                 res = TRUE;    //应答
             }
@@ -234,7 +197,7 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
 
         }
         break;
-
+#if 0
 //==================================================================================
 //                                设置阶数/读取阶数
 //==================================================================================
@@ -529,8 +492,8 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
             {
                 //第一二个字节是ReadAddress 第二三个字节是ReadLenth
                 INT16U i = 0;
-                INT16U uin_Offset = Uint8TOUint16(pst_Fram->puc_PayLoad);
-                INT16U uin_Lenth = Uint8TOUint16(pst_Fram->puc_PayLoad + 2);
+                INT16U uin_Offset = Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[0], FALSE);
+                INT16U uin_Lenth = Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[2], FALSE);
 
                 pst_Fram->uin_PayLoadLenth = 4 + uin_Lenth * 8;
                 for(i = 0; i<uin_Lenth;i++)
@@ -569,8 +532,8 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
             {
                 //第一二个字节是ReadAddress 第二三个字节是ReadLenth
                 INT16U i = 0;
-                INT16U uin_Offset = Uint8TOUint16(pst_Fram->puc_PayLoad);
-                INT16U uin_Lenth = Uint8TOUint16(pst_Fram->puc_PayLoad + 2);
+                INT16U uin_Offset = Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[0], FALSE);
+                INT16U uin_Lenth = Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[2], FALSE);
 
                 pst_Fram->uin_PayLoadLenth = 4 + uin_Lenth * 8;
                 for(i = 0; i<uin_Lenth;i++)
@@ -608,8 +571,8 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
             {
                 //第一二个字节是ReadAddress 第二三个字节是ReadLenth
                 INT16U i = 0;
-                INT16U uin_Offset = Uint8TOUint16(pst_Fram->puc_PayLoad);
-                INT16U uin_Lenth = Uint8TOUint16(pst_Fram->puc_PayLoad + 2);
+                INT16U uin_Offset = Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[0], FALSE);
+                INT16U uin_Lenth = Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[2], FALSE);
 
                 pst_Fram->uin_PayLoadLenth = 4 + uin_Lenth * 8;
                 for(i = 0; i<uin_Lenth;i++)
