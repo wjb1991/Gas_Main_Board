@@ -26,7 +26,7 @@ extern  "C" {                                  /* See Note #1.                  
 #include  <stm32f7xx_hal.h>
 #include  "stm32f7xx_ll_usart.h"
 #include  "stm32f7xx_ll_spi.h"
-  
+#include  "stm32f7xx_ll_dma.h"
 
 //#ifdef      OS_SUPPORT
 #include  "bsp_os.h"

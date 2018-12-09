@@ -157,7 +157,7 @@ void AppTaskCreate (void)
                  (OS_ERR       *)&os_err);                                      /* 存放错误值 */
 #endif
 
-#if 1
+#if 0
     /* STDBUS PORT 线程 */
     OSTaskCreate((OS_TCB       *)&TaskStdBusLaserTCB,                          /* 创建任务控制块 */
                  (CPU_CHAR     *)"StdBus Laser Task",                                 /* 任务名称 */
@@ -217,7 +217,7 @@ void AppTaskCreate (void)
                  (OS_OPT        )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_SAVE_FP),
                  (OS_ERR       *)&os_err);                                       /* 存放错误值 */
     
-#if 1
+#if 0
     /* 测速任务 */
     OSTaskCreate((OS_TCB       *)&TaskMeasSpeedTCB,                                /* 创建任务控制块 */
                  (CPU_CHAR     *)"MeasSpeed Task",                                 /* 任务名称 */
@@ -250,7 +250,7 @@ void AppTaskCreate (void)
                   (OS_ERR       *)&os_err);                                      /* 存放错误值 */
 
 #endif
-#if 1
+#if 0
     /* 显示板任务 */
     OSTaskCreate((OS_TCB       *)&TaskDisBoardTCB,                                /* 创建任务控制块 */
                  (CPU_CHAR     *)"DisBorad Task",                                 /* 任务名称 */
@@ -268,7 +268,7 @@ void AppTaskCreate (void)
 #endif
 
 
-#if 1
+#if 0
     /* 紫外处理光谱仪 */
     OSTaskCreate((OS_TCB       *)&TaskGasProcTCB,                               /* 创建任务控制块 */
                  (CPU_CHAR     *)"Gas Process",                                 /* 任务名称 */
@@ -284,7 +284,7 @@ void AppTaskCreate (void)
                  (OS_OPT        )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_SAVE_FP),
                  (OS_ERR       *)&os_err);                                      /* 存放错误值 */
 #endif
-#if 1
+#if 0
     /* 灰度处理 */
     OSTaskCreate((OS_TCB       *)&TaskGreyProcTCB,                              /* 创建任务控制块 */
                  (CPU_CHAR     *)"Grey Process",                                /* 任务名称 */

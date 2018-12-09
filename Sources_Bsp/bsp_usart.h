@@ -17,6 +17,8 @@
 
 #include "bsp.h"
 
+#define  DEF_USART_RX_DMA  (TRUE)
+
 #define DEF_USE_COM1   (TRUE)
 #define DEF_USE_COM2   (TRUE)
 #define DEF_USE_COM3   (TRUE)
@@ -63,6 +65,8 @@ struct _DEV_SERIALPORT{
 
     /*  µ×²ã¾ä±ú      */
     void * pv_UartHandle; //¾ä±ú
+    void * pv_TxDma;      
+    void * pv_RxDma;
 };
 
 
