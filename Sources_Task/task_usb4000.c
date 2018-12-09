@@ -24,7 +24,7 @@ void Task_UsbHost (void  *p_arg)
     while(TRUE)
     {
         INT16U uin_Len;
-        OSTaskQPend(100,OS_OPT_PEND_BLOCKING,&uin_Len,NULL,&os_err);
+        OSTaskQPend(0,OS_OPT_PEND_BLOCKING,&uin_Len,NULL,&os_err);
         
         USB_HOST_Process();
     }

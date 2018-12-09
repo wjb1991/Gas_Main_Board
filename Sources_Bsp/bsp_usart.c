@@ -867,7 +867,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 #if (DEF_USE_COM2 == TRUE)
     if(huart->Instance == USART2)
     {
-#if 1
+#if 0
         /*##-1- Enable peripherals and GPIO Clocks #################################*/
         /* Enable GPIO TX/RX clock */
         __HAL_RCC_GPIOA_CLK_ENABLE();
@@ -893,7 +893,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
         HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 #endif
 
-#if 0
+#if 1
         /*##-1- Enable peripherals and GPIO Clocks #################################*/
         /* Enable GPIO TX/RX clock */
         __HAL_RCC_GPIOD_CLK_ENABLE();
@@ -1318,8 +1318,8 @@ void Bsp_UartPrintf(const char * Format,...)
 
 int fputc(int ch, FILE *f)
 {
-    while (!LL_USART_IsActiveFlag_TXE(USART1)){}
-    LL_USART_TransmitData8(USART1, ch);
+    while (!LL_USART_IsActiveFlag_TXE(USART2)){}
+    LL_USART_TransmitData8(USART2, ch);
 
     //while (!LL_USART_IsActiveFlag_TC(USART2)){}
     //LL_USART_ClearFlag_TC(USART2);

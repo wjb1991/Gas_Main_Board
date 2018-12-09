@@ -21,6 +21,8 @@ void  Bsp_Init (void)
 #endif    
     
     HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_2);         /* 2Bit抢占优先级 2Bit响应优先级 数字越小响应级越高 */
+
+    //USB_HOST_Init();
     
     BSP_LedInit(); 
     Bsp_GpioInit();
@@ -47,7 +49,7 @@ void  Bsp_Init (void)
     COM2.ul_HwFlowCtl  = UART_HWCONTROL_NONE;
     COM2.ul_Mode       = UART_MODE_TX_RX;
     Bsp_UartOpen(&COM2);
-    
+#if 0
     /* Usb4000 
     COM3.ul_BaudRate   = 115200;
     COM3.ul_WordLength = UART_WORDLENGTH_8B;
@@ -75,13 +77,13 @@ void  Bsp_Init (void)
     COM6.ul_Mode       = UART_MODE_TX_RX;
     Bsp_UartOpen(&COM6);
     
-    
+
     Bsp_At24c512Init();
     //Bsp_SpiInit(&st_SPI1);
     Bsp_LTC1867Init(&st_LTC1867A);
     Bsp_LTC1867Init(&st_LTC1867B);
     //Bsp_W25QxxInit(&st_W25Q128);
-    
+#endif    
     while(0)
     {
         SPI_HandleTypeDef* SpiHandle = st_SPI1.pv_SpiHandle;
