@@ -49,7 +49,7 @@ void  Bsp_Init (void)
     COM2.ul_HwFlowCtl  = UART_HWCONTROL_NONE;
     COM2.ul_Mode       = UART_MODE_TX_RX;
     Bsp_UartOpen(&COM2);
-#if 0
+#if 1
     /* Usb4000 
     COM3.ul_BaudRate   = 115200;
     COM3.ul_WordLength = UART_WORDLENGTH_8B;

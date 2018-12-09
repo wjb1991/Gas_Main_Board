@@ -1318,8 +1318,8 @@ void Bsp_UartPrintf(const char * Format,...)
 
 int fputc(int ch, FILE *f)
 {
-    while (!LL_USART_IsActiveFlag_TXE(USART2)){}
-    LL_USART_TransmitData8(USART2, ch);
+    while (!LL_USART_IsActiveFlag_TXE(USART1)){}
+    LL_USART_TransmitData8(USART1, ch);
 
     //while (!LL_USART_IsActiveFlag_TC(USART2)){}
     //LL_USART_ClearFlag_TC(USART2);
