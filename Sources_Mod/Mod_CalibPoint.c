@@ -46,8 +46,18 @@ BOOL Mod_CalibPointListClear(CalibPointList_t* pst_CpointList)
         pst_CpointList->pst_List[i].b_Use = FALSE;
         pst_CpointList->pst_List[i].f_X = 0.0;
         pst_CpointList->pst_List[i].f_Y = 0.0;
-        SaveToEepromExt((INT32U)(&pst_CpointList->pst_List[i]),sizeof(CaliPoint_t));
+        SaveToEepromExt((INT32U)(&pst_CpointList->pst_List[i]),sizeof(CalibPoint_t));
     }
+    return TRUE;
+}
+
+BOOL Mod_CalibPointListReadOnePoint(CalibPointList_t* pst_CpointList, INT32U ul_Index, CalibPoint_t* pst_Point)
+{
+    if(pst_CpointList == NULL || pst_CpointList->pst_List == NULL || ul_Index >= pst_CpointList->ul_Lenth )
+        return FALSE;
+    pst_Point->b_Use = pst_CpointList->pst_List[ul_Index].b_Use;
+    pst_Point->f_X = pst_CpointList->pst_List[ul_Index].f_X;
+    pst_Point->f_Y = pst_CpointList->pst_List[ul_Index].f_Y;
     return TRUE;
 }
 
@@ -58,7 +68,7 @@ BOOL Mod_CalibPointListEditOnePoint(CalibPointList_t* pst_CpointList, INT32U ul_
     pst_CpointList->pst_List[ul_Index].b_Use = pst_Point->b_Use;
     pst_CpointList->pst_List[ul_Index].f_X = pst_Point->f_X;
     pst_CpointList->pst_List[ul_Index].f_Y = pst_Point->f_Y;
-    SaveToEepromExt((INT32U)(&pst_CpointList->pst_List[ul_Index]),sizeof(CaliPoint_t));
+    SaveToEepromExt((INT32U)(&pst_CpointList->pst_List[ul_Index]),sizeof(CalibPoint_t));
     return TRUE;
 }
 
@@ -76,7 +86,7 @@ BOOL Mod_CalibPointListAddOnePoint(CalibPointList_t* pst_CpointList, CalibPoint_
                 pst_CpointList->pst_List[i].b_Use = TRUE;
                 pst_CpointList->pst_List[i].f_X = pst_Point->f_X;
                 pst_CpointList->pst_List[i].f_Y = pst_Point->f_Y;
-                SaveToEepromExt((INT32U)(&pst_CpointList->pst_List[i]),sizeof(CaliPoint_t));
+                SaveToEepromExt((INT32U)(&pst_CpointList->pst_List[i]),sizeof(CalibPoint_t));
                 break;
             }
         }
@@ -96,7 +106,7 @@ BOOL Mod_CalibPointListDeleteOnePoint(CalibPointList_t* pst_CpointList, INT32U u
     pst_CpointList->pst_List[ul_Index].b_Use = FALSE;
     pst_CpointList->pst_List[ul_Index].f_X = 0.0;
     pst_CpointList->pst_List[ul_Index].f_Y = 0.0;
-    SaveToEepromExt((INT32U)(&pst_CpointList->pst_List[ul_Index]),sizeof(CaliPoint_t));
+    SaveToEepromExt((INT32U)(&pst_CpointList->pst_List[ul_Index]),sizeof(CalibPoint_t));
     return TRUE;
 }
 

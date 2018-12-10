@@ -91,4 +91,6 @@ void Mod_GasMeasureInit(GasMeasure_t* pst_Meas);
 
 void Mod_GasMeasurePoll(GasMeasure_t* pst_Meas);
 
+BOOL Mod_GasMarkWorkLine(GasMeasure_t* pst_Meas,GasMeasureState_e e_Ops);
+
 #endif

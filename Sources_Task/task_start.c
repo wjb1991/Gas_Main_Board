@@ -101,7 +101,7 @@ void Task_Start (void *p_arg)
                       OS_OPT_TIME_HMSM_STRICT,
                       &os_err);
         
-        TRACE_DBG(">>DBG:       开始任务\r\n");
+        TRACE_DBG(">>DBG:   CPU使用率:%f%\r\n",OSStatTaskCPUUsage/100.0);
         
         BSP_Led1Toggle();
     }

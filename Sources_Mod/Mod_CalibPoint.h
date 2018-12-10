@@ -23,6 +23,8 @@ BOOL Mod_CalibPointListInit(CalibPointList_t* pst_CpointList);
 
 BOOL Mod_CalibPointListClear(CalibPointList_t* pst_CpointList);
 
+BOOL Mod_CalibPointListReadOnePoint(CalibPointList_t* pst_CpointList, INT32U ul_Index, CalibPoint_t* pst_Point);
+
 BOOL Mod_CalibPointListEditOnePoint(CalibPointList_t* pst_CpointList, INT32U ul_Index, CalibPoint_t* pst_Point);
 
 BOOL Mod_CalibPointListAddOnePoint(CalibPointList_t* pst_CpointList, CalibPoint_t* pst_Point);

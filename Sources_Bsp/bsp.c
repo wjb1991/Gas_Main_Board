@@ -86,6 +86,15 @@ void  Bsp_Init (void)
 #endif    
     while(0)
     {
+      static FP32 af_X[3] = {0,1,2};
+      static FP32 af_Y[3] = {1,2,3};
+      static FP32 pf_NiheCoeff[3] = {0};
+        NiHe1(af_X,af_Y,3, pf_NiheCoeff,2);
+        pf_NiheCoeff[0] = pf_NiheCoeff[1];
+    }
+    
+    while(0)
+    {
         SPI_HandleTypeDef* SpiHandle = st_SPI1.pv_SpiHandle;
         volatile INT8U RecvByte = 0xff;
         

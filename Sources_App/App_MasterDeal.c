@@ -143,7 +143,6 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
         }
         break;
 
-#if 0
 
 //==================================================================================
 //                          修改一个标定点/读取一个标定点
@@ -158,8 +157,9 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
                 point.b_Use = pst_Fram->puc_PayLoad[2];
                 point.f_X = Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[3],FALSE);
                 point.f_Y = Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[7],FALSE);
-                
-                Mod_CalibPointListEditOnePoint(&st_CPList_GasNO,pst_Fram->puc_PayLoad[1],&point);
+                if( pst_Fram->puc_PayLoad[0] == 0 )
+                    Mod_CalibPointListEditOnePoint(&st_CPList_GasNO,pst_Fram->puc_PayLoad[1],&point);
+                res = TRUE;    //应答
             }
         }
         else if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
@@ -167,62 +167,69 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
             //读命令是读取一个标定点
             //无输入        返回标定点数量
             //输入一个索引  返回指定索引的标定点的数据
-            if(pst_Fram->uin_PayLoadLenth == 0)
+            if(pst_Fram->uin_PayLoadLenth == 1)
             {
-                uint16_t i = 0;
                 //读取第一页返回数组长度
-                pst_Fram->puc_PayLoad[0] = (uint8_t)(sizeof(st_CPList_GasNO)/sizeof(CalibPoint_t));
-                pst_Fram->uin_PayLoadLenth = 1;
-                res = TRUE;    //应答
-            }
-            else if(pst_Fram->uin_PayLoadLenth == 1)
-            {
-                uint8_t i = pst_Fram->puc_PayLoad[0];
-                CaliPoint_t* p = GasAnalysis.pst_CaliPointList;
-
-                if(i < DEF_MAX_POINT_NUM)
+                if( pst_Fram->puc_PayLoad[0] == 0 )
                 {
-                    pst_Fram->puc_PayLoad[1] = p[i].b_Use;
-
-                    Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[2], p[i].f_Concentration, FALSE);
-                    Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[6], p[i].f_Hi204_4, FALSE);
-                    Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[10], p[i].f_Hi214_8, FALSE);
-                    Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[14], p[i].f_Hi226_0, FALSE);
-
-                    pst_Fram->uin_PayLoadLenth = 18;
+                    pst_Fram->puc_PayLoad[1] = DEF_CALIBPOINT_MAX;
+                    pst_Fram->uin_PayLoadLenth = 2;
+                    res = TRUE;    //应答
                 }
-
-                res = TRUE;    //应答
+ 
+            }
+            else if(pst_Fram->uin_PayLoadLenth == 2)
+            {
+                CalibPoint_t point;
+                if( pst_Fram->puc_PayLoad[0] == 0 )
+                {   
+                    Mod_CalibPointListReadOnePoint(&st_CPList_GasNO,pst_Fram->puc_PayLoad[1],&point);
+                    pst_Fram->puc_PayLoad[2] = point.b_Use;
+                    Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[3],point.f_X,FALSE);
+                    Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[7],point.f_Y,FALSE);                
+                    pst_Fram->uin_PayLoadLenth = 11;        
+                    res = TRUE;    //应答
+                }
             }
 
         }
         break;
+
 //==================================================================================
 //                                设置阶数/读取阶数
 //==================================================================================
     case 0x23:
         if(pst_Fram->uch_SubCmd == e_StdbusWriteCmd)
         {
-            if(pst_Fram->uin_PayLoadLenth == 1)
+            if(pst_Fram->uin_PayLoadLenth == 2)
             {
-                INT8U   t = pst_Fram->puc_PayLoad[0];
-                if ( t > 3)
-                    t = 3;
+                if ( pst_Fram->puc_PayLoad[1] > 3)
+                   res = FALSE;
 
-                GasAnalysis.uc_WorkLineOrder = t;
-                pst_Fram->uin_PayLoadLenth = 1;
+                if( pst_Fram->puc_PayLoad[0] == 0 )
+                {
+                    st_GasMeasure.pst_Gas1->uch_NiheOrder = pst_Fram->puc_PayLoad[1];
+
+                    pst_Fram->uin_PayLoadLenth = 2;
+                    res = TRUE;    //应答
+                }
             }
         }
         else if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
         {
-            if(pst_Fram->uin_PayLoadLenth == 0)
+            if(pst_Fram->uin_PayLoadLenth == 1)
             {
-                pst_Fram->puc_PayLoad[0] = GasAnalysis.uc_WorkLineOrder;
-                pst_Fram->uin_PayLoadLenth = 1;
+                if( pst_Fram->puc_PayLoad[0] == 0 )
+                {
+                    pst_Fram->puc_PayLoad[1] = st_GasMeasure.pst_Gas1->uch_NiheOrder;
+                    pst_Fram->uin_PayLoadLenth = 2;
+                    res = TRUE;    //应答
+                }
             }
         }
-        res = TRUE;    //应答
+
         break;
+
 //==================================================================================
 //                                  建立工作曲线
 //==================================================================================
@@ -230,9 +237,9 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
         if(pst_Fram->uch_SubCmd == e_StdbusWriteCmd)
         {
             //写命令是建立工作曲线
-            if(pst_Fram->uin_PayLoadLenth == 0)
+            if(pst_Fram->uin_PayLoadLenth == 1)
             {
-                Mod_GasAnalysisMarkWorkLine(&GasAnalysis);
+                Mod_GasMarkWorkLine(&st_GasMeasure,pst_Fram->puc_PayLoad[0]);
                 res = TRUE;            //应答 不修改数据原始数据返回
             }
         }
@@ -253,37 +260,21 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
         {
             //读命令是读取拟合系数
             //输入两个索引 第一个索引选择哪组拟合系数 第二个索引是选择An
-            if(pst_Fram->uin_PayLoadLenth == 2)
+            if(pst_Fram->uin_PayLoadLenth == 1)
             {
-                uint8_t i = pst_Fram->puc_PayLoad[1];
-
-                float* p;
-
-                switch(pst_Fram->puc_PayLoad[0])
+                if(pst_Fram->puc_PayLoad[0] == 0)
                 {
-                case 0:
-                    p = GasAnalysis.pf_a204;
-                    break;
+                    Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[1],st_GasMeasure.pst_Gas1->af_NiheCoeff[0],FALSE);                
+                    Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[5],st_GasMeasure.pst_Gas1->af_NiheCoeff[1],FALSE);   
+                    Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[9],st_GasMeasure.pst_Gas1->af_NiheCoeff[2],FALSE);   
 
-                case 1:
-                    p = GasAnalysis.pf_a214;
-                    break;
-
-                case 2:
-                    p = GasAnalysis.pf_a226;
-                    break;
-
-                default:
-                    break;
+                    pst_Fram->uin_PayLoadLenth = 13;
+                    res = TRUE;    //应答
                 }
-                //前两个索引不修改直接返回
-                Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[2],p[i],FALSE);
-                pst_Fram->uin_PayLoadLenth = 6;
-                res = TRUE;    //应答
             }
         }
         break;
-#endif
+
 //==================================================================================
 //                                   读取10路绿光电压
 //==================================================================================

@@ -491,6 +491,36 @@ BOOL Mod_GasMeasureGotoAbsMeasure(GasMeasure_t* pst_Meas)
     return TRUE;
 }
 
+BOOL Mod_GasMarkWorkLine(GasMeasure_t* pst_Meas,GasMeasureState_e e_Ops)
+{
+    
+    switch(e_Ops)
+    {
+    case eGasCalibGas1:
+        Mod_CalibPointListNihe(pst_Meas->pst_Gas1->pst_CalibPointList,
+                               pst_Meas->pst_Gas1->uch_NiheOrder,
+                               pst_Meas->pst_Gas1->af_NiheCoeff);
+        break;
+    case eGasCalibGas2:                         
+        Mod_CalibPointListNihe(pst_Meas->pst_Gas2->pst_CalibPointList,
+                               pst_Meas->pst_Gas2->uch_NiheOrder,
+                               pst_Meas->pst_Gas2->af_NiheCoeff);
+        break;
+    case eGasCalibAll:
+        Mod_CalibPointListNihe(pst_Meas->pst_Gas1->pst_CalibPointList,
+                               pst_Meas->pst_Gas1->uch_NiheOrder,
+                               pst_Meas->pst_Gas1->af_NiheCoeff);
+        Mod_CalibPointListNihe(pst_Meas->pst_Gas2->pst_CalibPointList,
+                               pst_Meas->pst_Gas2->uch_NiheOrder,
+                               pst_Meas->pst_Gas2->af_NiheCoeff);
+        break;
+    default:
+        return FALSE;
+        
+    }
+    return TRUE;
+}
+
 void USB4000_EvnetHandle(USB4000_HandleTypeDef *USB4000_Handle)
 {
     /* 通知上层 其他模块*/
