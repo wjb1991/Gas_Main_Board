@@ -29,8 +29,11 @@ void  Bsp_Init (void)
     
     Bsp_I2cInit(&Bsp_At24c512);
     
+
     Bsp_DMAInit();
     //Bsp_SramInit();
+    
+    Bsp_At24c512Init(); 
     
     /* COM1->µ÷ÊÔ´®¿Ú */
     COM1.ul_BaudRate   = 230400;
@@ -78,12 +81,23 @@ void  Bsp_Init (void)
     Bsp_UartOpen(&COM6);
     
 
-    Bsp_At24c512Init();
+
     //Bsp_SpiInit(&st_SPI1);
     Bsp_LTC1867Init(&st_LTC1867A);
     Bsp_LTC1867Init(&st_LTC1867B);
     //Bsp_W25QxxInit(&st_W25Q128);
 #endif    
+    
+    while(0)
+    {
+        static FP64    f =  2.0;
+        static INT8U s[16] = {0};
+        
+        Bsp_CnvFP64ToArr(s,f,FALSE);
+        f = Bsp_CnvArrToFP64(s,FALSE);
+        f+=1.0;
+    }
+    
     while(0)
     {
       static FP32 af_X[3] = {0,1,2};

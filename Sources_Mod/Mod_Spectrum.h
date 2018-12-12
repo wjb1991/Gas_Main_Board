@@ -76,7 +76,7 @@ typedef struct {
 }GasMeasure_t;
 
 extern FP64 alf_AbsSpectrum[3840];
-
+extern GasInfo_t st_GasN0;
 extern GasMeasure_t st_GasMeasure;
 
 BOOL Mod_GasMeasureGotoAdjZero(GasMeasure_t* pst_Meas);

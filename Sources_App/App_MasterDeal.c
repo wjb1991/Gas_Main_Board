@@ -209,7 +209,7 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
                 if( pst_Fram->puc_PayLoad[0] == 0 )
                 {
                     st_GasMeasure.pst_Gas1->uch_NiheOrder = pst_Fram->puc_PayLoad[1];
-
+                    SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas1->uch_NiheOrder));
                     pst_Fram->uin_PayLoadLenth = 2;
                     res = TRUE;    //应答
                 }
@@ -403,7 +403,7 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
         }
         break;
 //==================================================================================
-//                                   获取绿光工作状态/总透过率/总灰度
+//                         获取绿光工作状态/总透过率/总灰度
 //==================================================================================
     case 0x3b:
         if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
@@ -535,7 +535,7 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
         }
         break;
 //==================================================================================
-//                                  读取背景光谱
+//                                  读取差分光谱
 //==================================================================================
     case 0x43:
         if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
@@ -588,26 +588,33 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
             {
                 if(pst_Fram->puc_PayLoad[0] == 0)
                 {
-                    Mod_GasMeasureGotoAdjZero(&st_GasMeasure);            //切换到调0状态
+                    Mod_GasMeasureGotoAdjZero(&st_GasMeasure);           //切换到调0状态
                     res = TRUE;    //应答
                 }
-                else if(pst_Fram->puc_PayLoad[0] == 2)
+                else if(pst_Fram->puc_PayLoad[0] == 4)
                 {
                     Mod_GasMeasureGotoAbsMeasure(&st_GasMeasure);        //切换到工作状态
+                    res = TRUE;    //应答
+                }
+                else if(pst_Fram->puc_PayLoad[0] == 5)
+                {
+                    Mod_GasMeasureGotoDiffMeasure(&st_GasMeasure);        //切换到工作状态
                     res = TRUE;    //应答
                 }
             }
             else if(pst_Fram->uin_PayLoadLenth == 17)
             {
-                FP32 f;
+                FP64 f1,f2;
 
-                if(pst_Fram->puc_PayLoad[0] == 2)
+                if(pst_Fram->puc_PayLoad[0] == 1)
                 {
                     TRACE_DBG(">>DBG>>      接收到标定命令\n\r");
 
-                    //f = Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[1],FALSE);
-                    //GasAnalysis.f_RefConcentration = f;            //给定浓度
-                    //Mod_GasAnalysisGoCalibration(&GasAnalysis);
+                    f1 = Bsp_CnvArrToFP64(&pst_Fram->puc_PayLoad[1],FALSE);
+                    f2 = Bsp_CnvArrToFP64(&pst_Fram->puc_PayLoad[9],FALSE);
+                    Mod_GasMeasureGotoCalib(&st_GasMeasure,
+                                            ((GasMeasureState_e)pst_Fram->puc_PayLoad[0]),
+                                            f1,f2);
                     res = TRUE;    //应答
                 }
             }
@@ -627,60 +634,32 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
     case 0x4b:
         if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
         {
-            pst_Fram->uin_PayLoadLenth = 21;
+            pst_Fram->uin_PayLoadLenth = 37;
             pst_Fram->puc_PayLoad[0] = st_GasMeasure.e_State;
             Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[1],st_GasMeasure.f_Trans,FALSE);
-            Bsp_CnvFP64ToArr(&pst_Fram->puc_PayLoad[5],st_GasMeasure.pst_Gas1->lf_Concentration,FALSE);
-            Bsp_CnvFP64ToArr(&pst_Fram->puc_PayLoad[13],0.0,FALSE);
+            if(st_GasMeasure.pst_Gas1 != NULL)
+            {
+                Bsp_CnvFP64ToArr(&pst_Fram->puc_PayLoad[5],st_GasMeasure.pst_Gas1->lf_PeakHight,FALSE);
+                Bsp_CnvFP64ToArr(&pst_Fram->puc_PayLoad[13],st_GasMeasure.pst_Gas1->lf_Concentration,FALSE);
+            }
+            else
+            {
+                Bsp_CnvFP64ToArr(&pst_Fram->puc_PayLoad[5],0.0,FALSE);
+                Bsp_CnvFP64ToArr(&pst_Fram->puc_PayLoad[13],0.0,FALSE);
+            }
+            if(st_GasMeasure.pst_Gas2 != NULL)
+            {
+                Bsp_CnvFP64ToArr(&pst_Fram->puc_PayLoad[21],st_GasMeasure.pst_Gas2->lf_PeakHight,FALSE);
+                Bsp_CnvFP64ToArr(&pst_Fram->puc_PayLoad[29],st_GasMeasure.pst_Gas2->lf_Concentration,FALSE);
+            }
+            else
+            {
+                Bsp_CnvFP64ToArr(&pst_Fram->puc_PayLoad[21],0.0,FALSE);
+                Bsp_CnvFP64ToArr(&pst_Fram->puc_PayLoad[29],0.0,FALSE);
+            }
             res = TRUE;
         }
         break;  
-//==================================================================================
-//                                 读取吸收峰高度
-//==================================================================================
-    case 0x50:
-        if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
-        {
-            if(pst_Fram->uin_PayLoadLenth == 0)
-            {
-                //返回三个吸收峰的高度
-                pst_Fram->puc_PayLoad[0] = 3;
-                //Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[1],GasAnalysis.f_Hi204_4,FALSE);
-                //Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[5],GasAnalysis.f_Hi214_8,FALSE);
-                //Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[9],GasAnalysis.f_Hi226_0,FALSE);
-                pst_Fram->uin_PayLoadLenth = 13;
-                res = TRUE;    //应答
-            }
-            else if(pst_Fram->uin_PayLoadLenth == 1)
-            {
-                //根据索引返回对应的吸收峰高度
-            }
-
-        }
-        break;
-
-//==================================================================================
-//                                    读取浓度
-//==================================================================================
-    case 0x51:
-        if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
-        {
-            if(pst_Fram->uin_PayLoadLenth == 0)
-            {
-                //返回三个吸收峰的高度
-                pst_Fram->puc_PayLoad[0] = 3;
-                //Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[1],GasAnalysis.f_Concentration_204,FALSE);
-                //Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[5],GasAnalysis.f_Concentration_214,FALSE);
-                //Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[9],GasAnalysis.f_Concentration_226,FALSE);
-                pst_Fram->uin_PayLoadLenth = 13;
-                res = TRUE;    //应答
-            }
-            else if(pst_Fram->uin_PayLoadLenth == 1)
-            {
-                //根据索引返回对应的吸收峰高度
-            }
-        }
-        break;
 
 //==================================================================================
 //                                   继电器IO控制

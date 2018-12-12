@@ -139,7 +139,7 @@ FP64 Bsp_CnvArrToFP64(INT8U* puc_Arr,BOOL b_Rev)
     INT64U i;
     if(b_Rev == FALSE)
     {
-		i = (((INT64U)puc_Arr[7]<<56) + ((INT64U)puc_Arr[7]<<48) +
+		i = (((INT64U)puc_Arr[7]<<56) + ((INT64U)puc_Arr[6]<<48) +
 			((INT64U)puc_Arr[5]<<40) + ((INT64U)puc_Arr[4]<<32) +
 			((INT64U)puc_Arr[3]<<24) + ((INT64U)puc_Arr[2]<<16) +
 			((INT64U)puc_Arr[1]<<8) + ((INT64U)puc_Arr[0]));

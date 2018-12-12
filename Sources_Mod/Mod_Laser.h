@@ -6,11 +6,13 @@
 #include "Mod_Include.h"
 
 typedef struct {
-    INT32U   ul_Count;               /* 测试计数 */
+    INT8U   uch_State;              /* 状态 */
+    INT32U  ul_Count;               /* 测试计数 */
     FP32    f_Trans;                /* 透过率 */
+    FP64    lf_PeakCO2;             /* CO2峰值 */
     FP64    lf_ConcentrationCO2;    /* CO2浓度 */
+    FP64    lf_PeakCO;              /* CO峰值 */
     FP64    lf_ConcentrationCO;     /* CO浓度 */
-
     StdbusDev_t* pst_Handle;
 }LaserBoard_t;
 

@@ -7,7 +7,7 @@ int main(void)
 
     HAL_Init();                                                 /* See Note 1.                                          */
   
-    BSP_SystemClkCfg();                                         /* 初始化时钟频率 168Mhz                                */
+    BSP_SystemClkCfg();                                         /* 初始化时钟频率 216Mhz                                */
 
     /* 拷贝Flash中的中断向量表到ram中 提高中断跳转的速度? 
     for(int i = 0; i < 0x200; i++)

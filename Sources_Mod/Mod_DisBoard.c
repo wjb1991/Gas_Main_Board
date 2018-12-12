@@ -43,3 +43,25 @@ void Mod_DisBoardPoll(void)
           &os_err);
       
 }
+
+BOOL Mod_MeasDisBoardDealFram(StdbusFram_t* pst_Fram)
+{
+    if (pst_Fram == NULL)
+        return FALSE;
+    switch(pst_Fram->uch_Cmd)
+    {
+    case 0x40:
+        if(pst_Fram->uch_SubCmd == e_StdbusReadAck)
+        {
+            //¶ÁÃüÁî
+
+        }
+        else if(pst_Fram->uch_SubCmd == e_StdbusWriteAck)
+        {
+
+        }
+
+        break;
+    }
+    return FALSE;
+}

@@ -45,7 +45,7 @@ StdbusHost_t st_StdbusHost = {
 //|----------|----------------------------------------------------------------------
 //| 函数设计 | wjb
 //==================================================================================
-void PostMsg(StdbusPort_t* pst_Port)
+BOOL PostMsg(StdbusPort_t* pst_Port)
 {
     OS_ERR  os_err;
     OSTaskQPost(pst_Port->pv_Msg,(void*)pst_Port->e_State,1,OS_OPT_POST_FIFO ,&os_err);
@@ -71,7 +71,9 @@ void PostMsg(StdbusPort_t* pst_Port)
         default:
             break;
         }
+        return FALSE;
     }
+    return TRUE;
 }
 
 //==================================================================================
@@ -329,7 +331,12 @@ void Mod_StdbusPortSendOneByte(StdbusPort_t * pst_Port)
             if( pst_Port->pv_Handle == (void *)&COM4)
                 Bsp_Rs485de(eRs485Recv);
             pst_Port->e_State = e_StdbusSended;
-            PostMsg(pst_Port);                          //发送 发送完成 消息
+            
+            if(PostMsg(pst_Port) == FALSE)
+            {
+                Mod_StdbusRscPack(pst_Port);                  //释放本端口的数据
+                UnLockPort(pst_Port);
+            }
         }
     }
 }
@@ -371,7 +378,11 @@ BOOL Mod_StdbusPortRecvOneByte(StdbusPort_t* pst_Port,INT8U uch_Byte)
             {
                 pst_Port->e_State = e_StdbusRecved;
                 pst_Port->puc_Buff[pst_Port->uin_BuffLenth++] = uch_Byte;
-                PostMsg(pst_Port);
+                if(PostMsg(pst_Port) == FALSE)
+                {
+                    Mod_StdbusRscPack(pst_Port);                  //释放本端口的数据
+                    UnLockPort(pst_Port);
+                }
             }
             else if (uch_Byte == 0x7b)                          //再次接收到帧头
             {
@@ -795,7 +806,6 @@ void Mod_StdbusPortPoll(StdbusPort_t * pst_Port)
                 Mod_StdbusRscPack(pst_Port);                  //释放本端口的数据
                 UnLockPort(pst_Port);                         /* 释放总线 */
             }
-
             break;
         case e_StdbusSended:
             Mod_StdbusRscPack(pst_Port);                  // 释放本端口的数据
@@ -811,3 +821,4 @@ __weak BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)  //处理函数
 {
     return FALSE;
 }
+    

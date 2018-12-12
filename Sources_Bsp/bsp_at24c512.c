@@ -3,15 +3,25 @@
 
 uint8_t Bsp_At24c512Read(uint8_t *pBuffer,uint16_t uin_Addr, uint16_t uin_Size)
 {
+     OS_ERR                os_err;
+    //关中断
+	__disable_irq();
+  
     /* 发送开始位 */
 	if (!Bsp_I2cStart(&Bsp_At24c512))                   
-	    return 0;
+	{
+	    //开中断
+	    __enable_irq();
+		return 0;
+	}
     
     /* 发送设备地址 写命令 */
     Bsp_I2cSendByte(&Bsp_At24c512,AT24C512_ADDR);
 	if (!Bsp_I2cWaitAck(&Bsp_At24c512))
     {
         Bsp_I2cStop(&Bsp_At24c512); 
+	    //开中断
+	    __enable_irq();
 		return 0;
     }
     
@@ -26,7 +36,11 @@ uint8_t Bsp_At24c512Read(uint8_t *pBuffer,uint16_t uin_Addr, uint16_t uin_Size)
 	
     /* 发送开始位 */
     if (!Bsp_I2cStart(&Bsp_At24c512))
-	    return 0;
+	{
+	    //开中断
+	    __enable_irq();
+		return 0;
+	}
     
     /* 发送设备地址 读命令 */
 	Bsp_I2cSendByte(&Bsp_At24c512,AT24C512_ADDR|0x01);   //设置读地址      
@@ -44,6 +58,12 @@ uint8_t Bsp_At24c512Read(uint8_t *pBuffer,uint16_t uin_Addr, uint16_t uin_Size)
         uin_Size--;
     }
     Bsp_I2cStop(&Bsp_At24c512);
+    //开中断
+    __enable_irq();
+    
+    OSTimeDlyHMSM(0u, 0u, 0u, 2u,
+                  OS_OPT_TIME_HMSM_STRICT,
+                  &os_err);
 
     return 1;
 }
@@ -92,10 +112,10 @@ uint8_t Bsp_At24c512Write(uint8_t *pBuffer,uint16_t uin_Addr, uint16_t uin_Size)
     
 	//开中断
 	__enable_irq();  
-    Bsp_DelayMs(15);
-    //OSTimeDlyHMSM(0u, 0u, 0u, 20u,
-    //              OS_OPT_TIME_HMSM_STRICT,
-    //              &os_err);
+    //Bsp_DelayMs(15);
+    OSTimeDlyHMSM(0u, 0u, 0u, 15u,
+                  OS_OPT_TIME_HMSM_STRICT,
+                  &os_err);
 
     return 1;   
 }

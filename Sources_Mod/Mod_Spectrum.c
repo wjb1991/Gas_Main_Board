@@ -43,8 +43,8 @@ GasMeasure_t st_GasMeasure = {
     alf_Spectrum,                   /* 现在的光谱 */
 
     0,                              /* 光谱长度 */
-    100,                            /* 使用的光谱范围左边界 */
-    1300,                           /* 使用的光谱范围右边界 */
+    0,                            /* 使用的光谱范围左边界 */
+    3648,                           /* 使用的光谱范围右边界 */
                                     
     0.0,                            /* 透过率 */
     10.0,                           /* 透过率下限值 */   
@@ -107,15 +107,16 @@ static void* PendMeg(void)
 
 void Mod_GasMeasureInit(GasMeasure_t* pst_Meas)
 {
-    st_GasN0.st_PeakRef.ul_PeakCenterDot = 800;
-    st_GasN0.st_PeakRef.ul_PeakLeftDot = st_GasN0.st_PeakRef.ul_PeakCenterDot - 20;
-    st_GasN0.st_PeakRef.ul_PeakRightDot = st_GasN0.st_PeakRef.ul_PeakCenterDot + 20;
+    st_GasN0.st_PeakRef.ul_PeakCenterDot = 650;
+    st_GasN0.st_PeakRef.ul_PeakLeftDot = 640;
+    st_GasN0.st_PeakRef.ul_PeakRightDot = 660;
 
-    st_GasN0.st_PeakRef.ul_LeftBackgroundRightDot = st_GasN0.st_PeakRef.ul_PeakLeftDot - 1;
-    st_GasN0.st_PeakRef.ul_LeftBackgroundLeftDot = st_GasN0.st_PeakRef.ul_LeftBackgroundRightDot - 40;
 
-    st_GasN0.st_PeakRef.ul_RightBackgroundLeftDot = st_GasN0.st_PeakRef.ul_PeakRightDot + 1;
-    st_GasN0.st_PeakRef.ul_LeftBackgroundLeftDot = st_GasN0.st_PeakRef.ul_RightBackgroundLeftDot + 40;
+    st_GasN0.st_PeakRef.ul_LeftBackgroundLeftDot = 600;
+    st_GasN0.st_PeakRef.ul_LeftBackgroundRightDot = 620;
+
+    st_GasN0.st_PeakRef.ul_RightBackgroundLeftDot = 780;
+    st_GasN0.st_PeakRef.ul_RightBackgroundRightDot = 800;
 
     if(pst_Meas->pst_Gas1 != NULL)
         Mod_CalibPointListInit(pst_Meas->pst_Gas1->pst_CalibPointList);
@@ -249,9 +250,11 @@ void Mod_GasMeasurePoll(GasMeasure_t* pst_Meas)
             /* 存储数据到EEPROM */
             CalibPoint_t st_CalibPoint = {TRUE,0.0,0.0};
             Mod_CalibPointListEditOnePoint(pst_Meas->pst_Gas1->pst_CalibPointList,0,&st_CalibPoint);
-
+            
+            OS_ERR os_err;
+            OSTaskSuspend(&TaskUsbHostTCB,&os_err);     //挂起光谱采集
             SaveToEepromExt((INT32U)pst_Meas->plf_AbsSpectrum,pst_Meas->ul_SpectrumLen);        //存储背景谱
-
+            OSTaskResume(&TaskUsbHostTCB,&os_err);      //恢复光谱采集
             Mod_GasMeasureGotoAbsMeasure(pst_Meas);
         }
         break;
@@ -424,6 +427,7 @@ BOOL Mod_GasMeasureGotoAdjZero(GasMeasure_t* pst_Meas)
     if(pst_Meas == NULL)
         return FALSE;
     pst_Meas->e_State = eGasAdjZero;
+    pst_Meas->ul_Cnt = 0;
     return TRUE;
 }
 
@@ -440,6 +444,7 @@ BOOL Mod_GasMeasureGotoCalib(GasMeasure_t* pst_Meas,GasMeasureState_e e_State,FP
         pst_Meas->pst_Gas1->lf_Concentration = lf_GasCon1;
         pst_Meas->pst_Gas1->lf_PeakHight = 0.0;
         pst_Meas->ul_Cnt = 0;
+        pst_Meas->e_State = eGasCalibGas1; 
         return TRUE;
     case eGasCalibGas2:
         if( pst_Meas->pst_Gas2 == NULL )
@@ -447,6 +452,7 @@ BOOL Mod_GasMeasureGotoCalib(GasMeasure_t* pst_Meas,GasMeasureState_e e_State,FP
         pst_Meas->pst_Gas2->lf_Concentration = lf_GasCon2;
         pst_Meas->pst_Gas2->lf_PeakHight = 0.0;
         pst_Meas->ul_Cnt = 0;
+        pst_Meas->e_State = eGasCalibGas2; 
         return TRUE;
     case eGasCalibAll:
         if( pst_Meas->pst_Gas1 == NULL || pst_Meas->pst_Gas2 == NULL )
@@ -456,23 +462,11 @@ BOOL Mod_GasMeasureGotoCalib(GasMeasure_t* pst_Meas,GasMeasureState_e e_State,FP
         pst_Meas->pst_Gas2->lf_Concentration = lf_GasCon2;
         pst_Meas->pst_Gas2->lf_PeakHight = 0.0;
         pst_Meas->ul_Cnt = 0;
+        pst_Meas->e_State = eGasCalibAll; 
         return TRUE;
     default:
         return FALSE;
     }
-      
-      
-      
-    if(( pst_Meas->pst_Gas1 == NULL && e_State == eGasCalibGas1 )||
-       ( pst_Meas->pst_Gas2 == NULL && e_State == eGasCalibGas2 ))
-        return FALSE;
-    
-    if(( pst_Meas->pst_Gas1 == NULL || pst_Meas->pst_Gas2 == NULL ) &&  e_State == eGasCalibAll)
-        return FALSE;
-    
-    
-    pst_Meas->e_State = e_State;
-    return TRUE;
 }
 
 BOOL Mod_GasMeasureGotoDiffMeasure(GasMeasure_t* pst_Meas)
@@ -497,22 +491,64 @@ BOOL Mod_GasMarkWorkLine(GasMeasure_t* pst_Meas,GasMeasureState_e e_Ops)
     switch(e_Ops)
     {
     case eGasCalibGas1:
+        if(st_GasMeasure.pst_Gas1 == NULL)
+            return FALSE;
+        st_GasMeasure.pst_Gas1->af_NiheCoeff[0] = 0;
+        st_GasMeasure.pst_Gas1->af_NiheCoeff[1] = 0;
+        st_GasMeasure.pst_Gas1->af_NiheCoeff[2] = 0;
         Mod_CalibPointListNihe(pst_Meas->pst_Gas1->pst_CalibPointList,
                                pst_Meas->pst_Gas1->uch_NiheOrder,
                                pst_Meas->pst_Gas1->af_NiheCoeff);
+        SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas1->af_NiheCoeff[0]));
+        SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas1->af_NiheCoeff[1]));
+        SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas1->af_NiheCoeff[2]));
+        TRACE_DBG(">>DBG:   气体1 拟合系数0:%f 拟合系数1:%f 拟合系数2:%f\r\n",
+                    st_GasMeasure.pst_Gas1->af_NiheCoeff[0],
+                    st_GasMeasure.pst_Gas1->af_NiheCoeff[1],
+                    st_GasMeasure.pst_Gas1->af_NiheCoeff[2]);
         break;
-    case eGasCalibGas2:                         
+    case eGasCalibGas2:
+        if(st_GasMeasure.pst_Gas2 == NULL)
+            return FALSE;
+        st_GasMeasure.pst_Gas2->af_NiheCoeff[0] = 0;
+        st_GasMeasure.pst_Gas2->af_NiheCoeff[1] = 0;
+        st_GasMeasure.pst_Gas2->af_NiheCoeff[2] = 0;
         Mod_CalibPointListNihe(pst_Meas->pst_Gas2->pst_CalibPointList,
                                pst_Meas->pst_Gas2->uch_NiheOrder,
                                pst_Meas->pst_Gas2->af_NiheCoeff);
-        break;
+        SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas2->af_NiheCoeff[0]));
+        SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas2->af_NiheCoeff[1]));
+        SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas2->af_NiheCoeff[2]));
+        TRACE_DBG(">>DBG:   气体2 拟合系数0:%f 拟合系数1:%f 拟合系数2:%f\r\n",
+                    st_GasMeasure.pst_Gas2->af_NiheCoeff[0],
+                    st_GasMeasure.pst_Gas2->af_NiheCoeff[1],
+                    st_GasMeasure.pst_Gas2->af_NiheCoeff[2]);
+        break;                                      
     case eGasCalibAll:
+        if(st_GasMeasure.pst_Gas1 == NULL)
+            return FALSE;
+        if(st_GasMeasure.pst_Gas2 == NULL)
+            return FALSE;
         Mod_CalibPointListNihe(pst_Meas->pst_Gas1->pst_CalibPointList,
                                pst_Meas->pst_Gas1->uch_NiheOrder,
                                pst_Meas->pst_Gas1->af_NiheCoeff);
         Mod_CalibPointListNihe(pst_Meas->pst_Gas2->pst_CalibPointList,
                                pst_Meas->pst_Gas2->uch_NiheOrder,
                                pst_Meas->pst_Gas2->af_NiheCoeff);
+        SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas1->af_NiheCoeff[0]));
+        SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas1->af_NiheCoeff[1]));
+        SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas1->af_NiheCoeff[2]));
+        SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas2->af_NiheCoeff[0]));
+        SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas2->af_NiheCoeff[1]));
+        SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas2->af_NiheCoeff[2]));
+        TRACE_DBG(">>DBG:   气体1 拟合系数0:%f 拟合系数1:%f 拟合系数2:%f\r\n",
+                    st_GasMeasure.pst_Gas1->af_NiheCoeff[0],
+                    st_GasMeasure.pst_Gas1->af_NiheCoeff[1],
+                    st_GasMeasure.pst_Gas1->af_NiheCoeff[2]);
+        TRACE_DBG(">>DBG:   气体2 拟合系数0:%f 拟合系数1:%f 拟合系数2:%f\r\n",
+                    st_GasMeasure.pst_Gas2->af_NiheCoeff[0],
+                    st_GasMeasure.pst_Gas2->af_NiheCoeff[1],
+                    st_GasMeasure.pst_Gas2->af_NiheCoeff[2]);
         break;
     default:
         return FALSE;
