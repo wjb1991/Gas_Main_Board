@@ -35,7 +35,7 @@ LaserBoard_t st_Laser = {
 //==================================================================================
 void Mod_LaserPoll(void)
 {
-    Mod_StdbusWriteCmd(&st_LaserBoard,0x80,NULL,0);
+    Mod_StdbusReadCmd(&st_LaserBoard,0x80,NULL,0);
 }
 
 BOOL Mod_MeasLaserDealFram(StdbusFram_t* pst_Fram)
@@ -49,15 +49,15 @@ BOOL Mod_MeasLaserDealFram(StdbusFram_t* pst_Fram)
         {
             //读命令
             // 0-4测试计数 4-8 透过率 8-16 CO2浓度 9-13 CO1浓度
-            if(pst_Fram->uin_PayLoadLenth == 41)
+            if(pst_Fram->uin_PayLoadLenth == 25)
             {
                 st_Laser.uch_State = pst_Fram->puc_PayLoad[0];
                 st_Laser.ul_Count = Bsp_CnvArrToINT32U(&pst_Fram->puc_PayLoad[1],FALSE);
                 st_Laser.f_Trans  = Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[5],FALSE);
-                st_Laser.lf_PeakCO2  = Bsp_CnvArrToFP64(&pst_Fram->puc_PayLoad[9],FALSE);
-                st_Laser.lf_ConcentrationCO2  = Bsp_CnvArrToFP64(&pst_Fram->puc_PayLoad[17],FALSE);
-                st_Laser.lf_PeakCO  = Bsp_CnvArrToFP64(&pst_Fram->puc_PayLoad[25],FALSE);
-                st_Laser.lf_ConcentrationCO  = Bsp_CnvArrToFP64(&pst_Fram->puc_PayLoad[33],FALSE);
+                st_Laser.lf_PeakCO2             = (FP64)Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[9],FALSE);
+                st_Laser.lf_ConcentrationCO2    = (FP64)Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[13],FALSE);
+                st_Laser.lf_PeakCO              = (FP64)Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[17],FALSE);
+                st_Laser.lf_ConcentrationCO     = (FP64)Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[21],FALSE);
             }
         }
         else if(pst_Fram->uch_SubCmd == e_StdbusWriteAck)

@@ -12,7 +12,7 @@
 //==================================================================================================
 #include "App_Include.h"
 
-#define DEF_STDBUS_DBG_EN           FLASE
+#define DEF_STDBUS_DBG_EN           TRUE
 
 #if (DEF_STDBUS_DBG_EN == TRUE)
     #define STDBUS_DBG(...)             do {                                \

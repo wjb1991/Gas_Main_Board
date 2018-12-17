@@ -233,7 +233,7 @@ void AppTaskCreate (void)
                  (OS_OPT        )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_SAVE_FP),
                  (OS_ERR       *)&os_err);                                      /* 存放错误值 */
 #endif
-#if 0
+#if 1
      /* 轮询激光板任务 */
      OSTaskCreate((OS_TCB       *)&TaskLaserTCB,                                /* 创建任务控制块 */
                   (CPU_CHAR     *)"Laser Task",                                 /* 任务名称 */

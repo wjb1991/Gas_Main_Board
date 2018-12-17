@@ -30,10 +30,11 @@ void Mod_DisBoardPoll(void)
 {
     OS_ERR os_err;
     INT8U auch_Buff[3];
-    auch_Buff[0] = st_DisBoard.uch_DisUnit1++;
-    auch_Buff[1] = st_GasMeasure.f_Trans;
-    auch_Buff[2] = st_Grey.f_Trans;             //0-100
+    auch_Buff[0] = (INT8U)st_Laser.f_Trans;
+    auch_Buff[1] = (INT8U)st_GasMeasure.f_Trans;
+    auch_Buff[2] = (INT8U)st_Grey.f_Trans;             //0-100
     
+    auch_Buff[0] = HexToBcd(auch_Buff[0]);
     auch_Buff[1] = HexToBcd(auch_Buff[1]);
     auch_Buff[2] = HexToBcd(auch_Buff[2]);
     Mod_StdbusWriteCmd(&st_StdbusDis,0x10,auch_Buff,3);
