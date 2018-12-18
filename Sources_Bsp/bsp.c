@@ -32,9 +32,9 @@ void  Bsp_Init (void)
 
     Bsp_DMAInit();
     //Bsp_SramInit();
-    
+#if 1   
     Bsp_At24c512Init(); 
-    
+#endif   
     /* COM1->µ÷ÊÔ´®¿Ú */
     COM1.ul_BaudRate   = 230400;
     COM1.ul_WordLength = UART_WORDLENGTH_8B;

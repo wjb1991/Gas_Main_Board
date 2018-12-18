@@ -1,7 +1,7 @@
 #ifndef __MOD_SPECTRUM_H__
 #define __MOD_SPECTRUM_H__
 
-#define     DEF_CALIB_NIHE_ORDER_MAX    3
+#define     DEF_CALIB_NIHE_ORDER_MAX    5
 
 typedef enum {
     eGasN2 = 0,
@@ -40,7 +40,7 @@ typedef struct {
     CalibPointList_t* pst_CalibPointList;       /* 标定点列表 */
 
     INT8U       uch_NiheOrder;                  /* 拟合阶数 */
-    FP32        af_NiheCoeff[DEF_CALIB_NIHE_ORDER_MAX];                /* 拟合因子 */
+    FP32        af_NiheCoeff[DEF_CALIB_NIHE_ORDER_MAX+1];                /* 拟合因子 */
 
     FP64        lf_PeakHight;                   /* 吸收峰高度 */
     FP64        lf_Concentration;               /* 浓度 */

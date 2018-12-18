@@ -22,11 +22,13 @@ START_ADD+0x7200 + 0x70, (uint32_t)(&ast_CalibPoint_GasNO[7]),   KIND_INT8U,   s
 START_ADD+0x7200 + 0x80, (uint32_t)(&ast_CalibPoint_GasNO[8]),   KIND_INT8U,   sizeof(CalibPoint_t),     LIMIT_NULL,       0,          0,        0,
 START_ADD+0x7200 + 0x90, (uint32_t)(&ast_CalibPoint_GasNO[9]),   KIND_INT8U,   sizeof(CalibPoint_t),     LIMIT_NULL,       0,          0,        0,
             
-START_ADD+0x7400 + 0x00, (uint32_t)(&st_GasN0.uch_NiheOrder),    KIND_INT8U,      1,     LIMIT_RANGE,      1,          3,        3,
+START_ADD+0x7400 + 0x00, (uint32_t)(&st_GasN0.uch_NiheOrder),    KIND_INT8U,      1,     LIMIT_RANGE,      1,          3,        5,
 START_ADD+0x7400 + 0x04, (uint32_t)(&st_GasN0.af_NiheCoeff[0]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
 START_ADD+0x7400 + 0x08, (uint32_t)(&st_GasN0.af_NiheCoeff[1]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
 START_ADD+0x7400 + 0x0C, (uint32_t)(&st_GasN0.af_NiheCoeff[2]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
-
+START_ADD+0x7400 + 0x10, (uint32_t)(&st_GasN0.af_NiheCoeff[3]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
+START_ADD+0x7400 + 0x14, (uint32_t)(&st_GasN0.af_NiheCoeff[4]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
+START_ADD+0x7400 + 0x14, (uint32_t)(&st_GasN0.af_NiheCoeff[5]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
 //存储地址|-----------------变量地址---------------|-----类型------|-长度-|-----限定方-----|---最小值--|---最大值---|--默认值---//
 /*  4096 + 512  128个字节预留  */
 START_ADD+0x7600 + 0x00, (uint32_t)(&USB4000.uch_ScansToAverage),   KIND_INT8U,   1,     LIMIT_RANGE,       1,          99,        10,

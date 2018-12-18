@@ -69,6 +69,9 @@ BOOL Mod_CalibPointListEditOnePoint(CalibPointList_t* pst_CpointList, INT32U ul_
     pst_CpointList->pst_List[ul_Index].f_X = pst_Point->f_X;
     pst_CpointList->pst_List[ul_Index].f_Y = pst_Point->f_Y;
     SaveToEepromExt((INT32U)(&pst_CpointList->pst_List[ul_Index]),sizeof(CalibPoint_t));
+    
+    Mod_CalibPointListInit(pst_CpointList); //Ë¢ÐÂ¸öÊý20181217
+    
     return TRUE;
 }
 

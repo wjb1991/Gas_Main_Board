@@ -106,17 +106,17 @@ static void* PendMeg(void)
 }
 
 void Mod_GasMeasureInit(GasMeasure_t* pst_Meas)
-{
-    st_GasN0.st_PeakRef.ul_PeakCenterDot = 650;
+{    
     st_GasN0.st_PeakRef.ul_PeakLeftDot = 640;
+    st_GasN0.st_PeakRef.ul_PeakCenterDot = 650;
     st_GasN0.st_PeakRef.ul_PeakRightDot = 660;
 
 
-    st_GasN0.st_PeakRef.ul_LeftBackgroundLeftDot = 600;
-    st_GasN0.st_PeakRef.ul_LeftBackgroundRightDot = 620;
+    st_GasN0.st_PeakRef.ul_LeftBackgroundLeftDot = 619;//600;
+    st_GasN0.st_PeakRef.ul_LeftBackgroundRightDot = 639;//620;
 
-    st_GasN0.st_PeakRef.ul_RightBackgroundLeftDot = 780;
-    st_GasN0.st_PeakRef.ul_RightBackgroundRightDot = 800;
+    st_GasN0.st_PeakRef.ul_RightBackgroundLeftDot = 661;//780;
+    st_GasN0.st_PeakRef.ul_RightBackgroundRightDot = 681;//800;
 
     if(pst_Meas->pst_Gas1 != NULL)
         Mod_CalibPointListInit(pst_Meas->pst_Gas1->pst_CalibPointList);
@@ -298,7 +298,8 @@ void Mod_GasMeasurePoll(GasMeasure_t* pst_Meas)
                     st_CalibPoint.f_X   = pst_Meas->pst_Gas1->lf_PeakHight;
                     st_CalibPoint.f_Y   = pst_Meas->pst_Gas1->lf_Concentration;
                     /* 存储数据到EEPROM */
-                    Mod_CalibPointListEditOnePoint(pst_Meas->pst_Gas1->pst_CalibPointList,1,&st_CalibPoint);
+                    //Mod_CalibPointListEditOnePoint(pst_Meas->pst_Gas1->pst_CalibPointList,1,&st_CalibPoint);
+                    Mod_CalibPointListAddOnePoint(pst_Meas->pst_Gas1->pst_CalibPointList,&st_CalibPoint);
                     Mod_GasMeasureGotoAbsMeasure(pst_Meas);
                 }
                 break;
@@ -496,12 +497,18 @@ BOOL Mod_GasMarkWorkLine(GasMeasure_t* pst_Meas,GasMeasureState_e e_Ops)
         st_GasMeasure.pst_Gas1->af_NiheCoeff[0] = 0;
         st_GasMeasure.pst_Gas1->af_NiheCoeff[1] = 0;
         st_GasMeasure.pst_Gas1->af_NiheCoeff[2] = 0;
+        st_GasMeasure.pst_Gas1->af_NiheCoeff[3] = 0;
+        st_GasMeasure.pst_Gas1->af_NiheCoeff[4] = 0;
+        st_GasMeasure.pst_Gas1->af_NiheCoeff[5] = 0;      
         Mod_CalibPointListNihe(pst_Meas->pst_Gas1->pst_CalibPointList,
                                pst_Meas->pst_Gas1->uch_NiheOrder,
                                pst_Meas->pst_Gas1->af_NiheCoeff);
         SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas1->af_NiheCoeff[0]));
         SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas1->af_NiheCoeff[1]));
         SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas1->af_NiheCoeff[2]));
+        SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas1->af_NiheCoeff[3]));
+        SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas1->af_NiheCoeff[4]));
+        SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas1->af_NiheCoeff[5]));
         TRACE_DBG(">>DBG:   气体1 拟合系数0:%f 拟合系数1:%f 拟合系数2:%f\r\n",
                     st_GasMeasure.pst_Gas1->af_NiheCoeff[0],
                     st_GasMeasure.pst_Gas1->af_NiheCoeff[1],
@@ -513,12 +520,18 @@ BOOL Mod_GasMarkWorkLine(GasMeasure_t* pst_Meas,GasMeasureState_e e_Ops)
         st_GasMeasure.pst_Gas2->af_NiheCoeff[0] = 0;
         st_GasMeasure.pst_Gas2->af_NiheCoeff[1] = 0;
         st_GasMeasure.pst_Gas2->af_NiheCoeff[2] = 0;
+        st_GasMeasure.pst_Gas2->af_NiheCoeff[3] = 0;
+        st_GasMeasure.pst_Gas2->af_NiheCoeff[4] = 0;
+        st_GasMeasure.pst_Gas2->af_NiheCoeff[5] = 0;
         Mod_CalibPointListNihe(pst_Meas->pst_Gas2->pst_CalibPointList,
                                pst_Meas->pst_Gas2->uch_NiheOrder,
                                pst_Meas->pst_Gas2->af_NiheCoeff);
         SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas2->af_NiheCoeff[0]));
         SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas2->af_NiheCoeff[1]));
         SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas2->af_NiheCoeff[2]));
+        SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas2->af_NiheCoeff[3]));
+        SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas2->af_NiheCoeff[4]));
+        SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas2->af_NiheCoeff[5]));
         TRACE_DBG(">>DBG:   气体2 拟合系数0:%f 拟合系数1:%f 拟合系数2:%f\r\n",
                     st_GasMeasure.pst_Gas2->af_NiheCoeff[0],
                     st_GasMeasure.pst_Gas2->af_NiheCoeff[1],
