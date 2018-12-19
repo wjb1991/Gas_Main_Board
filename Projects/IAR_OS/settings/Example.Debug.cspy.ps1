@@ -23,9 +23,9 @@
 
 if ($debugfile -eq "")
 {
-& "D:\Program Files\IAR Systems\Embedded Workbench 8.1\common\bin\cspybat" -f "D:\Wangjiangbo\Documents\GitHub\Gas_Main_Board\Projects\IAR_OS\settings\Example.Debug.general.xcl" --backend -f "D:\Wangjiangbo\Documents\GitHub\Gas_Main_Board\Projects\IAR_OS\settings\Example.Debug.driver.xcl" 
+& "D:\Program Files\IAR Systems\Embedded Workbench 8.2\common\bin\cspybat" -f "D:\Wangjiangbo\Documents\GitHub\Gas_Main_Board\Projects\IAR_OS\settings\Example.Debug.general.xcl" --backend -f "D:\Wangjiangbo\Documents\GitHub\Gas_Main_Board\Projects\IAR_OS\settings\Example.Debug.driver.xcl" 
 }
 else
 {
-& "D:\Program Files\IAR Systems\Embedded Workbench 8.1\common\bin\cspybat" -f "D:\Wangjiangbo\Documents\GitHub\Gas_Main_Board\Projects\IAR_OS\settings\Example.Debug.general.xcl" --debug_file=$debugfile --backend -f "D:\Wangjiangbo\Documents\GitHub\Gas_Main_Board\Projects\IAR_OS\settings\Example.Debug.driver.xcl" 
+& "D:\Program Files\IAR Systems\Embedded Workbench 8.2\common\bin\cspybat" -f "D:\Wangjiangbo\Documents\GitHub\Gas_Main_Board\Projects\IAR_OS\settings\Example.Debug.general.xcl" --debug_file=$debugfile --backend -f "D:\Wangjiangbo\Documents\GitHub\Gas_Main_Board\Projects\IAR_OS\settings\Example.Debug.driver.xcl" 
 }
