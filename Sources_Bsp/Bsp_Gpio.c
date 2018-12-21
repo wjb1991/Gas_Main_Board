@@ -35,9 +35,9 @@ GpioConfig_t ast_GpioConfig[] = {
     
     {e_IO_245OE,         "74HC245 OE",  FALSE,   FALSE,   GPIOF,  GPIO_PIN_11,    GPIO_MODE_OUTPUT_PP, GPIO_PULLUP,  GPIO_SPEED_HIGH},
     {e_IO_245DIR,        "74HC245 DIR", FALSE,   TRUE,    GPIOF,  GPIO_PIN_15,    GPIO_MODE_OUTPUT_PP, GPIO_PULLUP,  GPIO_SPEED_HIGH},
-    {e_IO_Sync0,         "同步信号0",   FALSE,   FALSE,   GPIOF,  GPIO_PIN_12,    GPIO_MODE_IT_RISING, GPIO_PULLUP,  GPIO_SPEED_HIGH},
-    {e_IO_Sync1,         "测量结束",   FALSE,   FALSE,   GPIOF,  GPIO_PIN_13,    GPIO_MODE_IT_RISING, GPIO_PULLUP,  GPIO_SPEED_HIGH},
-    {e_IO_Sync2,         "测量开始",   FALSE,   FALSE,   GPIOF,  GPIO_PIN_14,    GPIO_MODE_IT_RISING, GPIO_PULLUP,  GPIO_SPEED_HIGH},
+    {e_IO_Sync0,         "同步信号0",   FALSE,   FALSE,   GPIOF,  GPIO_PIN_12,    GPIO_MODE_IT_RISING_FALLING, GPIO_PULLUP,  GPIO_SPEED_HIGH},
+    {e_IO_Sync1,         "测量结束",   FALSE,   FALSE,   GPIOF,  GPIO_PIN_13,     GPIO_MODE_IT_RISING_FALLING, GPIO_PULLUP,  GPIO_SPEED_HIGH},
+    {e_IO_Sync2,         "测量开始",   FALSE,   FALSE,   GPIOF,  GPIO_PIN_14,     GPIO_MODE_IT_RISING_FALLING, GPIO_PULLUP,  GPIO_SPEED_HIGH},
 
 
 };
@@ -174,14 +174,17 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     //16个中断线
     static GpioEvent_t st_Event[16];
     static INT8U uch_Index = 0;
-    BOOL b_IsRising = HAL_GPIO_ReadPin(GPIOD,GPIO_Pin);     //读取一次电平
     
-    Bsp_GetTimeSample(&st_Event[uch_Index].st_Ts);  //获取时间戳
+    Bsp_DelayUs(100);
+    
+    BOOL b_IsRising = HAL_GPIO_ReadPin(GPIOF,GPIO_Pin);     //读取一次电平
+    
+    Bsp_GetTimeSample(&st_Event[uch_Index].st_Ts);          //获取时间戳
     st_Event[uch_Index].uin_GpioPin = GPIO_Pin;
     st_Event[uch_Index].vp_GpioPort = GPIOD;
     st_Event[uch_Index].b_IsRising = b_IsRising;
     
-    if(HAL_GPIO_ReadPin(GPIOD,GPIO_Pin) != b_IsRising)      //读取第二次电平作为消抖
+    if(HAL_GPIO_ReadPin(GPIOF,GPIO_Pin) != b_IsRising)      //读取第二次电平作为消抖
         return;
     
     /* 两次消抖都通过才发送消息 单双边沿都适合 */

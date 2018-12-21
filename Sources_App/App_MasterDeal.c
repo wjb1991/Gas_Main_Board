@@ -588,20 +588,30 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
             //byte1-5 float :切换到标定状态是时下发的标定浓度
             if(pst_Fram->uin_PayLoadLenth == 1)
             {
-                if(pst_Fram->puc_PayLoad[0] == 0)
+                switch(pst_Fram->puc_PayLoad[0])
                 {
+                case eGasAdjZero:
                     Mod_GasMeasureGotoAdjZero(&st_GasMeasure);           //切换到调0状态
                     res = TRUE;    //应答
-                }
-                else if(pst_Fram->puc_PayLoad[0] == 4)
-                {
+                    break;
+                case eGasAbsMeasure:
                     Mod_GasMeasureGotoAbsMeasure(&st_GasMeasure);        //切换到工作状态
                     res = TRUE;    //应答
-                }
-                else if(pst_Fram->puc_PayLoad[0] == 5)
-                {
+                    break;
+                case eGasDiffMeasure:
                     Mod_GasMeasureGotoDiffMeasure(&st_GasMeasure);        //切换到工作状态
                     res = TRUE;    //应答
+                    break;
+                case eGasWait:
+                    Mod_GasMeasureGotoWait(&st_GasMeasure);               //切换到等待状态
+                    res = TRUE;    //应答
+                    break;
+                case eGasCalibTrans:
+                    Mod_GasMeasureGotoCalibTrans(&st_GasMeasure);         //切换到透过率标定（能量标定）        
+                    res = TRUE;    //应答
+                    break;
+                default:
+                    break;
                 }
             }
             else if(pst_Fram->uin_PayLoadLenth == 17)

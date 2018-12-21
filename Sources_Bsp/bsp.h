@@ -56,7 +56,6 @@ extern  "C" {                                  /* See Note #1.                  
 #include  "Bsp_W25Qxx.h"
 #include  "Bsp_LTC1867.h"
 
-
 /*__CMSIS_IAR_H__ 中有常用的宏定义 */
   
 void Bsp_Init(void);

@@ -18,6 +18,8 @@ typedef enum {
     eGasCalibAll,           /* 标定 所有气体 */
     eGasAbsMeasure,         /* 绝对浓度测量 */
     eGasDiffMeasure,        /* 差分浓度测量 */
+    eGasWait,               /* 等待测量 */
+    eGasCalibTrans,         /* 标定透过率 */    
 }GasMeasureState_e;
 
 typedef struct {
@@ -51,6 +53,8 @@ typedef struct {
 
     void*        pst_Dev;                       /* 光谱仪设备 */
 
+    BOOL         b_SaveAbsSpecetrum;            /* 存储调零光谱 */
+    
     FP32*        pf_WaveLenth;                  /* 波长数组 */
     FP64*        plf_AbsSpectrum;               /* 绝对光谱 调零光谱 */
     FP64*        plf_BkgSpectrum;               /* 背景光谱 差分测量 */
@@ -62,12 +66,14 @@ typedef struct {
     INT32U       ul_UseRightDot;                /* 使用的光谱范围右边界 */
 
     FP32         f_Trans;                       /* 透过率 */
+    FP32         f_TransK;                      /* 透过率系数 */
     FP32         f_TransThreshold;              /* 透过率下限值 */    
     INT32U       ul_TransLeftDot;               /* 透过率左边点 */
     INT32U       ul_TransRightDot;              /* 透过率右边点 */
 
     FP32         f_FilterCoeff;                 /* 光谱一阶滤波系数 */
     INT32U       ul_Cnt;                        /* 计数值 */
+    INT32U       ul_CalibTransCnt;              /* 透过率标定计数值 */
     INT32U       ul_AdjZeroCnt;                 /* 调零计数值 */
     INT32U       ul_CalibCnt;                   /* 校准计数值 */
 
@@ -86,6 +92,10 @@ BOOL Mod_GasMeasureGotoCalib(GasMeasure_t* pst_Meas,GasMeasureState_e e_State,FP
 BOOL Mod_GasMeasureGotoDiffMeasure(GasMeasure_t* pst_Meas);
 
 BOOL Mod_GasMeasureGotoAbsMeasure(GasMeasure_t* pst_Meas);
+
+BOOL Mod_GasMeasureGotoCalibTrans(GasMeasure_t* pst_Meas);
+
+BOOL Mod_GasMeasureGotoWait(GasMeasure_t* pst_Meas);
 
 void Mod_GasMeasureInit(GasMeasure_t* pst_Meas);
 

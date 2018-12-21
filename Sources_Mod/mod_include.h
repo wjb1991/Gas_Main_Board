@@ -3,6 +3,8 @@
 
 #include "bsp.h"
 
+#include "Mod_Filter.h"
+
 #include "Mod_CRC16.h"
 #include "Mod_StdbusM.h"
 

@@ -119,13 +119,17 @@ void Mod_GreyProc(GreyChannel_t* pst_Channel)
             f = pst_Channel->f_Volt / pst_Channel->f_AbsTransVolt * 100;  //更新当前单路的透过率
             pst_Channel->f_Trans = (f > 100) ? 100:f;
 
-
             if(pst_Channel->f_Trans >= pst_Manage->f_TransThreshold)      //透过率大于10%时才更新背景
             {
                 //一阶滤波 空闲时的电压是背景
                 pst_Channel->f_BkVolt = pst_Channel->f_Volt * 0.5 + \
                                         pst_Channel->f_BkVolt * 0.5;
             }
+            break;
+        case e_GreyWait:
+            /* 就绪状态 车辆进入时 不更新背景电压 */
+            f = pst_Channel->f_Volt / pst_Channel->f_AbsTransVolt * 100;  //更新当前单路的透过率
+            pst_Channel->f_Trans = (f > 100) ? 100:f;
             break;
         case e_GreyMeas:
             /* 测量时使用测量的电压和背景电压做计算 */
@@ -202,3 +206,9 @@ void Mod_GreyGotoIdle(GreyAnalysis_t* pst_Grye)
 {
     pst_Grye->e_Status = e_GreyIdle;
 }
+
+void Mod_GreyGotoWait(GreyAnalysis_t* pst_Grye)
+{
+    pst_Grye->e_Status = e_GreyWait;
+}
+

@@ -2504,6 +2504,9 @@
             <name>$PROJ_DIR$\..\..\Sources_Mod\Mod_DisBoard.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\Sources_Mod\Mod_Filter.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\Sources_Mod\mod_greyanalysis.c</name>
         </file>
         <file>

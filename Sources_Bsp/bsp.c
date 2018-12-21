@@ -10,6 +10,9 @@
 //|  V1.0    | 2018.10.31  |  wjb      | 初版
 //==================================================================================================
 #include  "Bsp.h"
+  
+        
+        
 
 void  Bsp_Init (void)
 {
@@ -22,11 +25,11 @@ void  Bsp_Init (void)
     
     HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_2);         /* 2Bit抢占优先级 2Bit响应优先级 数字越小响应级越高 */
 
-    //USB_HOST_Init();
     
     BSP_LedInit(); 
     Bsp_GpioInit();
-    
+
+
     Bsp_I2cInit(&Bsp_At24c512);
     
 

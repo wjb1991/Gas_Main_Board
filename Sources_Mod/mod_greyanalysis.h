@@ -17,7 +17,7 @@
 #define     DEF_GREY_SAMPLEDOT_MAX      10
 
 typedef enum   __GreyAnalysisStaus {
-    e_GreyIdle = 0,e_GreyMeas,e_GreyCalib,
+    e_GreyIdle = 0,e_GreyMeas,e_GreyCalib,e_GreyWait,
 }GreyAnalysisStaus_t;
 
 typedef struct __GreyChannel {
@@ -54,5 +54,7 @@ void Mod_GreyGotoCalib(GreyAnalysis_t* pst_Grye);
 void Mod_GreyGotoMeas(GreyAnalysis_t* pst_Grye);
 
 void Mod_GreyGotoIdle(GreyAnalysis_t* pst_Grye);
+
+void Mod_GreyGotoWait(GreyAnalysis_t* pst_Grye);
 
 #endif

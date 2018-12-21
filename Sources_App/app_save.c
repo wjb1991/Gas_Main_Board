@@ -22,7 +22,7 @@ START_ADD+0x7200 + 0x70, (uint32_t)(&ast_CalibPoint_GasNO[7]),   KIND_INT8U,   s
 START_ADD+0x7200 + 0x80, (uint32_t)(&ast_CalibPoint_GasNO[8]),   KIND_INT8U,   sizeof(CalibPoint_t),     LIMIT_NULL,       0,          0,        0,
 START_ADD+0x7200 + 0x90, (uint32_t)(&ast_CalibPoint_GasNO[9]),   KIND_INT8U,   sizeof(CalibPoint_t),     LIMIT_NULL,       0,          0,        0,
             
-START_ADD+0x7400 + 0x00, (uint32_t)(&st_GasN0.uch_NiheOrder),    KIND_INT8U,      1,     LIMIT_RANGE,      1,          3,        5,
+START_ADD+0x7400 + 0x00, (uint32_t)(&st_GasN0.uch_NiheOrder),    KIND_INT8U,      1,     LIMIT_RANGE,      1,          5,        5,
 START_ADD+0x7400 + 0x04, (uint32_t)(&st_GasN0.af_NiheCoeff[0]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
 START_ADD+0x7400 + 0x08, (uint32_t)(&st_GasN0.af_NiheCoeff[1]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
 START_ADD+0x7400 + 0x0C, (uint32_t)(&st_GasN0.af_NiheCoeff[2]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
@@ -36,8 +36,9 @@ START_ADD+0x7600 + 0x04, (uint32_t)(&USB4000.uch_Boxcar),           KIND_INT8U, 
 START_ADD+0x7600 + 0x08, (uint32_t)(&USB4000.b_EdcEnable),          KIND_INT8U,   1,     LIMIT_RANGE,       0,          1,          1,
 START_ADD+0x7600 + 0x0C, (uint32_t)(&USB4000.b_NlcEnable),          KIND_INT8U,   1,     LIMIT_RANGE,       0,          1,          0,
 START_ADD+0x7600 + 0x10, (uint32_t)(&USB4000.ul_SetIntegralTime),   KIND_INT32U,  1,     LIMIT_RANGE,       1,      65000000,    50000,
-           
-           
+
+START_ADD+0x7600 + 0x20, (uint32_t)(&st_GasMeasure.b_SaveAbsSpecetrum),   KIND_INT8U,  1,     LIMIT_RANGE,       0,      1,    1,       
+START_ADD+0x7600 + 0x24, (uint32_t)(&st_GasMeasure.f_TransK),              KIND_FP32,  1,     LIMIT_NULL,        0,      1,    1,            
            
 START_ADD+0x7800 + 0x00, (uint32_t)(&ast_GreyChannle[0].f_AbsTransVolt),   KIND_FP32,  1,     LIMIT_RANGE,       0.0,      4.1f,    4.1f,
 START_ADD+0x7800 + 0x04, (uint32_t)(&ast_GreyChannle[1].f_AbsTransVolt),   KIND_FP32,  1,     LIMIT_RANGE,       0.0,      4.1f,    4.1f,

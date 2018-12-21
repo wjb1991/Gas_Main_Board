@@ -160,7 +160,7 @@ BOOL Mod_CalibPointListNihe(CalibPointList_t* pst_CpointList,INT8U uch_NiheOrder
     
     CALIBPOINT_DBG("拟合校准点列表\r\n");
     CALIBPOINT_DBG("拟合阶数:%d, 拟合点数:%d\r\n",uch_NiheOrder,ul_Use);
-    for(i = 0; i <= ul_Use; i++)
+    for(i = 0; i < ul_Use; i++)
         CALIBPOINT_DBG("拟合点%d X = %f, Y = %f\r\n",i,af_X[i],af_Y[i]);
 
     for(i = 0; i <= uch_NiheOrder; i++)

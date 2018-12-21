@@ -1139,42 +1139,52 @@ static USBH_StatusTypeDef USBH_USB4000_ProcessSpectrum(USBH_HandleTypeDef *phost
         {
             
         }
-
+        //for (int i = 0; i < USB4000_Handle->uin_Pixels; i++)
+        //    USB4000_Handle->plf_ProcessSpectrum[i] = i;
         // perform boxcar if requested (should be done after NLC)
+        
+        if (USB4000_Handle->uch_Boxcar > 0)
+        {
+            Mod_FilterBoxCar(USB4000_Handle->plf_ProcessSpectrum , USB4000_Handle->uin_Pixels, USB4000_Handle->uch_Boxcar);
+        }
+        
+        #if 0
         if (USB4000_Handle->uch_Boxcar > 0)
         {
             int boxcar = USB4000_Handle->uch_Boxcar;
             double * procSpectrum = USB4000_Handle->plf_ProcessSpectrum;
             double smoothed[200] = {0};
             int boxcarLimit = USB4000_Handle->uin_Pixels - boxcar - 1;  /* 最后一个点的索引*/
-            int boxcarRange = 2 * boxcar + 1;                                               /* 滤波范围 */
+            int boxcarRange = 2 * boxcar + 1;   // bocar = 1 this = 3                                            /* 滤波范围 */
             double sum; 
             int i,j,k; 
             
             /* 加载数据到内存中 */         
-            for( k = 0; k < boxcarRange; k++ )
+            for( k = 0; k < boxcarRange; k++ )  /*加载左右各boxcar个点到内存*/
             {
-                smoothed[k] = procSpectrum[k];
+                smoothed[k] = procSpectrum[k];  // bocar = 1 加载了012
             }
-
-            for (i = boxcar; i <= boxcarLimit; i++)
+            k = 0;
+            for (i = boxcar; i <= boxcarLimit; i++) //i = 1
             {
                 sum = 0;
-                for(j = 0; j < boxcarRange; j++)
+                for(j = 0; j < boxcarRange; j++)    /* 将左右各boxcar个点累加 */
                 {
                     sum += smoothed[j];
                 }
                 procSpectrum[i] = sum / boxcarRange;
               
                 /* 加载下一个点到缓冲区 循环*/
+                smoothed[k] = procSpectrum[i+boxcar+1];  //k = 0 i = 1 box = 1;
+                
                 if(k >= boxcarRange)
                     k = 0;
                 else
                     k++;
-                
-                smoothed[k] = procSpectrum[i+boxcar];     
             }
         }  
+        #endif
+        
         USB4000_EvnetHandle(USB4000_Handle);
           
 
