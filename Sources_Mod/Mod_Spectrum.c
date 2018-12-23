@@ -461,15 +461,19 @@ void Mod_GasMeasurePoll(GasMeasure_t* pst_Meas)
 
         if(pst_Meas->pst_Gas1 != NULL)
         {
+            FP64 f;
             pst_Meas->pst_Gas1->lf_PeakHight = Mod_GasMeasureGetPeakHight(pst_Meas->plf_DiffSpectrum, pst_Meas->pst_Gas1);
-            pst_Meas->pst_Gas1->lf_Concentration = s_fx(pst_Meas->pst_Gas1->af_NiheCoeff,pst_Meas->pst_Gas1->uch_NiheOrder,
-                                                       (FP32)pst_Meas->pst_Gas1->lf_PeakHight);
+            f = s_fx(pst_Meas->pst_Gas1->af_NiheCoeff,pst_Meas->pst_Gas1->uch_NiheOrder,(FP32)pst_Meas->pst_Gas1->lf_PeakHight);
+            f = (f < 0) ? 0:f;
+            pst_Meas->pst_Gas1->lf_Concentration = f;
         }
         if(pst_Meas->pst_Gas2 != NULL)
         {
+            FP64 f;
             pst_Meas->pst_Gas2->lf_PeakHight = Mod_GasMeasureGetPeakHight(pst_Meas->plf_DiffSpectrum, pst_Meas->pst_Gas2);
-            pst_Meas->pst_Gas2->lf_Concentration = s_fx(pst_Meas->pst_Gas2->af_NiheCoeff,pst_Meas->pst_Gas2->uch_NiheOrder,
-                                                       (FP32)pst_Meas->pst_Gas2->lf_PeakHight);
+            f = s_fx(pst_Meas->pst_Gas2->af_NiheCoeff,pst_Meas->pst_Gas2->uch_NiheOrder,(FP32)pst_Meas->pst_Gas2->lf_PeakHight);
+            f = (f < 0) ? 0:f;
+            pst_Meas->pst_Gas2->lf_Concentration = f;
         }
 
         /* ¸üÐÂ±³¾°¹âÆ× */
@@ -497,12 +501,15 @@ void Mod_GasMeasurePoll(GasMeasure_t* pst_Meas)
             pst_Meas->pst_Gas1->lf_PeakHight = Mod_GasMeasureGetPeakHight(pst_Meas->plf_DiffSpectrum, pst_Meas->pst_Gas1);
             pst_Meas->pst_Gas1->lf_Concentration = s_fx(pst_Meas->pst_Gas1->af_NiheCoeff,pst_Meas->pst_Gas1->uch_NiheOrder,
                                                        (FP32)pst_Meas->pst_Gas1->lf_PeakHight);
+            Mod_MeasureGasNOReply(pst_Meas->pst_Gas1->lf_Concentration);
+
         }
         if(pst_Meas->pst_Gas2 != NULL)
         {
             pst_Meas->pst_Gas2->lf_PeakHight = Mod_GasMeasureGetPeakHight(pst_Meas->plf_DiffSpectrum, pst_Meas->pst_Gas2);
             pst_Meas->pst_Gas2->lf_Concentration = s_fx(pst_Meas->pst_Gas2->af_NiheCoeff,pst_Meas->pst_Gas2->uch_NiheOrder,
                                                        (FP32)pst_Meas->pst_Gas2->lf_PeakHight);
+            Mod_MeasureGasHCReply(pst_Meas->pst_Gas2->lf_Concentration);
         }
 
         break;
@@ -690,4 +697,14 @@ void USB4000_EvnetHandle(USB4000_HandleTypeDef *USB4000_Handle)
                  sizeof(USB4000_Handle),
                  OS_OPT_POST_FIFO,
                  &os_err);
+}
+
+__weak void Mod_MeasureGasHCReply(FP64 lf_Concentration)
+{
+
+}
+
+__weak void Mod_MeasureGasNOReply(FP64 lf_Concentration)
+{
+
 }
