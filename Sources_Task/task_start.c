@@ -97,8 +97,8 @@ void Task_Start (void *p_arg)
 
     while (DEF_TRUE) {                                          /* Task body, always written as an infinite loop.       */
 
-        OSTimeDlyHMSM(0u, 0u, 1u, 0u,
-                      OS_OPT_TIME_HMSM_STRICT | OS_OPT_TIME_PERIODIC,/* 周期模式 */
+        OSTimeDlyHMSM(0u, 0u, 3u, 0u,
+                      OS_OPT_TIME_HMSM_STRICT,
                       &os_err);   
         TRACE_DBG(">>DBG:   CPU使用率:%f%\r\n",OSStatTaskCPUUsage/100.0);
         

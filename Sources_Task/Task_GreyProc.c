@@ -13,8 +13,17 @@
 
 void Task_GreyProc(void  *p_arg)
 {
+    OS_ERR  os_err;
+    
     while(TRUE)
     {
+        //INT8U i = 0;
+
+        //每100Ms测试一次灰度  1S 10个结果
+        OSTimeDlyHMSM(0u, 0u, 0u, 200,
+              OS_OPT_TIME_HMSM_STRICT | OS_OPT_TIME_PERIODIC,/* 周期模式 */
+              &os_err);
+        
         Mod_GreyPoll(&st_Grey);
     }
 }

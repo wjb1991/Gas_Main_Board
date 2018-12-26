@@ -23,17 +23,8 @@ typedef struct {
 }MeasureResult_t;
 
 
-typedef enum {
-    e_MeasureIdle = 0,
-    e_MeasureWait,
-    e_MeasureDead,
-    e_MeasureSample,
-    e_MeasureCal,
-    e_MeasureTimeOut,   
-}MeasureState_e;
-
 typedef struct {
-    MeasureState_e  e_State;        /* 测试状态 */
+
     INT32U  ul_DeadTime;            /* 死区时间 */
     INT32U  ul_MesureTime;          /* 测试时间 */
     

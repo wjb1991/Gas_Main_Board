@@ -56,7 +56,7 @@
 #define  TASK_GASPROC_STK_SIZE          512u
 #define  TASK_GREYPROC_STK_SIZE         512u
 #define  TASK_LASER_STK_SIZE            512u
-#define  TASK_MEASSPEED_STK_SIZE        1024u
+#define  TASK_MEASSPEED_STK_SIZE        512u
 
 #define  TASK_MEASURE_STK_SIZE          512u
 #define  TASK_DISBOARD_STK_SIZE         256u

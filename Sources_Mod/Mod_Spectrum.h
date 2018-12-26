@@ -103,9 +103,4 @@ void Mod_GasMeasurePoll(GasMeasure_t* pst_Meas);
 
 BOOL Mod_GasMarkWorkLine(GasMeasure_t* pst_Meas,GasMeasureState_e e_Ops);
 
-__weak void Mod_MeasureGasHCReply(FP64 lf_Concentration);
-
-__weak void Mod_MeasureGasNOReply(FP64 lf_Concentration);
-
-
 #endif
