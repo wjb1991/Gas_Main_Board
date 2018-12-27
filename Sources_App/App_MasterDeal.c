@@ -671,8 +671,7 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
             }
             res = TRUE;
         }
-        break;  
-
+        break;      
 //==================================================================================
 //                                   继电器IO控制
 //==================================================================================
@@ -696,7 +695,173 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
             }
         }
         break;
+//==================================================================================
+//                                   设置死区时间
+//==================================================================================
+    case 0xA0:
+        if(pst_Fram->uch_SubCmd == e_StdbusWriteCmd)
+        {
+            if(pst_Fram->uin_PayLoadLenth == 4)
+            {
+                st_Measure.ul_DeadTime = Bsp_CnvArrToINT32U(&pst_Fram->puc_PayLoad[0],FALSE);
+                res = TRUE;     //应答
+            }
+        }
+        else if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
+        {
+            if(pst_Fram->uin_PayLoadLenth == 0)
+            {
+                Bsp_CnvINT32UToArr(&pst_Fram->puc_PayLoad[0],st_Measure.ul_DeadTime,FALSE);
+                pst_Fram->uin_PayLoadLenth = 4;
+                res = TRUE;     //应答
+            }
+        }
+        break;  
+//==================================================================================
+//                                   设置测量时间
+//==================================================================================  
+    case 0xA1:
+        if(pst_Fram->uch_SubCmd == e_StdbusWriteCmd)
+        {
+            if(pst_Fram->uin_PayLoadLenth == 4)
+            {
+                st_Measure.ul_MesureTime = Bsp_CnvArrToINT32U(&pst_Fram->puc_PayLoad[0],FALSE);
+                res = TRUE;     //应答
+            }
+        }
+        else if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
+        {
+            if(pst_Fram->uin_PayLoadLenth == 0)
+            {
+                Bsp_CnvINT32UToArr(&pst_Fram->puc_PayLoad[0],st_Measure.ul_MesureTime,FALSE);
+                pst_Fram->uin_PayLoadLenth = 4;
+                res = TRUE;     //应答
+            }
+        }
+        break;  
+//==================================================================================
+//                                  读取CO2采样点
+//==================================================================================
+	case 0xA2:
+		if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
+		{
+			if(pst_Fram->uin_PayLoadLenth == 0)
+			{
+				//读取第一页返回数组长度
+				int i = 0;
 
+				Bsp_CnvINT16UToArr(&pst_Fram->puc_PayLoad[0],st_Measure.st_SampleCO2.ul_Len,FALSE);
+
+				for(i = 0; i < st_Measure.st_SampleCO2.ul_Len; i++)
+				{
+					Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[2+i*4],st_Measure.st_SampleCO2.af_Buff[i],FALSE);
+				}
+
+				pst_Fram->uin_PayLoadLenth = 2 + i * 4;
+
+				res = 1;    //应答
+			}
+		}
+		break;
+//==================================================================================
+//                                  读取CO采样点
+//==================================================================================
+	case 0xA3:
+		if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
+		{
+			if(pst_Fram->uin_PayLoadLenth == 0)
+			{
+				//读取第一页返回数组长度
+				int i = 0;
+
+				Bsp_CnvINT16UToArr(&pst_Fram->puc_PayLoad[0],st_Measure.st_SampleCO.ul_Len,FALSE);
+
+				for(i = 0; i < st_Measure.st_SampleCO2.ul_Len; i++)
+				{
+					Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[2+i*4],st_Measure.st_SampleCO.af_Buff[i],FALSE);
+				}
+
+				pst_Fram->uin_PayLoadLenth = 2 + i * 4;
+
+				res = 1;    //应答
+			}
+		}
+		break;
+//==================================================================================
+//                                  读取NO采样点
+//==================================================================================
+	case 0xA4:
+		if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
+		{
+			if(pst_Fram->uin_PayLoadLenth == 0)
+			{
+				//读取第一页返回数组长度
+				int i = 0;
+
+				Bsp_CnvINT16UToArr(&pst_Fram->puc_PayLoad[0],st_Measure.st_SampleNO.ul_Len,FALSE);
+
+				for(i = 0; i < st_Measure.st_SampleCO2.ul_Len; i++)
+				{
+					Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[2+i*4],st_Measure.st_SampleNO.af_Buff[i],FALSE);
+				}
+
+				pst_Fram->uin_PayLoadLenth = 2 + i * 4;
+
+				res = 1;    //应答
+			}
+		}
+		break;
+//==================================================================================
+//                                  读取HC采样点
+//==================================================================================
+	case 0xA5:
+		if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
+		{
+			if(pst_Fram->uin_PayLoadLenth == 0)
+			{
+				//读取第一页返回数组长度
+				int i = 0;
+
+				Bsp_CnvINT16UToArr(&pst_Fram->puc_PayLoad[0],st_Measure.st_SampleHC.ul_Len,FALSE);
+
+				for(i = 0; i < st_Measure.st_SampleCO2.ul_Len; i++)
+				{
+					Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[2+i*4],st_Measure.st_SampleHC.af_Buff[i],FALSE);
+				}
+
+				pst_Fram->uin_PayLoadLenth = 2 + i * 4;
+
+				res = 1;    //应答
+			}
+		}
+		break;
+//==================================================================================
+//                                  读取烟度采样点
+//==================================================================================
+	case 0xA6:
+		if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
+		{
+			if(pst_Fram->uin_PayLoadLenth == 1)
+			{
+				//读取第一页返回数组长度
+				int i = 0;
+                int index = pst_Fram->puc_PayLoad[0];
+				Bsp_CnvINT16UToArr(&pst_Fram->puc_PayLoad[1],st_Measure.st_SampleGrey[index].ul_Len,FALSE);
+
+				for(i = 0; i < st_Measure.st_SampleGrey[index].ul_Len; i++)
+				{
+					Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[2+i*4],st_Measure.st_SampleGrey[index].af_Buff[i],FALSE);
+				}
+
+				pst_Fram->uin_PayLoadLenth = 2 + i * 4;
+
+				res = 1;    //应答
+			}
+		}
+		break;
+        
+        
+        
     default:
         break;
 

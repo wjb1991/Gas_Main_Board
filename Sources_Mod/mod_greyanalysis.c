@@ -25,7 +25,7 @@ typedef struct __GreenCalibPoint {
 */
 
 
-#define     DEF_GREY_DBG_EN           TRUE
+#define     DEF_GREY_DBG_EN           FALSE
 
 #if (DEF_GREY_DBG_EN == TRUE)
     #define GREY_DBG(...)            do {                                \
@@ -104,7 +104,10 @@ void Mod_GreyCalculate(GreyChannel_t* pst_Channel)
     t = exp(t);                         //t = 1 - N/100
 
     n = (1-t)*100;
-
+    
+    n = (n < 0) ? 0:n;
+    n = (n > 100) ? 100:n;
+    
     pst_Channel->f_Grey = n;
 }
 
@@ -112,10 +115,14 @@ void Mod_GreyProc(GreyChannel_t* pst_Channel)
 {
     GreyAnalysis_t* pst_Manage = pst_Channel->pv_Manage;
     FP32 f;
+    
     switch (pst_Manage->e_Status)
     {
         case e_GreyIdle:
             /* 空闲时不停更新背景电压 */
+          
+            GREY_DBG(">>GREY DBG:   e_GreyIdle\r\n");
+          
             f = pst_Channel->f_Volt / pst_Channel->f_AbsTransVolt * 100;  //更新当前单路的透过率
             pst_Channel->f_Trans = (f > 100) ? 100:f;
 
@@ -128,14 +135,21 @@ void Mod_GreyProc(GreyChannel_t* pst_Channel)
             break;
         case e_GreyWait:
             /* 就绪状态 车辆进入时 不更新背景电压 */
+          
+            GREY_DBG(">>GREY DBG:   e_GreyWait\r\n");
+            
             f = pst_Channel->f_Volt / pst_Channel->f_AbsTransVolt * 100;  //更新当前单路的透过率
             pst_Channel->f_Trans = (f > 100) ? 100:f;
             break;
         case e_GreyMeas:
             /* 测量时使用测量的电压和背景电压做计算 */
+          
+            GREY_DBG(">>GREY DBG:  ch = %d",pst_Channel->uch_Num);
+            
             if(pst_Channel->f_Trans >= pst_Manage->f_TransThreshold)      //透过率大于10%时才计算灰度
             {
-                Mod_GreyCalculate(pst_Channel);                          //计算灰度
+                Mod_GreyCalculate(pst_Channel);                           //计算灰度
+                Mod_GreyMeasureNotification(pst_Channel->uch_Num,pst_Channel->f_Grey);
             }
             break;
         case e_GreyCalib:
@@ -152,6 +166,14 @@ void Mod_GreyProc(GreyChannel_t* pst_Channel)
 void Mod_GreyPoll(GreyAnalysis_t* pst_Grye)
 {
     INT8U   i;
+    OS_ERR os_err;
+    
+    //每100Ms测试一次灰度  1S 10个结果
+    OSTimeDlyHMSM(0u, 0u, 0u, 100,
+          OS_OPT_TIME_HMSM_STRICT | OS_OPT_TIME_PERIODIC,/* 周期模式 */
+          &os_err);
+    
+    
     /* 采样10个通道的AD电压值 */
     for( i = 0; i < pst_Grye->uch_ChannelNum ; i++)
     {
@@ -212,3 +234,8 @@ void Mod_GreyGotoWait(GreyAnalysis_t* pst_Grye)
     pst_Grye->e_Status = e_GreyWait;
 }
 
+
+__weak void Mod_GreyMeasureNotification(INT8U uch_Channel, FP32 f_Grey)
+{
+    /* 通知灰度 */
+}

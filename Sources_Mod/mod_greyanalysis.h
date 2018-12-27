@@ -57,4 +57,6 @@ void Mod_GreyGotoIdle(GreyAnalysis_t* pst_Grye);
 
 void Mod_GreyGotoWait(GreyAnalysis_t* pst_Grye);
 
+__weak void Mod_GreyMeasureNotification(INT8U uch_Channel, FP32 f_Grey);
+
 #endif

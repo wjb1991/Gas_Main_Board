@@ -21,5 +21,10 @@ extern LaserBoard_t st_Laser;
 
 void Mod_LaserPoll(void);
 
+__weak void Mod_LaserReply(LaserBoard_t* pst_Laser);
+
+__weak void Mod_LaserCO2Notification(FP32 f_Concentration);
+
+__weak void Mod_LaserCONotification(FP32 f_Concentration);
 
 #endif
