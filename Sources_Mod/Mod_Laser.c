@@ -110,11 +110,42 @@ BOOL Mod_MeasLaserDealFram(StdbusFram_t* pst_Fram)
         {
 
         }
-        break;     
+        break;    
+        
+    case 0xA6:
+        if(pst_Fram->uch_SubCmd == e_StdbusReadAck)
+        {
+            //读命令
+            // 0-1测试点点数 2-x 浓度数据
+            INT16U  len =  Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[0],FALSE);
+          
+            if( pst_Fram->uin_PayLoadLenth == 8)
+            {
+                FP64 f;
+                f = Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[0],FALSE);
+                st_Measure.lf_CO2 = f * 1000000;
+                f = Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[4],FALSE);
+                st_Measure.lf_CO = f * 1000000;
+                Mod_LaserReply(&st_Laser);
+            }
+        }
+        else if(pst_Fram->uch_SubCmd == e_StdbusWriteAck)
+        {
+
+        }
+        break; 
+        
     }
     return FALSE;
 }
 
+BOOL Mod_LaserRequestGasAvg(LaserBoard_t* pst_Laser)
+{
+    if (pst_Laser == NULL)
+        return FALSE;
+    Mod_StdbusReadCmd(&st_LaserBoard,0xA6,NULL,0);
+    return TRUE;
+}
 
 BOOL Mod_LaserRequestCO2Reaule(LaserBoard_t* pst_Laser)
 {

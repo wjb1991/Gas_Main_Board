@@ -143,6 +143,31 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
         }
         break;
 
+//==================================================================================
+//                            切换动态静态测量模式
+//==================================================================================
+	case 0x18:
+		if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
+		{
+
+		}
+		else if(pst_Fram->uch_SubCmd == e_StdbusWriteCmd)
+        {
+            if(pst_Fram->uin_PayLoadLenth == 1)
+            {
+				if(pst_Fram->puc_PayLoad[0] == 0)
+				{
+					Mod_MeasureDoStaticMeasure(&st_Measure);
+				}
+				else
+				{
+					Mod_MeasureDoDynamicMeasure(&st_Measure);
+				}
+				res = 1;    //应答
+            }
+        }
+
+		break;
 
 //==================================================================================
 //                          修改一个标定点/读取一个标定点
@@ -704,6 +729,7 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
             if(pst_Fram->uin_PayLoadLenth == 4)
             {
                 st_Measure.ul_DeadTime = Bsp_CnvArrToINT32U(&pst_Fram->puc_PayLoad[0],FALSE);
+                SaveToEeprom((INT32U)(&st_Measure.ul_DeadTime));
                 res = TRUE;     //应答
             }
         }
@@ -726,6 +752,7 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
             if(pst_Fram->uin_PayLoadLenth == 4)
             {
                 st_Measure.ul_MesureTime = Bsp_CnvArrToINT32U(&pst_Fram->puc_PayLoad[0],FALSE);
+                SaveToEeprom((INT32U)(&st_Measure.ul_MesureTime));
                 res = TRUE;     //应答
             }
         }
@@ -740,7 +767,7 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
         }
         break;  
 //==================================================================================
-//                                  读取CO2采样点
+//                                  读取NO采样点
 //==================================================================================
 	case 0xA2:
 		if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
@@ -750,57 +777,9 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
 				//读取第一页返回数组长度
 				int i = 0;
 
-				Bsp_CnvINT16UToArr(&pst_Fram->puc_PayLoad[0],st_Measure.st_SampleCO2.ul_Len,FALSE);
-
-				for(i = 0; i < st_Measure.st_SampleCO2.ul_Len; i++)
-				{
-					Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[2+i*4],st_Measure.st_SampleCO2.af_Buff[i],FALSE);
-				}
-
-				pst_Fram->uin_PayLoadLenth = 2 + i * 4;
-
-				res = 1;    //应答
-			}
-		}
-		break;
-//==================================================================================
-//                                  读取CO采样点
-//==================================================================================
-	case 0xA3:
-		if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
-		{
-			if(pst_Fram->uin_PayLoadLenth == 0)
-			{
-				//读取第一页返回数组长度
-				int i = 0;
-
-				Bsp_CnvINT16UToArr(&pst_Fram->puc_PayLoad[0],st_Measure.st_SampleCO.ul_Len,FALSE);
-
-				for(i = 0; i < st_Measure.st_SampleCO2.ul_Len; i++)
-				{
-					Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[2+i*4],st_Measure.st_SampleCO.af_Buff[i],FALSE);
-				}
-
-				pst_Fram->uin_PayLoadLenth = 2 + i * 4;
-
-				res = 1;    //应答
-			}
-		}
-		break;
-//==================================================================================
-//                                  读取NO采样点
-//==================================================================================
-	case 0xA4:
-		if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
-		{
-			if(pst_Fram->uin_PayLoadLenth == 0)
-			{
-				//读取第一页返回数组长度
-				int i = 0;
-
 				Bsp_CnvINT16UToArr(&pst_Fram->puc_PayLoad[0],st_Measure.st_SampleNO.ul_Len,FALSE);
 
-				for(i = 0; i < st_Measure.st_SampleCO2.ul_Len; i++)
+				for(i = 0; i < st_Measure.st_SampleNO.ul_Len; i++)
 				{
 					Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[2+i*4],st_Measure.st_SampleNO.af_Buff[i],FALSE);
 				}
@@ -814,7 +793,7 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
 //==================================================================================
 //                                  读取HC采样点
 //==================================================================================
-	case 0xA5:
+	case 0xA3:
 		if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
 		{
 			if(pst_Fram->uin_PayLoadLenth == 0)
@@ -824,7 +803,7 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
 
 				Bsp_CnvINT16UToArr(&pst_Fram->puc_PayLoad[0],st_Measure.st_SampleHC.ul_Len,FALSE);
 
-				for(i = 0; i < st_Measure.st_SampleCO2.ul_Len; i++)
+				for(i = 0; i < st_Measure.st_SampleHC.ul_Len; i++)
 				{
 					Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[2+i*4],st_Measure.st_SampleHC.af_Buff[i],FALSE);
 				}
@@ -835,10 +814,72 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
 			}
 		}
 		break;
+
+//==================================================================================
+//                                   设置无效点数N1
+//==================================================================================
+	case 0xA4:
+		if(pst_Fram->uch_SubCmd == e_StdbusWriteCmd)
+		{
+			if(pst_Fram->uin_PayLoadLenth == 2)
+			{
+				st_Measure.uin_InvalidDots = Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[0],FALSE);
+                SaveToEeprom((INT32U)(&st_Measure.uin_InvalidDots));
+				res = TRUE;     //应答
+			}
+		}
+		else if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
+		{
+			if(pst_Fram->uin_PayLoadLenth == 0)
+			{
+				Bsp_CnvINT16UToArr(&pst_Fram->puc_PayLoad[0],st_Measure.uin_InvalidDots,FALSE);
+				pst_Fram->uin_PayLoadLenth = 2;
+				res = TRUE;     //应答
+			}
+		}
+		break;
+//==================================================================================
+//                                   设置有效点数N2
+//==================================================================================
+	case 0xA5:
+		if(pst_Fram->uch_SubCmd == e_StdbusWriteCmd)
+		{
+			if(pst_Fram->uin_PayLoadLenth == 2)
+			{
+				st_Measure.uin_ActiveDots = Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[0],FALSE);
+                SaveToEeprom((INT32U)(&st_Measure.uin_ActiveDots));
+				res = TRUE;     //应答
+			}
+		}
+		else if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
+		{
+			if(pst_Fram->uin_PayLoadLenth == 0)
+			{
+				Bsp_CnvINT16UToArr(&pst_Fram->puc_PayLoad[0],st_Measure.uin_ActiveDots,FALSE);
+				pst_Fram->uin_PayLoadLenth = 2;
+				res = TRUE;     //应答
+			}
+		}
+		break;
+//==================================================================================
+//                                  读取平均的浓度
+//==================================================================================
+	case 0xA6:
+		if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
+		{
+			if(pst_Fram->uin_PayLoadLenth ==0)
+			{
+				pst_Fram->uin_PayLoadLenth = 8;
+				Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[0],(FP32)st_Measure.lf_NO,FALSE);
+				Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[4],(FP32)st_Measure.lf_HC,FALSE);
+				res = 1;    //应答
+			}
+		}
+		break;
 //==================================================================================
 //                                  读取烟度采样点
 //==================================================================================
-	case 0xA6:
+	case 0xAA:
 		if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
 		{
 			if(pst_Fram->uin_PayLoadLenth == 1)
@@ -858,9 +899,7 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
 				res = 1;    //应答
 			}
 		}
-		break;
-        
-        
+		break;     
         
     default:
         break;

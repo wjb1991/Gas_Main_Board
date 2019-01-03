@@ -39,7 +39,13 @@ START_ADD+0x7600 + 0x10, (uint32_t)(&USB4000.ul_SetIntegralTime),   KIND_INT32U,
 
 START_ADD+0x7600 + 0x20, (uint32_t)(&st_GasMeasure.b_SaveAbsSpecetrum),   KIND_INT8U,  1,     LIMIT_RANGE,       0,      1,    1,       
 START_ADD+0x7600 + 0x24, (uint32_t)(&st_GasMeasure.f_TransK),              KIND_FP32,  1,     LIMIT_NULL,        0,      1,    1,            
-           
+ 
+START_ADD+0x7600 + 0x30, (uint32_t)(&st_Measure.ul_DeadTime),       KIND_INT32U,  1,     LIMIT_RANGE,        0,      10000,    10,       
+START_ADD+0x7600 + 0x34, (uint32_t)(&st_Measure.ul_MesureTime),     KIND_INT32U,  1,     LIMIT_RANGE,        0,      10000,    1000, 
+START_ADD+0x7600 + 0x38, (uint32_t)(&st_Measure.uin_InvalidDots),   KIND_INT16U,  1,     LIMIT_RANGE,        0,      DEF_SAMPLE_DOT_MAX,    0,       
+START_ADD+0x7600 + 0x3c, (uint32_t)(&st_Measure.uin_ActiveDots),    KIND_INT16U,  1,     LIMIT_RANGE,        0,      DEF_SAMPLE_DOT_MAX,    DEF_SAMPLE_DOT_MAX, 
+
+
 START_ADD+0x7800 + 0x00, (uint32_t)(&ast_GreyChannle[0].f_AbsTransVolt),   KIND_FP32,  1,     LIMIT_RANGE,       0.0,      4.1f,    4.1f,
 START_ADD+0x7800 + 0x04, (uint32_t)(&ast_GreyChannle[1].f_AbsTransVolt),   KIND_FP32,  1,     LIMIT_RANGE,       0.0,      4.1f,    4.1f,
 START_ADD+0x7800 + 0x08, (uint32_t)(&ast_GreyChannle[2].f_AbsTransVolt),   KIND_FP32,  1,     LIMIT_RANGE,       0.0,      4.1f,    4.1f,
