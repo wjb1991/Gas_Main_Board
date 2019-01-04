@@ -95,7 +95,7 @@ USB4000_HandleTypeDef   USB4000 = {
     FALSE,//          b_IsConnect;
     FALSE,//          b_HighSpeed;  
 };
-    
+
 //==================================================================================
 //| 函数名称 | USBH_USB4000_InterfaceInit
 //|----------|----------------------------------------------------------------------
@@ -296,6 +296,8 @@ static USBH_StatusTypeDef USBH_USB4000_Process (USBH_HandleTypeDef *phost)
     USB4000_HandleTypeDef *USB4000_Handle =  (USB4000_HandleTypeDef *) phost->pActiveClass->pData; 
     uint16_t i = 0;
     
+    OSTaskQFlush(&TaskUsbHostTCB,&os_err);  /*看情况*/
+    
     /* 读取信息 F4正常 F7读取后会一直收到 端点0来的控制信息 会影响速度 F7需要重新枚举 */
     if(USB4000_Handle->b_Open != TRUE )
     {
@@ -305,9 +307,13 @@ static USBH_StatusTypeDef USBH_USB4000_Process (USBH_HandleTypeDef *phost)
         
         USBH_ReEnumerate(phost);
         
-        USB4000_Handle->b_Open = TRUE;    
+        USB4000_Handle->b_Open = TRUE;  
+        
+        return USBH_OK;
     }
 
+    USBH_TimeOutStop();
+        
     /* 设置积分时间 */
     USBH_USB4000_SetIntegralTime(phost,USB4000_Handle->ul_SetIntegralTime);
     

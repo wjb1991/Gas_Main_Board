@@ -266,5 +266,5 @@ void  App_OS_TaskSwHook (void)
 
 void  App_OS_TimeTickHook (void)
 {
-
+    Bsp_TimerPoll();
 }

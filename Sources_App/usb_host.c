@@ -93,7 +93,35 @@ static void USBH_UserProcess(USBH_HandleTypeDef *phost, uint8_t id);
  * -- Insert your external function declaration here --
  */
 /* USER CODE BEGIN 1 */
+static void USBH_TimeOutIrq (void* pv_Timer);
+static SoftTimer_t  UsbConnectTimer = {
+    TRUE,                       //单次模式
+    10000,                      //第一次的定时时间    
+    0,                          //周期定时时间
+    USBH_TimeOutIrq,            //回调函数
 
+};
+                             
+void USBH_TimeOutIrq (void* pv_Timer)
+{
+    USBH_ReEnumerate(&hUsbHostFS);
+}
+
+
+void USBH_TimeOutStart(void)
+{
+    Bsp_TimerStart(&UsbConnectTimer);
+}
+
+void USBH_TimeOutStop(void)
+{
+    Bsp_TimerStop(&UsbConnectTimer);
+}
+
+void USBH_TimeOutInit(void)
+{
+    Bsp_TimerReg(&UsbConnectTimer);
+}
 /* USER CODE END 1 */
 
 /**
@@ -108,7 +136,7 @@ void USB_HOST_Init(void)
   
   /* Init host Library, add supported class and start the library. */
   USBH_Init(&hUsbHostFS, USBH_UserProcess, HOST_FS);
-
+  USBH_TimeOutInit();
 //  USBH_RegisterClass(&hUsbHostFS, USBH_AUDIO_CLASS);
 
 //  USBH_RegisterClass(&hUsbHostFS, USBH_CDC_CLASS);
@@ -122,6 +150,7 @@ void USB_HOST_Init(void)
   USBH_RegisterClass(&hUsbHostFS, USBH_USB4000_CLASS);
     
   USBH_Start(&hUsbHostFS);
+  
 
   /* USER CODE BEGIN USB_HOST_Init_PostTreatment */
   
@@ -136,6 +165,9 @@ void USB_HOST_Process(void)
   /* USB Host Background task */
   USBH_Process(&hUsbHostFS);
 }
+
+
+
 /*
  * user callback definition
  */
@@ -159,6 +191,7 @@ static void USBH_UserProcess  (USBH_HandleTypeDef *phost, uint8_t id)
         printf("HOST_USER_CONNECTION\r\n");
         HAL_Delay(4000);
         Appli_state = APPLICATION_START;
+        USBH_TimeOutStart();
         break;
 
     default:
