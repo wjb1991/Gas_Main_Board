@@ -643,17 +643,29 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
             {
                 FP64 f1,f2;
 
-                if(pst_Fram->puc_PayLoad[0] == 1)
-                {
-                    TRACE_DBG(">>DBG>>      接收到标定命令\n\r");
+                TRACE_DBG(">>DBG>>      接收到标定命令\n\r");
 
-                    f1 = Bsp_CnvArrToFP64(&pst_Fram->puc_PayLoad[1],FALSE);
-                    f2 = Bsp_CnvArrToFP64(&pst_Fram->puc_PayLoad[9],FALSE);
-                    Mod_GasMeasureGotoCalib(&st_GasMeasure,
+                f1 = Bsp_CnvArrToFP64(&pst_Fram->puc_PayLoad[1],FALSE);
+                f2 = Bsp_CnvArrToFP64(&pst_Fram->puc_PayLoad[9],FALSE);
+                
+                if(pst_Fram->puc_PayLoad[0] == eGasCalibGas1 || pst_Fram->puc_PayLoad[0] == eGasCalibGas2 ||
+                   pst_Fram->puc_PayLoad[0] == eGasCalibAll)
+                {
+                     Mod_GasMeasureGotoCalib(&st_GasMeasure,
                                             ((GasMeasureState_e)pst_Fram->puc_PayLoad[0]),
                                             f1,f2);
-                    res = TRUE;    //应答
+                     res = TRUE;    //应答
                 }
+
+                if(pst_Fram->puc_PayLoad[0] == eGasCalibCorrectionGas1 || pst_Fram->puc_PayLoad[0] == eGasCalibCorrectionGas2 ||
+                   pst_Fram->puc_PayLoad[0] == eGasCalibCorrectionGasAll)
+                {
+                     Mod_GasMeasureGotoCalibCorrection(&st_GasMeasure,
+                                            ((GasMeasureState_e)pst_Fram->puc_PayLoad[0]),
+                                            f1,f2);
+                     res = TRUE;    //应答
+                }
+
             }
 
         }

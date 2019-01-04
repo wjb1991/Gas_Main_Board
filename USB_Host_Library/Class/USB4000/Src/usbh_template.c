@@ -339,9 +339,9 @@ static USBH_StatusTypeDef USBH_USB4000_Process (USBH_HandleTypeDef *phost)
         uint32_t delay_time = USB4000_Handle->ul_IntegralTime / 1000;
         
         /* 读取光谱需要20ms左右 最快50ms获取一张光谱 其余的20+ms 留作其他任务 */
-        if(delay_time < 100)
+        if(delay_time < 50)
         {
-            delay_time = 100;
+            delay_time = 50;
         }
         
         OSTimeDlyHMSM(0u, 0u, 0u, delay_time,

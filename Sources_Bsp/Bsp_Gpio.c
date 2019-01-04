@@ -36,10 +36,8 @@ GpioConfig_t ast_GpioConfig[] = {
     {e_IO_245OE,         "74HC245 OE",  FALSE,   FALSE,   GPIOF,  GPIO_PIN_11,    GPIO_MODE_OUTPUT_PP, GPIO_PULLUP,  GPIO_SPEED_HIGH},
     {e_IO_245DIR,        "74HC245 DIR", FALSE,   TRUE,    GPIOF,  GPIO_PIN_15,    GPIO_MODE_OUTPUT_PP, GPIO_PULLUP,  GPIO_SPEED_HIGH},
     {e_IO_Sync0,         "同步信号0",   FALSE,   FALSE,   GPIOF,  GPIO_PIN_12,    GPIO_MODE_IT_RISING_FALLING, GPIO_PULLUP,  GPIO_SPEED_HIGH},
-    {e_IO_Sync1,         "测量结束",   FALSE,   FALSE,   GPIOF,  GPIO_PIN_13,     GPIO_MODE_IT_RISING_FALLING, GPIO_PULLUP,  GPIO_SPEED_HIGH},
-    {e_IO_Sync2,         "测量开始",   FALSE,   FALSE,   GPIOF,  GPIO_PIN_14,     GPIO_MODE_IT_RISING_FALLING, GPIO_PULLUP,  GPIO_SPEED_HIGH},
-
-
+    {e_IO_Sync1,         "测量结束",    FALSE,   FALSE,   GPIOF,  GPIO_PIN_13,     GPIO_MODE_IT_RISING_FALLING, GPIO_PULLUP,  GPIO_SPEED_HIGH},
+    {e_IO_Sync2,         "测量开始",    FALSE,   FALSE,   GPIOF,  GPIO_PIN_14,     GPIO_MODE_IT_RISING_FALLING, GPIO_PULLUP,  GPIO_SPEED_HIGH},
 };
 
 static INT32U  ul_UsePinNum = sizeof(ast_GpioConfig)/sizeof(GpioConfig_t);     /*计算使用的引脚数*/

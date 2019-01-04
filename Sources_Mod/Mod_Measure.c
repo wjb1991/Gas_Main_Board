@@ -268,6 +268,17 @@ void Mod_MeasurePoll(Measure_t* pst_Meas)
         }while(PendSem(100) != TRUE);
         MEASURE_DBG(">>MEASURE DBG:   读取CO2CO平均浓度完成\r\n");
         
+        /* 将采样点从大到小排列 */
+        SortBuff(pst_Meas->st_SampleNO.af_Buff,pst_Meas->st_SampleNO.ul_Len);
+        SortBuff(pst_Meas->st_SampleHC.af_Buff,pst_Meas->st_SampleHC.ul_Len);
+        for(i = 0; i < 10; i++)
+        {
+            SortBuff(pst_Meas->st_SampleGrey[i].af_Buff, pst_Meas->st_SampleGrey[i].ul_Len);
+        }
+        
+        pst_Meas->lf_Grey = 0;
+        
+        
         /* 计算除去n1个最大值之后 剩余值中n2个有效值的平均值 */
         f = 0;
         if (pst_Meas->st_SampleNO.ul_Len > pst_Meas->uin_InvalidDots)
@@ -385,7 +396,7 @@ void Mod_MeasurePoll(Measure_t* pst_Meas)
         PostMsg((void*)e_MeasureStaticCal);
         break;
      case e_MeasureStaticCal:
-        MEASURE_DBG(">>MEASURE DBG:   动态计算\r\n");
+        MEASURE_DBG(">>MEASURE DBG:   静态计算\r\n");
         
         MEASURE_DBG(">>MEASURE DBG:   读取CO2CO平均浓度\r\n");
         

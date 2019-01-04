@@ -19,7 +19,10 @@ typedef enum {
     eGasAbsMeasure,         /* 绝对浓度测量 */
     eGasDiffMeasure,        /* 差分浓度测量 */
     eGasWait,               /* 等待测量 */
-    eGasCalibTrans,         /* 标定透过率 */    
+    eGasCalibTrans,         /* 标定透过率 */   
+    eGasCalibCorrectionGas1,/* 现场矫正 */
+    eGasCalibCorrectionGas2,/* 现场矫正 */
+    eGasCalibCorrectionGasAll,/* 现场矫正 */
 }GasMeasureState_e;
 
 typedef struct {
@@ -43,6 +46,7 @@ typedef struct {
 
     INT8U       uch_NiheOrder;                  /* 拟合阶数 */
     FP32        af_NiheCoeff[DEF_CALIB_NIHE_ORDER_MAX+1];                /* 拟合因子 */
+    FP32        f_Correction;                   /* 矫正因子 */
 
     FP64        lf_PeakHight;                   /* 吸收峰高度 */
     FP64        lf_Concentration;               /* 浓度 */
@@ -88,6 +92,8 @@ extern GasMeasure_t st_GasMeasure;
 BOOL Mod_GasMeasureGotoAdjZero(GasMeasure_t* pst_Meas);
 
 BOOL Mod_GasMeasureGotoCalib(GasMeasure_t* pst_Meas,GasMeasureState_e e_State,FP64 lf_GasCon1,FP64 lf_GasCon2);
+
+BOOL Mod_GasMeasureGotoCalibCorrection(GasMeasure_t* pst_Meas,GasMeasureState_e e_State,FP64 lf_GasCon1,FP64 lf_GasCon2);
 
 BOOL Mod_GasMeasureGotoDiffMeasure(GasMeasure_t* pst_Meas);
 
