@@ -1174,7 +1174,7 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
         HAL_GPIO_DeInit(GPIOA, GPIO_PIN_10);
 
         /* UART1 DMA DeInit */
-        HAL_DMA_DeInit(&hdma_uart1_tx);
+        //HAL_DMA_DeInit(&hdma_uart1_tx);
         HAL_DMA_DeInit(&hdma_uart1_rx);
 
         /*##-3- Disable the NVIC for UART ##########################################*/
@@ -1195,7 +1195,7 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
         HAL_GPIO_DeInit(GPIOD, GPIO_PIN_6);
 
         /* UART2 DMA DeInit */
-        HAL_DMA_DeInit(&hdma_uart2_tx);
+        //HAL_DMA_DeInit(&hdma_uart2_tx);
         HAL_DMA_DeInit(&hdma_uart2_rx);
 
         /*##-3- Disable the NVIC for UART ##########################################*/
@@ -1216,7 +1216,7 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
         HAL_GPIO_DeInit(GPIOB, GPIO_PIN_11);
 
         /* UART3 DMA DeInit */
-        HAL_DMA_DeInit(&hdma_uart3_tx);
+        //HAL_DMA_DeInit(&hdma_uart3_tx);
         HAL_DMA_DeInit(&hdma_uart3_rx);
 
         /*##-3- Disable the NVIC for UART ##########################################*/
@@ -1237,7 +1237,7 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
         HAL_GPIO_DeInit(GPIOA, GPIO_PIN_1);
 
         /* UART4 DMA DeInit */
-        HAL_DMA_DeInit(&hdma_uart4_tx);
+        //HAL_DMA_DeInit(&hdma_uart4_tx);
         HAL_DMA_DeInit(&hdma_uart4_rx);
 
         /*##-3- Disable the NVIC for UART ##########################################*/
@@ -1258,7 +1258,7 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
         HAL_GPIO_DeInit(GPIOA, GPIO_PIN_1);
 
         /* UART5 DMA DeInit */
-        HAL_DMA_DeInit(&hdma_uart5_tx);
+        //HAL_DMA_DeInit(&hdma_uart5_tx);
         HAL_DMA_DeInit(&hdma_uart5_rx);
 
         /*##-3- Disable the NVIC for UART ##########################################*/
@@ -1279,7 +1279,7 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
         HAL_GPIO_DeInit(GPIOC, GPIO_PIN_7);
 
         /* UART6 DMA DeInit */
-        HAL_DMA_DeInit(&hdma_uart6_tx);
+        //HAL_DMA_DeInit(&hdma_uart6_tx);
         HAL_DMA_DeInit(&hdma_uart6_rx);
 
         /*##-3- Disable the NVIC for UART ##########################################*/
