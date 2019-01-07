@@ -21,6 +21,8 @@ extern LaserBoard_t st_Laser;
 
 void Mod_LaserPoll(void);
 
+BOOL Mod_LaserRequestGasAvg(LaserBoard_t* pst_Laser);
+
 __weak void Mod_LaserReply(LaserBoard_t* pst_Laser);
 
 __weak void Mod_LaserCO2Notification(FP32 f_Concentration);

@@ -150,6 +150,38 @@ static void SortBuff(FP32* pf_Buff,INT16U uin_Len)
 	}
 }
 
+static FP64 WindowFilter(FP32* pf_Buff,INT16U uin_Use,INT16U uin_InvalidDots, INT16U uin_ActiveDots)
+{
+    INT16U  i;
+    FP64 f = 0;
+    FP32 af_Buff[DEF_SAMPLE_DOT_MAX] = {0};
+    
+    //memcpy(af_Buff,pf_Buff,sizeof(af_Buff[DEF_SAMPLE_DOT_MAX]));
+    
+    for(i = 0; i < DEF_SAMPLE_DOT_MAX; i++)
+    {
+        af_Buff[i] = pf_Buff[i];
+    }
+    
+    
+    SortBuff(af_Buff,uin_Use);
+    
+    /* 计算除去n1个最大值之后 剩余值中n2个有效值的平均值 */
+    if (uin_Use > uin_InvalidDots)
+    {
+        /* 总点数 大于无效点数 */
+        INT16U num = uin_Use - uin_InvalidDots;		//计算去掉N1个无效点后剩余的样品点数
+
+        if (num  > uin_ActiveDots)					//判断剩余点数是否大于N2个有效点数
+            num  = uin_ActiveDots;
+
+        for( i = 0; i <	num; i++)
+            f += af_Buff[uin_InvalidDots + i];	    //求和
+        f /= num;								    //算平均
+    }
+    return f;
+}
+
 void Mod_MeasureInit(Measure_t* pst_Meas)
 {
     InitSem();
@@ -172,9 +204,9 @@ void Mod_MeasureDoDynamicMeasure(Measure_t* pst_Meas)
 
 void Mod_MeasurePoll(Measure_t* pst_Meas)
 {
-    INT32U i;
+
     INT32U s,ms;
-    FP64    f;
+
     FP64 q0,q1,q2;
     FP64 fCO2,fCO,fHC,fNO;
     
@@ -268,6 +300,17 @@ void Mod_MeasurePoll(Measure_t* pst_Meas)
         }while(PendSem(100) != TRUE);
         MEASURE_DBG(">>MEASURE DBG:   读取CO2CO平均浓度完成\r\n");
         
+        pst_Meas->lf_NO = WindowFilter (pst_Meas->st_SampleNO.af_Buff,
+                                        pst_Meas->st_SampleNO.ul_Len,
+                                        pst_Meas->uin_InvalidDots,
+                                        pst_Meas->uin_ActiveDots);
+        
+        pst_Meas->lf_HC = WindowFilter (pst_Meas->st_SampleHC.af_Buff,
+                                        pst_Meas->st_SampleHC.ul_Len,
+                                        pst_Meas->uin_InvalidDots,
+                                        pst_Meas->uin_ActiveDots);
+        
+#if 0        
         /* 将采样点从大到小排列 */
         SortBuff(pst_Meas->st_SampleNO.af_Buff,pst_Meas->st_SampleNO.ul_Len);
         SortBuff(pst_Meas->st_SampleHC.af_Buff,pst_Meas->st_SampleHC.ul_Len);
@@ -307,7 +350,7 @@ void Mod_MeasurePoll(Measure_t* pst_Meas)
             	f += pst_Meas->st_SampleHC.af_Buff[pst_Meas->uin_InvalidDots + i];	    //求和
             pst_Meas->lf_HC = f / num;								                    //算平均
         }
-        
+#endif      
         /* 带入燃烧方程 反演实际浓度 */
         q0 = pst_Meas->lf_CO / pst_Meas->lf_CO2;
         q1 = pst_Meas->lf_HC / pst_Meas->lf_CO2;
@@ -317,9 +360,10 @@ void Mod_MeasurePoll(Measure_t* pst_Meas)
         fCO = fCO2 * q0;
         fHC = fCO2 * q1;
         fNO = fCO2 * q2;
+
         
-        
-        /*
+        /**/
+        INT16U i;
         MEASURE_DBG(">>MEASURE DBG:================================================\r\n");  
         MEASURE_DBG(">>MEASURE DBG:   NO->%d个采样点\r\n",pst_Meas->st_SampleNO.ul_Len);
         for(i = 0; i < pst_Meas->st_SampleNO.ul_Len; i++)
@@ -335,7 +379,8 @@ void Mod_MeasurePoll(Measure_t* pst_Meas)
             for(i = 0; i < pst_Meas->st_SampleGrey[j].ul_Len; i++)
                 MEASURE_DBG(">>MEASURE DBG:     Grey[%d][%d]: %f\r\n", j, i, pst_Meas->st_SampleGrey[j].af_Buff[i]);        
         }
-        */
+        
+
         
         MEASURE_DBG(">>MEASURE DBG:================================================\r\n"); 
         MEASURE_DBG(">>MEASURE DBG:   一次动态测量完成\r\n");
@@ -406,7 +451,17 @@ void Mod_MeasurePoll(Measure_t* pst_Meas)
         }while(PendSem(100) != TRUE);
         
         
+        pst_Meas->lf_NO = WindowFilter (pst_Meas->st_SampleNO.af_Buff,
+                                        pst_Meas->st_SampleNO.ul_Len,
+                                        pst_Meas->uin_InvalidDots,
+                                        pst_Meas->uin_ActiveDots);
         
+        pst_Meas->lf_HC = WindowFilter (pst_Meas->st_SampleHC.af_Buff,
+                                        pst_Meas->st_SampleHC.ul_Len,
+                                        pst_Meas->uin_InvalidDots,
+                                        pst_Meas->uin_ActiveDots);
+        
+#if 0
         /* 将采样点从大到小排列 */
         SortBuff(pst_Meas->st_SampleNO.af_Buff,pst_Meas->st_SampleNO.ul_Len);
         SortBuff(pst_Meas->st_SampleHC.af_Buff,pst_Meas->st_SampleHC.ul_Len);
@@ -446,6 +501,7 @@ void Mod_MeasurePoll(Measure_t* pst_Meas)
             	f += pst_Meas->st_SampleHC.af_Buff[pst_Meas->uin_InvalidDots + i];	    //求和
             pst_Meas->lf_HC = f / num;								                    //算平均
         }
+#endif
         
         /* 带入燃烧方程 反演实际浓度 */
 

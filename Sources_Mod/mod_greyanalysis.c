@@ -93,6 +93,13 @@ void Mod_GreySample(GreyChannel_t* pst_Grye)
 void Mod_GreyCalculate(GreyChannel_t* pst_Channel)
 {
     //¼ÆËã»Ò¶È
+    FP32 t =  pst_Channel->f_Volt / pst_Channel->f_BkVolt;    //  Fr/Fs
+    FP32 n = (1-t)*100;
+    
+    n = (n < 0) ? 0:n;
+    n = (n > 100) ? 100:n;
+    
+#if 0
     //Frecv = Fsend * e^-kL
     //-1/L * log(e)(Fr/Fs) = -2.303/L * log(e)(1- N/100)
     //log(e)(Fr/Fs) = 2.303 * log(e)(1- N/100)
@@ -104,11 +111,13 @@ void Mod_GreyCalculate(GreyChannel_t* pst_Channel)
     t = exp(t);                         //t = 1 - N/100
 
     n = (1-t)*100;
+#endif   
     
     n = (n < 0) ? 0:n;
     n = (n > 100) ? 100:n;
     
     pst_Channel->f_Grey = n;
+
 }
 
 void Mod_GreyProc(GreyChannel_t* pst_Channel)

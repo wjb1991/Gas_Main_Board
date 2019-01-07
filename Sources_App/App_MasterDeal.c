@@ -899,7 +899,7 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
 				//读取第一页返回数组长度
 				int i = 0;
                 int index = pst_Fram->puc_PayLoad[0];
-				Bsp_CnvINT16UToArr(&pst_Fram->puc_PayLoad[1],st_Measure.st_SampleGrey[index].ul_Len,FALSE);
+				Bsp_CnvINT16UToArr(&pst_Fram->puc_PayLoad[0],st_Measure.st_SampleGrey[index].ul_Len,FALSE);
 
 				for(i = 0; i < st_Measure.st_SampleGrey[index].ul_Len; i++)
 				{

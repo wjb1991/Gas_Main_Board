@@ -37,7 +37,7 @@ void Mod_LaserPoll(void)
 {
     OS_ERR  os_err;
   
-    OSTimeDlyHMSM(0u, 0u, 0u, 200,
+    OSTimeDlyHMSM(0u, 0u, 0u, 600,
                 OS_OPT_TIME_HMSM_STRICT | OS_OPT_TIME_PERIODIC,/* 周期模式 */
                 &os_err);
     Mod_StdbusReadCmd(&st_LaserBoard,0x80,NULL,0);
