@@ -513,7 +513,7 @@ void Mod_MeasurePoll(Measure_t* pst_Meas)
         fCO = fCO2 * q0;
         fHC = fCO2 * q1;
         fNO = fCO2 * q2;
-/*
+/**/
         MEASURE_DBG(">>MEASURE DBG:================================================\r\n");  
         MEASURE_DBG(">>MEASURE DBG:   NO->%d个采样点\r\n",pst_Meas->st_SampleNO.ul_Len);
         for(i = 0; i < pst_Meas->st_SampleNO.ul_Len; i++)
@@ -529,7 +529,7 @@ void Mod_MeasurePoll(Measure_t* pst_Meas)
             for(i = 0; i < pst_Meas->st_SampleGrey[j].ul_Len; i++)
                 MEASURE_DBG(">>MEASURE DBG:     Grey[%d][%d]: %f\r\n", j, i, pst_Meas->st_SampleGrey[j].af_Buff[i]);        
         }
-*/
+
 
         MEASURE_DBG(">>MEASURE DBG:================================================\r\n"); 
         MEASURE_DBG(">>MEASURE DBG:   一次静态测量完成\r\n");

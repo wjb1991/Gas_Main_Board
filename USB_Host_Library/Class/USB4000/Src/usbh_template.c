@@ -1073,6 +1073,12 @@ static USBH_StatusTypeDef USBH_USB4000_ProcessSpectrum(USBH_HandleTypeDef *phost
     /* 多次扫描平均 */
     if (USB4000_Handle->uch_ScansToAverage > 1)
     {
+        /* 累计光谱 */
+        for(i = 0; i < USB4000_Handle->uin_Pixels; i++)
+        {
+            USB4000_Handle->pl_SumSpectrum[i] += USB4000_Handle->pin_Spectrum[i];
+        }
+      
         if(++USB4000_Handle->uch_ScansConut >= USB4000_Handle->uch_ScansToAverage)
         {
             USB4000_Handle->uch_ScansConut = 0;
@@ -1092,15 +1098,6 @@ static USBH_StatusTypeDef USBH_USB4000_ProcessSpectrum(USBH_HandleTypeDef *phost
             
             ready = 1;
         }
-        else
-        {
-            /* 累计光谱 */
-            for(i = 0; i < USB4000_Handle->uin_Pixels; i++)
-            {
-                USB4000_Handle->pl_SumSpectrum[i] += USB4000_Handle->pin_Spectrum[i];
-            }
-        }
-      
     }
     else 
     {

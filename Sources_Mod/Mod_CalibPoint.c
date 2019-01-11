@@ -139,7 +139,8 @@ BOOL Mod_CalibPointListNihe(CalibPointList_t* pst_CpointList,INT8U uch_NiheOrder
     FP32    af_X[10] = {0.0};
     FP32    af_Y[10] = {0.0};
     INT32U  ul_Use = 0;
-    INT32U  i;
+    INT32U  i,j;
+	FP32 t;
     if(pst_CpointList == NULL || pst_CpointList->pst_List == NULL)
         return FALSE;
 
@@ -152,6 +153,25 @@ BOOL Mod_CalibPointListNihe(CalibPointList_t* pst_CpointList,INT8U uch_NiheOrder
             ul_Use++;
         }
     }
+    
+
+    /* 从小到大排序 */
+	for(i = 0; i < pst_CpointList->ul_Lenth-1; i++)
+	{
+		for(j = i+1; j < pst_CpointList->ul_Lenth; j++)
+		{
+			if(af_X[j] > af_X[i])
+			{
+				t = af_X[j];				//交换两个数
+				af_X[j] = af_X[i];
+				af_X[i] = t;
+                
+				t = af_Y[j];				//交换两个数
+				af_Y[j] = af_Y[i];
+				af_Y[i] = t;
+			}
+		}
+	}
 
     if(ul_Use == 0)
         return FALSE;
