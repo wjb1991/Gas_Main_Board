@@ -156,11 +156,11 @@ BOOL Mod_CalibPointListNihe(CalibPointList_t* pst_CpointList,INT8U uch_NiheOrder
     
 
     /* 从小到大排序 */
-	for(i = 0; i < pst_CpointList->ul_Lenth-1; i++)
+	for(i = 0; i < ul_Use-1; i++)
 	{
-		for(j = i+1; j < pst_CpointList->ul_Lenth; j++)
+		for(j = i+1; j < ul_Use; j++)
 		{
-			if(af_X[j] > af_X[i])
+			if(af_X[j] < af_X[i])
 			{
 				t = af_X[j];				//交换两个数
 				af_X[j] = af_X[i];

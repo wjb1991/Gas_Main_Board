@@ -1,7 +1,7 @@
 #ifndef __MOD_CALIBPOINT_H__
 #define __MOD_CALIBPOINT_H__
 
-#define     DEF_CALIBPOINT_MAX          10      /* 最大校准点点数 */
+#define     DEF_CALIBPOINT_MAX          16      /* 最大校准点点数 */
 
 typedef struct {
     BOOL    b_Use;                      //是否使用
