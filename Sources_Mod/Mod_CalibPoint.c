@@ -136,8 +136,8 @@ BOOL Mod_CalibPointListDeleteOnePoint(CalibPointList_t* pst_CpointList, INT32U u
 
 BOOL Mod_CalibPointListNihe(CalibPointList_t* pst_CpointList,INT8U uch_NiheOrder,FP32* pf_NiheCoeff)
 {
-    FP32    af_X[10] = {0.0};
-    FP32    af_Y[10] = {0.0};
+    FP32    af_X[DEF_CALIBPOINT_MAX] = {0.0};
+    FP32    af_Y[DEF_CALIBPOINT_MAX] = {0.0};
     INT32U  ul_Use = 0;
     INT32U  i,j;
 	FP32 t;

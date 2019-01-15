@@ -500,6 +500,7 @@ void Mod_GasMeasurePoll(GasMeasure_t* pst_Meas)
 
             FP64 f;
             pst_Meas->pst_Gas1->lf_PeakHight = Mod_GasMeasureGetPeakHight(pst_Meas->plf_DiffSpectrum, pst_Meas->pst_Gas1);
+            pst_Meas->pst_Gas1->lf_PeakHight = (pst_Meas->pst_Gas1->lf_PeakHight < 0) ? 0:pst_Meas->pst_Gas1->lf_PeakHight;
             f = s_fx(pst_Meas->pst_Gas1->af_NiheCoeff,pst_Meas->pst_Gas1->uch_NiheOrder,(FP32)pst_Meas->pst_Gas1->lf_PeakHight);
             pst_Meas->pst_Gas1->f_Correction = pst_Meas->pst_Gas1->lf_Concentration / f;
             
@@ -533,6 +534,7 @@ void Mod_GasMeasurePoll(GasMeasure_t* pst_Meas)
 
             FP64 f;
             pst_Meas->pst_Gas2->lf_PeakHight = Mod_GasMeasureGetPeakHight(pst_Meas->plf_DiffSpectrum, pst_Meas->pst_Gas2);
+            pst_Meas->pst_Gas2->lf_PeakHight = (pst_Meas->pst_Gas2->lf_PeakHight < 0) ? 0:pst_Meas->pst_Gas2->lf_PeakHight;
             f = s_fx(pst_Meas->pst_Gas2->af_NiheCoeff,pst_Meas->pst_Gas2->uch_NiheOrder,(FP32)pst_Meas->pst_Gas2->lf_PeakHight);
             pst_Meas->pst_Gas2 ->f_Correction = pst_Meas->pst_Gas2->lf_Concentration / f;
             SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas2->f_Correction));
@@ -556,6 +558,7 @@ void Mod_GasMeasurePoll(GasMeasure_t* pst_Meas)
         {
             FP64 f;
             pst_Meas->pst_Gas1->lf_PeakHight = Mod_GasMeasureGetPeakHight(pst_Meas->plf_DiffSpectrum, pst_Meas->pst_Gas1);
+            pst_Meas->pst_Gas1->lf_PeakHight = (pst_Meas->pst_Gas1->lf_PeakHight < 0) ? 0:pst_Meas->pst_Gas1->lf_PeakHight;
             f = s_fx(pst_Meas->pst_Gas1->af_NiheCoeff,pst_Meas->pst_Gas1->uch_NiheOrder,(FP32)pst_Meas->pst_Gas1->lf_PeakHight);
             f = (f < 0) ? 0:f;
             pst_Meas->pst_Gas1->lf_Concentration = f * pst_Meas->pst_Gas1->f_Correction;
@@ -564,9 +567,10 @@ void Mod_GasMeasurePoll(GasMeasure_t* pst_Meas)
         {
             FP64 f;
             pst_Meas->pst_Gas2->lf_PeakHight = Mod_GasMeasureGetPeakHight(pst_Meas->plf_DiffSpectrum, pst_Meas->pst_Gas2);
+            pst_Meas->pst_Gas2->lf_PeakHight = (pst_Meas->pst_Gas2->lf_PeakHight < 0) ? 0:pst_Meas->pst_Gas2->lf_PeakHight;
             f = s_fx(pst_Meas->pst_Gas2->af_NiheCoeff,pst_Meas->pst_Gas2->uch_NiheOrder,(FP32)pst_Meas->pst_Gas2->lf_PeakHight);
             f = (f < 0) ? 0:f;
-            pst_Meas->pst_Gas2->lf_Concentration = f * pst_Meas->pst_Gas1->f_Correction;
+            pst_Meas->pst_Gas2->lf_Concentration = f * pst_Meas->pst_Gas2->f_Correction;
         }
 
         /* 更新背景光谱 */
@@ -592,6 +596,7 @@ void Mod_GasMeasurePoll(GasMeasure_t* pst_Meas)
         {
             FP64 f;
             pst_Meas->pst_Gas1->lf_PeakHight = Mod_GasMeasureGetPeakHight(pst_Meas->plf_DiffSpectrum, pst_Meas->pst_Gas1);
+            pst_Meas->pst_Gas1->lf_PeakHight = (pst_Meas->pst_Gas2->lf_PeakHight < 0) ? 0:pst_Meas->pst_Gas1->lf_PeakHight;
             f = s_fx(pst_Meas->pst_Gas1->af_NiheCoeff,pst_Meas->pst_Gas1->uch_NiheOrder,(FP32)pst_Meas->pst_Gas1->lf_PeakHight);
             f = (f < 0) ? 0:f;
             pst_Meas->pst_Gas1->lf_Concentration = f * pst_Meas->pst_Gas1->f_Correction;
@@ -602,6 +607,7 @@ void Mod_GasMeasurePoll(GasMeasure_t* pst_Meas)
         {
             FP64 f;
             pst_Meas->pst_Gas2->lf_PeakHight = Mod_GasMeasureGetPeakHight(pst_Meas->plf_DiffSpectrum, pst_Meas->pst_Gas2);
+            pst_Meas->pst_Gas2->lf_PeakHight = (pst_Meas->pst_Gas2->lf_PeakHight < 0) ? 0:pst_Meas->pst_Gas2->lf_PeakHight;
             f = s_fx(pst_Meas->pst_Gas2->af_NiheCoeff,pst_Meas->pst_Gas2->uch_NiheOrder,(FP32)pst_Meas->pst_Gas2->lf_PeakHight);
             f = (f < 0) ? 0:f;
             pst_Meas->pst_Gas2->lf_Concentration = f * pst_Meas->pst_Gas1->f_Correction;
@@ -751,7 +757,11 @@ BOOL Mod_GasMarkWorkLine(GasMeasure_t* pst_Meas,GasMeasureState_e e_Ops)
         st_GasMeasure.pst_Gas1->af_NiheCoeff[2] = 0;
         st_GasMeasure.pst_Gas1->af_NiheCoeff[3] = 0;
         st_GasMeasure.pst_Gas1->af_NiheCoeff[4] = 0;
-        st_GasMeasure.pst_Gas1->af_NiheCoeff[5] = 0;      
+        st_GasMeasure.pst_Gas1->af_NiheCoeff[5] = 0;  
+        st_GasMeasure.pst_Gas1->af_NiheCoeff[6] = 0;
+        st_GasMeasure.pst_Gas1->af_NiheCoeff[7] = 0;
+        st_GasMeasure.pst_Gas1->af_NiheCoeff[8] = 0;  
+        st_GasMeasure.pst_Gas1->af_NiheCoeff[9] = 0;  
         Mod_CalibPointListNihe(pst_Meas->pst_Gas1->pst_CalibPointList,
                                pst_Meas->pst_Gas1->uch_NiheOrder,
                                pst_Meas->pst_Gas1->af_NiheCoeff);
@@ -764,6 +774,10 @@ BOOL Mod_GasMarkWorkLine(GasMeasure_t* pst_Meas,GasMeasureState_e e_Ops)
         SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas1->af_NiheCoeff[3]));
         SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas1->af_NiheCoeff[4]));
         SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas1->af_NiheCoeff[5])); 
+        SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas1->af_NiheCoeff[6]));
+        SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas1->af_NiheCoeff[7]));
+        SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas1->af_NiheCoeff[8]));
+        SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas1->af_NiheCoeff[9])); 
         SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas1->f_Correction));
 
         TRACE_DBG(">>DBG:   气体1 拟合系数0:%f 拟合系数1:%f 拟合系数2:%f\r\n",
@@ -780,6 +794,10 @@ BOOL Mod_GasMarkWorkLine(GasMeasure_t* pst_Meas,GasMeasureState_e e_Ops)
         st_GasMeasure.pst_Gas2->af_NiheCoeff[3] = 0;
         st_GasMeasure.pst_Gas2->af_NiheCoeff[4] = 0;
         st_GasMeasure.pst_Gas2->af_NiheCoeff[5] = 0;
+        st_GasMeasure.pst_Gas2->af_NiheCoeff[6] = 0;
+        st_GasMeasure.pst_Gas2->af_NiheCoeff[7] = 0;
+        st_GasMeasure.pst_Gas2->af_NiheCoeff[8] = 0;  
+        st_GasMeasure.pst_Gas2->af_NiheCoeff[9] = 0;  
         Mod_CalibPointListNihe(pst_Meas->pst_Gas2->pst_CalibPointList,
                                pst_Meas->pst_Gas2->uch_NiheOrder,
                                pst_Meas->pst_Gas2->af_NiheCoeff);
@@ -791,14 +809,19 @@ BOOL Mod_GasMarkWorkLine(GasMeasure_t* pst_Meas,GasMeasureState_e e_Ops)
         SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas2->af_NiheCoeff[2]));
         SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas2->af_NiheCoeff[3]));
         SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas2->af_NiheCoeff[4]));
-        SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas2->af_NiheCoeff[5]));
+        SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas2->af_NiheCoeff[5])); 
+        SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas2->af_NiheCoeff[6]));
+        SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas2->af_NiheCoeff[7]));
+        SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas2->af_NiheCoeff[8]));
+        SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas2->af_NiheCoeff[9])); 
         SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas2->f_Correction));
         
         TRACE_DBG(">>DBG:   气体2 拟合系数0:%f 拟合系数1:%f 拟合系数2:%f\r\n",
                     st_GasMeasure.pst_Gas2->af_NiheCoeff[0],
                     st_GasMeasure.pst_Gas2->af_NiheCoeff[1],
                     st_GasMeasure.pst_Gas2->af_NiheCoeff[2]);
-        break;                                      
+        break; 
+/*
     case eGasCalibAll:
         if(st_GasMeasure.pst_Gas1 == NULL)
             return FALSE;
@@ -825,6 +848,7 @@ BOOL Mod_GasMarkWorkLine(GasMeasure_t* pst_Meas,GasMeasureState_e e_Ops)
                     st_GasMeasure.pst_Gas2->af_NiheCoeff[1],
                     st_GasMeasure.pst_Gas2->af_NiheCoeff[2]);
         break;
+*/
     default:
         return FALSE;
         

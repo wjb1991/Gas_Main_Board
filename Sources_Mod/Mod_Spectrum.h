@@ -1,7 +1,7 @@
 #ifndef __MOD_SPECTRUM_H__
 #define __MOD_SPECTRUM_H__
 
-#define     DEF_CALIB_NIHE_ORDER_MAX    5
+#define     DEF_CALIB_NIHE_ORDER_MAX    9
 
 typedef enum {
     eGasN2 = 0,
