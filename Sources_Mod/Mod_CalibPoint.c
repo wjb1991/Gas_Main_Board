@@ -1,7 +1,7 @@
 
 #include "App_Include.h"
 
-#define DEF_CALIBPOINT_DBG_EN           TRUE
+#define DEF_CALIBPOINT_DBG_EN           FALSE
 
 #if (DEF_CALIBPOINT_DBG_EN == TRUE)
     #define CALIBPOINT_DBG(...)         do {                                \
@@ -185,7 +185,7 @@ BOOL Mod_CalibPointListNihe(CalibPointList_t* pst_CpointList,INT8U uch_NiheOrder
 
     for(i = 0; i <= uch_NiheOrder; i++)
     {
-        CALIBPOINT_DBG("拟合系数[%d] = %f\r\n",i,pf_NiheCoeff[i]); 
+        CALIBPOINT_DBG("拟合系数[%d] = %e\r\n",i,pf_NiheCoeff[i]); 
     }
     
     return TRUE;

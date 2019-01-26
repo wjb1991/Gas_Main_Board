@@ -11,7 +11,7 @@
 //==================================================================================================
 #include "App_Include.h"
 
-#define     DEF_SPECTRUM_DBG_EN           FALSE
+#define     DEF_SPECTRUM_DBG_EN           TRUE
 
 #if (DEF_SPECTRUM_DBG_EN == TRUE)
     #define SPECTRUM_DBG(...)            do {                                \
@@ -124,6 +124,7 @@ static void* PendMeg(void)
 
 void Mod_GasMeasureInit(GasMeasure_t* pst_Meas)
 {    
+    INT16U i;
     //570 650 730
     st_GasN0.st_PeakRef.ul_PeakLeftDot = 640;
     st_GasN0.st_PeakRef.ul_PeakCenterDot = 650;
@@ -140,6 +141,10 @@ void Mod_GasMeasureInit(GasMeasure_t* pst_Meas)
     if(pst_Meas->pst_Gas2 != NULL)
         Mod_CalibPointListInit(pst_Meas->pst_Gas2->pst_CalibPointList);
     
+    for(i = 0; i < DEF_CALIB_NIHE_ORDER_MAX+1; i++)
+    {
+        SPECTRUM_DBG("拟合系数[%d] = %e\r\n",i,pst_Meas->pst_Gas1->af_NiheCoeff[i]); 
+    }
     
     InitSem();
 }
@@ -182,7 +187,6 @@ FP32 Mod_GasMeasureCalSpectrumTrans(GasMeasure_t* pst_Meas)
 void Mod_GasMeasureUpdataTrans(GasMeasure_t* pst_Meas)
 {
     FP64  lf_Sum1 = 0;
-    FP32  f_Trans = 0;
     INT32U  i;
     for(i = pst_Meas->ul_TransLeftDot; i< pst_Meas->ul_TransRightDot; i++)
     {
@@ -204,7 +208,7 @@ FP64 Mod_GasMeasureGetPeakHight(FP64* plf_Spectrum, GasInfo_t* pst_Gas)
 
     /* 直接根据 坐标来计算吸收峰高度 */
     memcpy(&pst_Gas->st_PeakMeasure, &pst_Gas->st_PeakRef, sizeof(Peak_t));
-    SPECTRUM_DBG("NO吸收峰原始位置：%d\r\n",pst_Peak->ul_PeakCenterDot,j);
+    SPECTRUM_DBG("NO吸收峰原始位置：%d\r\n",pst_Peak->ul_PeakCenterDot);
 #if 1
     /* 搜索中心范围内的最高点吸收峰*/
     for(i = pst_Peak->ul_PeakLeftDot; i <=pst_Peak->ul_PeakRightDot; i++)
@@ -596,7 +600,7 @@ void Mod_GasMeasurePoll(GasMeasure_t* pst_Meas)
         {
             FP64 f;
             pst_Meas->pst_Gas1->lf_PeakHight = Mod_GasMeasureGetPeakHight(pst_Meas->plf_DiffSpectrum, pst_Meas->pst_Gas1);
-            pst_Meas->pst_Gas1->lf_PeakHight = (pst_Meas->pst_Gas2->lf_PeakHight < 0) ? 0:pst_Meas->pst_Gas1->lf_PeakHight;
+            pst_Meas->pst_Gas1->lf_PeakHight = (pst_Meas->pst_Gas1->lf_PeakHight < 0) ? 0:pst_Meas->pst_Gas1->lf_PeakHight;
             f = s_fx(pst_Meas->pst_Gas1->af_NiheCoeff,pst_Meas->pst_Gas1->uch_NiheOrder,(FP32)pst_Meas->pst_Gas1->lf_PeakHight);
             f = (f < 0) ? 0:f;
             pst_Meas->pst_Gas1->lf_Concentration = f * pst_Meas->pst_Gas1->f_Correction;
@@ -610,7 +614,7 @@ void Mod_GasMeasurePoll(GasMeasure_t* pst_Meas)
             pst_Meas->pst_Gas2->lf_PeakHight = (pst_Meas->pst_Gas2->lf_PeakHight < 0) ? 0:pst_Meas->pst_Gas2->lf_PeakHight;
             f = s_fx(pst_Meas->pst_Gas2->af_NiheCoeff,pst_Meas->pst_Gas2->uch_NiheOrder,(FP32)pst_Meas->pst_Gas2->lf_PeakHight);
             f = (f < 0) ? 0:f;
-            pst_Meas->pst_Gas2->lf_Concentration = f * pst_Meas->pst_Gas1->f_Correction;
+            pst_Meas->pst_Gas2->lf_Concentration = f * pst_Meas->pst_Gas2->f_Correction;
             Mod_MeasureGasHCReply(pst_Meas->pst_Gas2->lf_Concentration);
         }
 
@@ -780,10 +784,6 @@ BOOL Mod_GasMarkWorkLine(GasMeasure_t* pst_Meas,GasMeasureState_e e_Ops)
         SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas1->af_NiheCoeff[9])); 
         SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas1->f_Correction));
 
-        TRACE_DBG(">>DBG:   气体1 拟合系数0:%f 拟合系数1:%f 拟合系数2:%f\r\n",
-                    st_GasMeasure.pst_Gas1->af_NiheCoeff[0],
-                    st_GasMeasure.pst_Gas1->af_NiheCoeff[1],
-                    st_GasMeasure.pst_Gas1->af_NiheCoeff[2]);
         break;
     case eGasCalibGas2:
         if(st_GasMeasure.pst_Gas2 == NULL)
@@ -815,11 +815,7 @@ BOOL Mod_GasMarkWorkLine(GasMeasure_t* pst_Meas,GasMeasureState_e e_Ops)
         SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas2->af_NiheCoeff[8]));
         SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas2->af_NiheCoeff[9])); 
         SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas2->f_Correction));
-        
-        TRACE_DBG(">>DBG:   气体2 拟合系数0:%f 拟合系数1:%f 拟合系数2:%f\r\n",
-                    st_GasMeasure.pst_Gas2->af_NiheCoeff[0],
-                    st_GasMeasure.pst_Gas2->af_NiheCoeff[1],
-                    st_GasMeasure.pst_Gas2->af_NiheCoeff[2]);
+
         break; 
 /*
     case eGasCalibAll:

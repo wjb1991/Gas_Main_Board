@@ -65,7 +65,7 @@ static void Mod_ErrHandle(void * pv_dev)
 {
     Mod_StdbusRscPack(&st_StdbusLaser);                  //释放本端口的数据
     Bsp_UartClose(pv_dev);
-    Bsp_UartClose(pv_dev);
+    Bsp_UartOpen(pv_dev);
 }
 
 void Mod_StdbusLaserInit(void)
