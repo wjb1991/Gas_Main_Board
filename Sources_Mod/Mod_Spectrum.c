@@ -11,7 +11,7 @@
 //==================================================================================================
 #include "App_Include.h"
 
-#define     DEF_SPECTRUM_DBG_EN           TRUE
+#define     DEF_SPECTRUM_DBG_EN           FALSE
 
 #if (DEF_SPECTRUM_DBG_EN == TRUE)
     #define SPECTRUM_DBG(...)            do {                                \

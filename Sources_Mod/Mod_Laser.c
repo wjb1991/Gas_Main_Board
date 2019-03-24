@@ -37,10 +37,10 @@ void Mod_LaserPoll(void)
 {
     OS_ERR  os_err;
   
-    OSTimeDlyHMSM(0u, 0u, 0u, 600,
+    OSTimeDlyHMSM(0u, 0u, 1u, 000,
                 OS_OPT_TIME_HMSM_STRICT | OS_OPT_TIME_PERIODIC,/* 周期模式 */
                 &os_err);
-    Mod_StdbusReadCmd(&st_LaserBoard,0x80,NULL,0);
+    //Mod_StdbusReadCmd(&st_LaserBoard,0x80,NULL,0);
 }
 
 BOOL Mod_MeasLaserDealFram(StdbusFram_t* pst_Fram)
