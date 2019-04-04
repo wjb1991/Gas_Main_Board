@@ -6,10 +6,10 @@ int main(void)
     OS_ERR   err;
 
     /* Enable I-Cache---------------------------------------------------------*/
-    //SCB_EnableICache();
+    SCB_EnableICache();
 
     /* Enable D-Cache---------------------------------------------------------*/
-    //SCB_EnableDCache();
+    SCB_EnableDCache();
 
     HAL_Init();                                                 /* See Note 1.                                          */
   

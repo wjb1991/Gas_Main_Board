@@ -2461,12 +2461,6 @@
             <group>
                 <name>USB4000</name>
                 <file>
-                    <name>$PROJ_DIR$\..\..\USB_Host_Library\Class\USB4000\Src\usbh_template.c</name>
-                    <excluded>
-                        <configuration>Debug</configuration>
-                    </excluded>
-                </file>
-                <file>
                     <name>$PROJ_DIR$\..\..\USB_Host_Library\Class\USB4000\Src\usbh_usb4000.c</name>
                 </file>
             </group>

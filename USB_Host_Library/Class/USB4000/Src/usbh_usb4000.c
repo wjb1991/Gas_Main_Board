@@ -299,7 +299,7 @@ static USBH_StatusTypeDef USBH_USB4000_ClassRequest (USBH_HandleTypeDef *phost)
 static USBH_StatusTypeDef USBH_USB4000_Delay(void)
 {
     //for(int i = 0; i < 15; i ++){}
-    //Bsp_DelayUs(1);
+    Bsp_DelayUs(1);
     return USBH_OK; 
 }
 
@@ -626,12 +626,10 @@ static USBH_StatusTypeDef USBH_USB4000_GetStatus(USBH_HandleTypeDef *phost)
     //Bsp_IntEn();
     while(URB_Status != USBH_URB_DONE)
     {
-        //USBH_USB4000_Delay();
-        //Bsp_IntDis();
-        //__NOP();
+        USBH_USB4000_Delay();
         URB_Status = USBH_LL_GetURBState(phost, USB4000_Handle->OutPipe1);
         //Bsp_IntEn();
-        if(++uc_ErrCnt> 3)
+        if(++uc_ErrCnt> 100)
         {
             uc_ErrCnt = 0;
             USBH_UsrLog ("OUTEP1 USBH_URB_NOTREADY");
@@ -641,22 +639,17 @@ static USBH_StatusTypeDef USBH_USB4000_GetStatus(USBH_HandleTypeDef *phost)
     }
     URB_Status = USBH_URB_IDLE;
     
-    //Bsp_IntDis();
+
     USBH_BulkReceiveData(phost, auc_Buff, 16, USB4000_Handle->InPipe1);
-    //Bsp_IntEn();
+
     while(URB_Status != USBH_URB_DONE)
     {
-        //USBH_USB4000_Delay();
-        //Bsp_IntDis();
-        //__NOP();
+        USBH_USB4000_Delay();
         URB_Status = USBH_LL_GetURBState(phost, USB4000_Handle->InPipe1);
-        //Bsp_IntDis();
-        if(++uc_ErrCnt> 50)
+        if(++uc_ErrCnt> 100)
         {
             uc_ErrCnt = 0;
             USBH_UsrLog ("INEP1 USBH_URB_NOTREADY");
-            //USBH_BulkReceiveData(phost, auc_Buff, 512, USB4000_Handle->InPipe1);
-            //SysTick->CTRL |= (SysTick_CTRL_ENABLE_Msk);
             return USBH_FAIL;
         }
     }
@@ -704,9 +697,9 @@ static USBH_StatusTypeDef USBH_USB4000_GetInformation(USBH_HandleTypeDef *phost,
     {
         USBH_USB4000_Delay();
         URB_Status = USBH_LL_GetURBState(phost, USB4000_Handle->OutPipe1);
-        if(++uc_ErrCnt> 3)
+        if(++uc_ErrCnt> 100)
         {
-            USBH_UsrLog ("USBH_URB_NOTREADY");
+            USBH_UsrLog ("OUTEP1 = %d",URB_Status);
             return USBH_FAIL;
         }
     }
@@ -718,9 +711,9 @@ static USBH_StatusTypeDef USBH_USB4000_GetInformation(USBH_HandleTypeDef *phost,
     {
         USBH_USB4000_Delay();
         URB_Status = USBH_LL_GetURBState(phost, USB4000_Handle->InPipe1);
-        if(++uc_ErrCnt> 1000)
+        if(++uc_ErrCnt> 100)
         {
-            USBH_UsrLog ("USBH_URB_NOTREADY");
+            USBH_UsrLog ("INEP1 = %d",URB_Status);
             return USBH_FAIL;
         }
     }
@@ -836,7 +829,7 @@ static USBH_StatusTypeDef USBH_USB4000_GetSpectrum(USBH_HandleTypeDef *phost)
     USBH_BulkSendData(phost,uc_SendBuff,1,USB4000_Handle->OutPipe1,1); 
     while(URB_Status != USBH_URB_DONE)
     {
-;
+        USBH_USB4000_Delay();
         URB_Status = USBH_LL_GetURBState(phost, USB4000_Handle->OutPipe1);
         if(++uc_ErrCnt> 3)
         {
@@ -847,7 +840,7 @@ static USBH_StatusTypeDef USBH_USB4000_GetSpectrum(USBH_HandleTypeDef *phost)
     }
     
     //USBH_USB4000_ProcessSpectrum(phost);
-    i = USB4000_Handle->ul_SetIntegralTime /1000 - 6;
+    i = USB4000_Handle->ul_SetIntegralTime /1000 - 3;
     OSTimeDlyHMSM(0u, 0u, 0u,i,
                   OS_OPT_TIME_HMSM_STRICT ,
                   &os_err);
@@ -869,6 +862,7 @@ static USBH_StatusTypeDef USBH_USB4000_GetSpectrum(USBH_HandleTypeDef *phost)
         
         do
         {
+            USBH_USB4000_Delay();
             URB_Status = USBH_LL_GetURBState(phost, USB4000_Handle->InPipe6);
             if(++uc_ErrCnt> 1000)
             {
@@ -882,7 +876,7 @@ static USBH_StatusTypeDef USBH_USB4000_GetSpectrum(USBH_HandleTypeDef *phost)
         {
             puc_buff[i*512 + j] = auc_Buff[i];
         }
-        USBH_UsrLog ("R %u",i);
+        //USBH_UsrLog ("R %u",i);
     }
     
     for(i = 4 ; i < 16; i++)
@@ -894,8 +888,9 @@ static USBH_StatusTypeDef USBH_USB4000_GetSpectrum(USBH_HandleTypeDef *phost)
         
         do
         {
+            USBH_USB4000_Delay();
             URB_Status = USBH_LL_GetURBState(phost, USB4000_Handle->InPipe2);
-            if(++uc_ErrCnt> 1000)
+            if(++uc_ErrCnt> 300)
             {
                 USBH_UsrLog ("EP2 RECV FAIL = %u",URB_Status);
                 uc_ErrCnt = 0;
