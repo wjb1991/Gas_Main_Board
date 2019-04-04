@@ -87,7 +87,7 @@ void Mod_GreySample(GreyChannel_t* pst_Grye)
     }
 
     pst_Grye->f_Volt = (FP32)Bsp_LTC1867HexToVolt(i);                       //更新当前电压
-    //GREY_DBG(">>GREY DBG:   通道%d = %x 电压 = %fV\r\n",pst_Grye->uch_Num,i,pst_Grye->f_Volt);
+    GREY_DBG(">>GREY DBG:   通道%d = %x 电压 = %fV\r\n",pst_Grye->uch_Num,i,pst_Grye->f_Volt);
 }
 
 void Mod_GreyCalculate(GreyChannel_t* pst_Channel)

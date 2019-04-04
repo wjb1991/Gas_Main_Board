@@ -8,39 +8,13 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2017 STMicroelectronics International N.V.
+  * <h2><center>&copy; Copyright (c) 2015 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
-  * Redistribution and use in source and binary forms, with or without
-  * modification, are permitted, provided that the following conditions are met:
-  *
-  * 1. Redistribution of source code must retain the above copyright notice,
-  *    this list of conditions and the following disclaimer.
-  * 2. Redistributions in binary form must reproduce the above copyright notice,
-  *    this list of conditions and the following disclaimer in the documentation
-  *    and/or other materials provided with the distribution.
-  * 3. Neither the name of STMicroelectronics nor the names of other
-  *    contributors to this software may be used to endorse or promote products
-  *    derived from this software without specific written permission.
-  * 4. This software, including modifications and/or derivative works of this
-  *    software, must execute solely and exclusively on microcontroller or
-  *    microprocessor devices manufactured by or for STMicroelectronics.
-  * 5. Redistribution and use of this software other than as permitted under
-  *    this license is void and will automatically terminate your rights under
-  *    this license.
-  *
-  * THIS SOFTWARE IS PROVIDED BY STMICROELECTRONICS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS, IMPLIED OR STATUTORY WARRANTIES, INCLUDING, BUT NOT
-  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
-  * PARTICULAR PURPOSE AND NON-INFRINGEMENT OF THIRD PARTY INTELLECTUAL PROPERTY
-  * RIGHTS ARE DISCLAIMED TO THE FULLEST EXTENT PERMITTED BY LAW. IN NO EVENT
-  * SHALL STMICROELECTRONICS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-  * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
-  * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
-  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  * This software component is licensed by ST under Ultimate Liberty license
+  * SLA0044, the "License"; You may not use this file except in compliance with
+  * the License. You may obtain a copy of the License at:
+  *                      http://www.st.com/SLA0044
   *
   ******************************************************************************
   */
@@ -122,8 +96,8 @@ static USBH_StatusTypeDef USBH_HID_KeybdDecode(USBH_HandleTypeDef *phost);
 HID_KEYBD_Info_TypeDef     keybd_info;
 uint32_t                   keybd_report_data[2];
 
-static HID_Report_ItemTypedef imp_0_lctrl = {
-  (uint8_t*)(void *)keybd_report_data + 0, /*data*/
+static const HID_Report_ItemTypedef imp_0_lctrl={
+  (uint8_t*)(void *)keybd_report_data+0, /*data*/
   1,     /*size*/
   0,     /*shift*/
   0,     /*count (only for array items)*/
@@ -134,8 +108,8 @@ static HID_Report_ItemTypedef imp_0_lctrl = {
   1,     /*max value device can report*/
   1      /*resolution*/
 };
-static HID_Report_ItemTypedef imp_0_lshift = {
-  (uint8_t*)(void *)keybd_report_data + 0, /*data*/
+static const HID_Report_ItemTypedef imp_0_lshift={
+  (uint8_t*)(void *)keybd_report_data+0, /*data*/
   1,     /*size*/
   1,     /*shift*/
   0,     /*count (only for array items)*/
@@ -146,8 +120,8 @@ static HID_Report_ItemTypedef imp_0_lshift = {
   1,     /*max value device can report*/
   1      /*resolution*/
 };
-static HID_Report_ItemTypedef imp_0_lalt = {
-  (uint8_t*)(void *)keybd_report_data + 0, /*data*/
+static const HID_Report_ItemTypedef imp_0_lalt={
+  (uint8_t*)(void *)keybd_report_data+0, /*data*/
   1,     /*size*/
   2,     /*shift*/
   0,     /*count (only for array items)*/
@@ -158,8 +132,8 @@ static HID_Report_ItemTypedef imp_0_lalt = {
   1,     /*max value device can report*/
   1      /*resolution*/
 };
-static HID_Report_ItemTypedef imp_0_lgui = {
-  (uint8_t*)(void *)keybd_report_data + 0, /*data*/
+static const HID_Report_ItemTypedef imp_0_lgui={
+  (uint8_t*)(void *)keybd_report_data+0, /*data*/
   1,     /*size*/
   3,     /*shift*/
   0,     /*count (only for array items)*/
@@ -170,8 +144,8 @@ static HID_Report_ItemTypedef imp_0_lgui = {
   1,     /*max value device can report*/
   1      /*resolution*/
 };
-static HID_Report_ItemTypedef imp_0_rctrl = {
-  (uint8_t*)(void *)keybd_report_data + 0, /*data*/
+static const HID_Report_ItemTypedef imp_0_rctrl={
+  (uint8_t*)(void *)keybd_report_data+0, /*data*/
   1,     /*size*/
   4,     /*shift*/
   0,     /*count (only for array items)*/
@@ -182,8 +156,8 @@ static HID_Report_ItemTypedef imp_0_rctrl = {
   1,     /*max value device can report*/
   1      /*resolution*/
 };
-static HID_Report_ItemTypedef imp_0_rshift = {
-  (uint8_t*)(void *)keybd_report_data + 0, /*data*/
+static const HID_Report_ItemTypedef imp_0_rshift={
+  (uint8_t*)(void *)keybd_report_data+0, /*data*/
   1,     /*size*/
   5,     /*shift*/
   0,     /*count (only for array items)*/
@@ -194,8 +168,8 @@ static HID_Report_ItemTypedef imp_0_rshift = {
   1,     /*max value device can report*/
   1      /*resolution*/
 };
-static HID_Report_ItemTypedef imp_0_ralt = {
-  (uint8_t*)(void *)keybd_report_data + 0, /*data*/
+static const HID_Report_ItemTypedef imp_0_ralt={
+  (uint8_t*)(void *)keybd_report_data+0, /*data*/
   1,     /*size*/
   6,     /*shift*/
   0,     /*count (only for array items)*/
@@ -206,8 +180,8 @@ static HID_Report_ItemTypedef imp_0_ralt = {
   1,     /*max value device can report*/
   1      /*resolution*/
 };
-static HID_Report_ItemTypedef imp_0_rgui = {
-  (uint8_t*)(void *)keybd_report_data + 0, /*data*/
+static const HID_Report_ItemTypedef imp_0_rgui={
+  (uint8_t*)(void *)keybd_report_data+0, /*data*/
   1,     /*size*/
   7,     /*shift*/
   0,     /*count (only for array items)*/
@@ -219,7 +193,7 @@ static HID_Report_ItemTypedef imp_0_rgui = {
   1      /*resolution*/
 };
 
-static HID_Report_ItemTypedef imp_0_key_array = {
+static const HID_Report_ItemTypedef imp_0_key_array = {
   (uint8_t*)(void *)keybd_report_data + 2, /*data*/
   8,     /*size*/
   0,     /*shift*/
@@ -399,18 +373,18 @@ static USBH_StatusTypeDef USBH_HID_KeybdDecode(USBH_HandleTypeDef *phost)
   if(USBH_HID_FifoRead(&HID_Handle->fifo, &keybd_report_data, HID_Handle->length) ==  HID_Handle->length)
   {
 
-    keybd_info.lctrl=(uint8_t)HID_ReadItem(&imp_0_lctrl, 0U);
-    keybd_info.lshift=(uint8_t)HID_ReadItem(&imp_0_lshift, 0U);
-    keybd_info.lalt=(uint8_t)HID_ReadItem(&imp_0_lalt, 0U);
-    keybd_info.lgui=(uint8_t)HID_ReadItem(&imp_0_lgui, 0U);
-    keybd_info.rctrl=(uint8_t)HID_ReadItem(&imp_0_rctrl, 0U);
-    keybd_info.rshift=(uint8_t)HID_ReadItem(&imp_0_rshift, 0U);
-    keybd_info.ralt=(uint8_t)HID_ReadItem(&imp_0_ralt, 0U);
-    keybd_info.rgui=(uint8_t)HID_ReadItem(&imp_0_rgui, 0U);
+    keybd_info.lctrl=(uint8_t)HID_ReadItem((HID_Report_ItemTypedef *) &imp_0_lctrl, 0U);
+    keybd_info.lshift=(uint8_t)HID_ReadItem((HID_Report_ItemTypedef *) &imp_0_lshift, 0U);
+    keybd_info.lalt=(uint8_t)HID_ReadItem((HID_Report_ItemTypedef *) &imp_0_lalt, 0U);
+    keybd_info.lgui=(uint8_t)HID_ReadItem((HID_Report_ItemTypedef *) &imp_0_lgui, 0U);
+    keybd_info.rctrl=(uint8_t)HID_ReadItem((HID_Report_ItemTypedef *) &imp_0_rctrl, 0U);
+    keybd_info.rshift=(uint8_t)HID_ReadItem((HID_Report_ItemTypedef *) &imp_0_rshift, 0U);
+    keybd_info.ralt=(uint8_t)HID_ReadItem((HID_Report_ItemTypedef *) &imp_0_ralt, 0U);
+    keybd_info.rgui=(uint8_t)HID_ReadItem((HID_Report_ItemTypedef *) &imp_0_rgui, 0U);
 
     for(x = 0U; x < sizeof(keybd_info.keys); x++)
     {
-      keybd_info.keys[x]=(uint8_t)HID_ReadItem(&imp_0_key_array, x);
+      keybd_info.keys[x]=(uint8_t)HID_ReadItem((HID_Report_ItemTypedef *) &imp_0_key_array, x);
     }
 
     return USBH_OK;

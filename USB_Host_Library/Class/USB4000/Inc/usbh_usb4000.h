@@ -37,21 +37,18 @@
 #include "usbh_core.h"
 
 
+
 /* States for USB4000 State Machine */
 typedef enum
 {
-  USB4000_INIT= 0,  
-  USB4000_IDLE,
-  USB4000_SEND_DATA,
-  USB4000_WAIT_SEND,
-  USB4000_GET_DATA,  
-  USB4000_WAIT_GET,
-  USB4000_SYNC,     
-  USB4000_POLL,
-  USB4000_ERROR,
-  USB4000_WAIT_GET2,
+    USB4000_DISCONNECT= 0,
+    USB4000_ENUMERATION_DONE,
+    USB4000_INIT,
+    USB4000_CONFIGURE,
+    USB4000_CONNECT,
 }
-USB4000_StateTypeDef;  
+USB4000_StateTypeDef;
+
 /* Structure for USB4000 process */
 typedef struct _USB4000_Process
 {
@@ -105,6 +102,7 @@ typedef struct _USB4000_Process
     uint8_t              b_EdcEnable;               //是否开启EDC 
     uint8_t              b_NlcEnable;               //是否开启NLC 非线性补偿
     
+    uint8_t              b_First;                   //第一次标记
     uint8_t              b_Open;
     uint8_t              b_IsConnect;
     uint8_t              b_HighSpeed;               

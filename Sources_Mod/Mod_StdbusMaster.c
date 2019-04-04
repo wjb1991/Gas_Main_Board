@@ -1,6 +1,6 @@
 #include "App_Include.h"
 
-#define DEF_STDBUS_MASTER_PORT  &COM6
+#define DEF_STDBUS_MASTER_PORT  &COM3
 #define DEF_STDBUS_MASTER_BUFF_LEN   1024
 #define DEF_STDBUS_MASTER_DEV_LEN    1
 

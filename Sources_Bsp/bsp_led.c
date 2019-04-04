@@ -111,8 +111,37 @@ void  BSP_LedInit (void)
     gpio_init.Pull  = GPIO_PULLUP;
     gpio_init.Speed = GPIO_SPEED_HIGH;
     HAL_GPIO_Init(BSP_IIC0SCL_GPIO_PORT, &gpio_init);
+    
+#if 0
+    /*Configure GPIO pin : PH12 */
+    gpio_init.Pin = GPIO_PIN_12;
+    gpio_init.Mode = GPIO_MODE_OUTPUT_PP;
+    gpio_init.Pull = GPIO_NOPULL;
+    gpio_init.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(GPIOH, &gpio_init);
+    
+    /*Configure GPIO pin : PA7 */
+    gpio_init.Pin = GPIO_PIN_7;
+    gpio_init.Mode = GPIO_MODE_OUTPUT_PP;
+    gpio_init.Pull = GPIO_NOPULL;
+    gpio_init.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(GPIOA, &gpio_init);
+
+    /*Configure GPIO pin : PB1 */
+    gpio_init.Pin = GPIO_PIN_1;
+    gpio_init.Mode = GPIO_MODE_OUTPUT_PP;
+    gpio_init.Pull = GPIO_NOPULL;
+    gpio_init.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(GPIOB, &gpio_init);
 
 
+    HAL_GPIO_WritePin(GPIOH, GPIO_PIN_12, (GPIO_PinState)0);
+    printf("À­µÍUSB_POW\r\n");
+    Bsp_DelayMs(2000);
+    HAL_GPIO_WritePin(GPIOH, GPIO_PIN_12, (GPIO_PinState)1);
+    printf("À­¸ßUSB_POW\r\n");
+    Bsp_DelayMs(1000);
+#endif
     BSP_Led1Set(eLedOff);
     BSP_Led2Set(eLedOff);
     Bsp_Rs485de(eRs485Recv);

@@ -70,10 +70,13 @@ INT16U Bsp_LTC1867SampleOne(void* pv_Dev,INT16U uin_CH)
     DEV_LTC1867* pst_Ltc1867 = (DEV_LTC1867*)pv_Dev;
     INT16U uin_Msb = 0;
     INT16U uin_Lsb = 0;
+    OS_ERR os_err;
+    
     LTC1867CH_TYPE Channel = Bsp_Ltc1866Chnnel(uin_CH);
     
-    Bsp_IntDis(); 
-    
+    //Bsp_IntDis(); 
+    OSSchedLock(&os_err);
+
     if(pst_Ltc1867->CS != NULL)
         pst_Ltc1867->CS(0);
     
@@ -85,7 +88,8 @@ INT16U Bsp_LTC1867SampleOne(void* pv_Dev,INT16U uin_CH)
     if(pst_Ltc1867->CS != NULL)
         pst_Ltc1867->CS(1);
     
-    Bsp_IntEn();
+    OSSchedUnlock(&os_err);    
+    //Bsp_IntEn();
     
     Bsp_DelayUs(4);
     

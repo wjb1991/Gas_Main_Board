@@ -20,7 +20,7 @@
         <LeaveTargetRunning>_ 0</LeaveTargetRunning>
     </StLinkDriver>
     <DebugChecksum>
-        <Checksum>909279330</Checksum>
+        <Checksum>383996620</Checksum>
     </DebugChecksum>
     <Exceptions>
         <StopOnUncaught>_ 0</StopOnUncaught>
@@ -30,8 +30,8 @@
         <Enabled>_ 0</Enabled>
     </CodeCoverage>
     <Disassembly>
-        <MixedMode>1</MixedMode>
         <InstrCount>0</InstrCount>
+        <MixedMode>1</MixedMode>
     </Disassembly>
     <CallStack>
         <ShowArgs>0</ShowArgs>
@@ -133,7 +133,14 @@
         <Count>0</Count>
     </Breakpoints2>
     <Aliases>
-        <Count>0</Count>
+        <A0>_ "D:\Wangjiangbo\Desktop\Gas_Main_Board\Drivers\CMSIS\Device\ST\STM32F7xx\Source\Templates\system_stm32f7xx.c" ""</A0>
+        <A1>_ "D:\Wangjiangbo\Desktop\Gas_Main_Board\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal.c" ""</A1>
+        <A2>_ "D:\Wangjiangbo\Desktop\Gas_Main_Board\Sources_App\app_main.c" ""</A2>
+        <A3>_ "D:\Wangjiangbo\Desktop\Gas_Main_Board\Sources_App\usb_host.c" ""</A3>
+        <A4>_ "D:\Wangjiangbo\Desktop\Gas_Main_Board\Sources_Bsp\stm32f7xx_hal_msp.c" ""</A4>
+        <A5>_ "D:\Wangjiangbo\Desktop\Gas_Main_Board\uCOSIII\uC-CONFIG\os_app_hooks.c" ""</A5>
+        <A6>_ "D:\Wangjiangbo\Desktop\Gas_Main_Board\uCOSIII\uC-LIB\lib_math.c" ""</A6>
+        <Count>7</Count>
         <SuppressDialog>0</SuppressDialog>
     </Aliases>
 </settings>

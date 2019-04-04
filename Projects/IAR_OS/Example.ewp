@@ -78,7 +78,7 @@
                 </option>
                 <option>
                     <name>OGChipSelectEditMenu</name>
-                    <state>STM32F767II	ST STM32F767II</state>
+                    <state>STM32F723IE	ST STM32F723IE</state>
                 </option>
                 <option>
                     <name>GenLowLevelInterface</name>
@@ -138,12 +138,12 @@
                 </option>
                 <option>
                     <name>GFPUDeviceSlave</name>
-                    <state>STM32F767II	ST STM32F767II</state>
+                    <state>STM32F723IE	ST STM32F723IE</state>
                 </option>
                 <option>
                     <name>FPU2</name>
                     <version>0</version>
-                    <state>7</state>
+                    <state>6</state>
                 </option>
                 <option>
                     <name>NrRegs</name>
@@ -224,7 +224,7 @@
                 </option>
                 <option>
                     <name>CCDefines</name>
-                    <state>STM32F767xx</state>
+                    <state>STM32F723xx</state>
                     <state>USE_HAL_DRIVER</state>
                     <state>OS_SUPPORT</state>
                     <state>xVECT_TAB_SRAM</state>
@@ -788,7 +788,7 @@
                 </option>
                 <option>
                     <name>IlinkIcfFile</name>
-                    <state>$PROJ_DIR$\stm32f767xx_flash.icf</state>
+                    <state>$PROJ_DIR$\stm32f723xx_flash.icf</state>
                 </option>
                 <option>
                     <name>IlinkIcfFileSlave</name>
@@ -2094,7 +2094,7 @@
     <group>
         <name>CMSIS</name>
         <file>
-            <name>$PROJ_DIR$\..\..\Drivers\CMSIS\Device\ST\STM32F7xx\Source\Templates\iar\startup_stm32f767xx.s</name>
+            <name>$PROJ_DIR$\..\..\Drivers\CMSIS\Device\ST\STM32F7xx\Source\Templates\iar\startup_stm32f723xx.s</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\Drivers\CMSIS\Device\ST\STM32F7xx\Source\Templates\system_stm32f7xx.c</name>
@@ -2462,6 +2462,12 @@
                 <name>USB4000</name>
                 <file>
                     <name>$PROJ_DIR$\..\..\USB_Host_Library\Class\USB4000\Src\usbh_template.c</name>
+                    <excluded>
+                        <configuration>Debug</configuration>
+                    </excluded>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\USB_Host_Library\Class\USB4000\Src\usbh_usb4000.c</name>
                 </file>
             </group>
         </group>

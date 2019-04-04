@@ -6,39 +6,13 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2017 STMicroelectronics International N.V.
+  * <h2><center>&copy; Copyright (c) 2015 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
-  * Redistribution and use in source and binary forms, with or without
-  * modification, are permitted, provided that the following conditions are met:
-  *
-  * 1. Redistribution of source code must retain the above copyright notice,
-  *    this list of conditions and the following disclaimer.
-  * 2. Redistributions in binary form must reproduce the above copyright notice,
-  *    this list of conditions and the following disclaimer in the documentation
-  *    and/or other materials provided with the distribution.
-  * 3. Neither the name of STMicroelectronics nor the names of other
-  *    contributors to this software may be used to endorse or promote products
-  *    derived from this software without specific written permission.
-  * 4. This software, including modifications and/or derivative works of this
-  *    software, must execute solely and exclusively on microcontroller or
-  *    microprocessor devices manufactured by or for STMicroelectronics.
-  * 5. Redistribution and use of this software other than as permitted under
-  *    this license is void and will automatically terminate your rights under
-  *    this license.
-  *
-  * THIS SOFTWARE IS PROVIDED BY STMICROELECTRONICS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS, IMPLIED OR STATUTORY WARRANTIES, INCLUDING, BUT NOT
-  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
-  * PARTICULAR PURPOSE AND NON-INFRINGEMENT OF THIRD PARTY INTELLECTUAL PROPERTY
-  * RIGHTS ARE DISCLAIMED TO THE FULLEST EXTENT PERMITTED BY LAW. IN NO EVENT
-  * SHALL STMICROELECTRONICS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-  * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
-  * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
-  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  * This software component is licensed by ST under Ultimate Liberty license
+  * SLA0044, the "License"; You may not use this file except in compliance with
+  * the License. You may obtain a copy of the License at:
+  *                      http://www.st.com/SLA0044
   *
   ******************************************************************************
   */
@@ -239,17 +213,28 @@ USBH_StatusTypeDef USBH_MSC_BOT_Process (USBH_HandleTypeDef *phost, uint8_t lun)
       {/* If there is NO Data Transfer Stage */
         MSC_Handle->hbot.state = BOT_RECEIVE_CSW;
       }
-#if (USBH_USE_OS == 1U)
-    osMessagePut ( phost->os_event, USBH_URB_EVENT, 0U);
-#endif
 
+#if (USBH_USE_OS == 1U)
+      phost->os_msg = (uint32_t)USBH_URB_EVENT;
+#if (osCMSIS < 0x20000U)
+      (void)osMessagePut(phost->os_event, phost->os_msg, 0U);
+#else
+      (void)osMessageQueuePut(phost->os_event, &phost->os_msg, 0U, NULL);
+#endif
+#endif
     }
     else if(URB_Status == USBH_URB_NOTREADY)
     {
       /* Re-send CBW */
       MSC_Handle->hbot.state = BOT_SEND_CBW;
+
 #if (USBH_USE_OS == 1U)
-    osMessagePut ( phost->os_event, USBH_URB_EVENT, 0U);
+      phost->os_msg = (uint32_t)USBH_URB_EVENT;
+#if (osCMSIS < 0x20000U)
+      (void)osMessagePut(phost->os_event, phost->os_msg, 0U);
+#else
+      (void)osMessageQueuePut(phost->os_event, &phost->os_msg, 0U, NULL);
+#endif
 #endif
     }
     else
@@ -257,8 +242,14 @@ USBH_StatusTypeDef USBH_MSC_BOT_Process (USBH_HandleTypeDef *phost, uint8_t lun)
       if(URB_Status == USBH_URB_STALL)
       {
         MSC_Handle->hbot.state  = BOT_ERROR_OUT;
+
 #if (USBH_USE_OS == 1U)
-        osMessagePut ( phost->os_event, USBH_URB_EVENT, 0U);
+        phost->os_msg = (uint32_t)USBH_URB_EVENT;
+#if (osCMSIS < 0x20000U)
+        (void)osMessagePut(phost->os_event, phost->os_msg, 0U);
+#else
+        (void)osMessageQueuePut(phost->os_event, &phost->os_msg, 0U, NULL);
+#endif
 #endif
       }
     }
@@ -301,8 +292,14 @@ USBH_StatusTypeDef USBH_MSC_BOT_Process (USBH_HandleTypeDef *phost, uint8_t lun)
       {
         /* If value was 0, and successful transfer, then change the state */
         MSC_Handle->hbot.state  = BOT_RECEIVE_CSW;
+
 #if (USBH_USE_OS == 1U)
-        osMessagePut (phost->os_event, USBH_URB_EVENT, 0U);
+        phost->os_msg = (uint32_t)USBH_URB_EVENT;
+#if (osCMSIS < 0x20000U)
+        (void)osMessagePut(phost->os_event, phost->os_msg, 0U);
+#else
+        (void)osMessageQueuePut(phost->os_event, &phost->os_msg, 0U, NULL);
+#endif
 #endif
       }
     }
@@ -319,7 +316,12 @@ USBH_StatusTypeDef USBH_MSC_BOT_Process (USBH_HandleTypeDef *phost, uint8_t lun)
       4. The host shall attempt to receive a CSW.*/
 
 #if (USBH_USE_OS == 1U)
-    osMessagePut (phost->os_event, USBH_URB_EVENT, 0U);
+      phost->os_msg = (uint32_t)USBH_URB_EVENT;
+#if (osCMSIS < 0x20000U)
+      (void)osMessagePut(phost->os_event, phost->os_msg, 0U);
+#else
+      (void)osMessageQueuePut(phost->os_event, &phost->os_msg, 0U, NULL);
+#endif
 #endif
     }
     else
@@ -362,8 +364,14 @@ USBH_StatusTypeDef USBH_MSC_BOT_Process (USBH_HandleTypeDef *phost, uint8_t lun)
         /* If value was 0, and successful transfer, then change the state */
         MSC_Handle->hbot.state  = BOT_RECEIVE_CSW;
       }
+
 #if (USBH_USE_OS == 1U)
-    osMessagePut (phost->os_event, USBH_URB_EVENT, 0U);
+      phost->os_msg = (uint32_t)USBH_URB_EVENT;
+#if (osCMSIS < 0x20000U)
+      (void)osMessagePut(phost->os_event, phost->os_msg, 0U);
+#else
+      (void)osMessageQueuePut(phost->os_event, &phost->os_msg, 0U, NULL);
+#endif
 #endif
     }
 
@@ -371,8 +379,14 @@ USBH_StatusTypeDef USBH_MSC_BOT_Process (USBH_HandleTypeDef *phost, uint8_t lun)
     {
       /* Resend same data */
       MSC_Handle->hbot.state  = BOT_DATA_OUT;
+
 #if (USBH_USE_OS == 1U)
-    osMessagePut ( phost->os_event, USBH_URB_EVENT, 0U);
+      phost->os_msg = (uint32_t)USBH_URB_EVENT;
+#if (osCMSIS < 0x20000U)
+      (void)osMessagePut(phost->os_event, phost->os_msg, 0U);
+#else
+      (void)osMessageQueuePut(phost->os_event, &phost->os_msg, 0U, NULL);
+#endif
 #endif
     }
 
@@ -386,8 +400,14 @@ USBH_StatusTypeDef USBH_MSC_BOT_Process (USBH_HandleTypeDef *phost, uint8_t lun)
       " The host shall clear the Bulk-Out pipe.
       4. The host shall attempt to receive a CSW.
       */
+
 #if (USBH_USE_OS == 1U)
-      osMessagePut ( phost->os_event, USBH_URB_EVENT, 0U);
+      phost->os_msg = (uint32_t)USBH_URB_EVENT;
+#if (osCMSIS < 0x20000U)
+      (void)osMessagePut(phost->os_event, phost->os_msg, 0U);
+#else
+      (void)osMessageQueuePut(phost->os_event, &phost->os_msg, 0U, NULL);
+#endif
 #endif
     }
     else
@@ -422,15 +442,27 @@ USBH_StatusTypeDef USBH_MSC_BOT_Process (USBH_HandleTypeDef *phost, uint8_t lun)
       {
         status = USBH_FAIL;
       }
+
 #if (USBH_USE_OS == 1U)
-      osMessagePut (phost->os_event, USBH_URB_EVENT, 0U);
+      phost->os_msg = (uint32_t)USBH_URB_EVENT;
+#if (osCMSIS < 0x20000U)
+      (void)osMessagePut(phost->os_event, phost->os_msg, 0U);
+#else
+      (void)osMessageQueuePut(phost->os_event, &phost->os_msg, 0U, NULL);
+#endif
 #endif
     }
     else if(URB_Status == USBH_URB_STALL)
     {
       MSC_Handle->hbot.state  = BOT_ERROR_IN;
+
 #if (USBH_USE_OS == 1U)
-      osMessagePut (phost->os_event, USBH_URB_EVENT, 0U);
+      phost->os_msg = (uint32_t)USBH_URB_EVENT;
+#if (osCMSIS < 0x20000U)
+      (void)osMessagePut(phost->os_event, phost->os_msg, 0U);
+#else
+      (void)osMessageQueuePut(phost->os_event, &phost->os_msg, 0U, NULL);
+#endif
 #endif
     }
     else

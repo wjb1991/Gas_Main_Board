@@ -6,42 +6,17 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2017 STMicroelectronics International N.V.
+  * <h2><center>&copy; Copyright (c) 2015 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
-  * Redistribution and use in source and binary forms, with or without
-  * modification, are permitted, provided that the following conditions are met:
-  *
-  * 1. Redistribution of source code must retain the above copyright notice,
-  *    this list of conditions and the following disclaimer.
-  * 2. Redistributions in binary form must reproduce the above copyright notice,
-  *    this list of conditions and the following disclaimer in the documentation
-  *    and/or other materials provided with the distribution.
-  * 3. Neither the name of STMicroelectronics nor the names of other
-  *    contributors to this software may be used to endorse or promote products
-  *    derived from this software without specific written permission.
-  * 4. This software, including modifications and/or derivative works of this
-  *    software, must execute solely and exclusively on microcontroller or
-  *    microprocessor devices manufactured by or for STMicroelectronics.
-  * 5. Redistribution and use of this software other than as permitted under
-  *    this license is void and will automatically terminate your rights under
-  *    this license.
-  *
-  * THIS SOFTWARE IS PROVIDED BY STMICROELECTRONICS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS, IMPLIED OR STATUTORY WARRANTIES, INCLUDING, BUT NOT
-  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
-  * PARTICULAR PURPOSE AND NON-INFRINGEMENT OF THIRD PARTY INTELLECTUAL PROPERTY
-  * RIGHTS ARE DISCLAIMED TO THE FULLEST EXTENT PERMITTED BY LAW. IN NO EVENT
-  * SHALL STMICROELECTRONICS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-  * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
-  * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
-  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  * This software component is licensed by ST under Ultimate Liberty license
+  * SLA0044, the "License"; You may not use this file except in compliance with
+  * the License. You may obtain a copy of the License at:
+  *                      http://www.st.com/SLA0044
   *
   ******************************************************************************
   */
+
 /* Includes ------------------------------------------------------------------*/
 
 #include "usbh_ctlreq.h"
@@ -582,10 +557,14 @@ USBH_StatusTypeDef USBH_CtlReq     (USBH_HandleTypeDef *phost,
     phost->Control.state = CTRL_SETUP;
     phost->RequestState = CMD_WAIT;
     status = USBH_BUSY;
+
 #if (USBH_USE_OS == 1U)
-    //osMessagePut ( phost->os_event, USBH_CONTROL_EVENT, 0);
-    OS_ERR os_err;
-    OSTaskQPost((OS_TCB*)&TaskUsbHostTCB,(void*)USBH_CONTROL_EVENT,1,OS_OPT_POST_FIFO,&os_err);  
+    phost->os_msg = (uint32_t)USBH_CONTROL_EVENT;
+#if (osCMSIS < 0x20000U)
+    (void)osMessagePut(phost->os_event, phost->os_msg, 0U);
+#else
+    (void)osMessageQueuePut(phost->os_event, &phost->os_msg, 0U, NULL);
+#endif
 #endif
     break;
 
@@ -681,10 +660,14 @@ static USBH_StatusTypeDef USBH_HandleControl (USBH_HandleTypeDef *phost)
           phost->Control.state = CTRL_STATUS_IN;
         }
       }
+
 #if (USBH_USE_OS == 1U)
-      //osMessagePut ( phost->os_event, USBH_CONTROL_EVENT, 0);
-        OS_ERR os_err;
-        OSTaskQPost((OS_TCB*)&TaskUsbHostTCB,(void*)USBH_CONTROL_EVENT,1,OS_OPT_POST_FIFO,&os_err);  
+      phost->os_msg = (uint32_t)USBH_CONTROL_EVENT;
+#if (osCMSIS < 0x20000U)
+      (void)osMessagePut(phost->os_event, phost->os_msg, 0U);
+#else
+      (void)osMessageQueuePut(phost->os_event, &phost->os_msg, 0U, NULL);
+#endif
 #endif
     }
     else
@@ -692,10 +675,14 @@ static USBH_StatusTypeDef USBH_HandleControl (USBH_HandleTypeDef *phost)
       if((URB_Status == USBH_URB_ERROR) || (URB_Status == USBH_URB_NOTREADY))
       {
         phost->Control.state = CTRL_ERROR;
+
 #if (USBH_USE_OS == 1U)
-        //osMessagePut (phost->os_event, USBH_CONTROL_EVENT, 0);
-        OS_ERR os_err;
-        OSTaskQPost((OS_TCB*)&TaskUsbHostTCB,(void*)USBH_CONTROL_EVENT,1,OS_OPT_POST_FIFO,&os_err);  
+        phost->os_msg = (uint32_t)USBH_CONTROL_EVENT;
+#if (osCMSIS < 0x20000U)
+        (void)osMessagePut(phost->os_event, phost->os_msg, 0U);
+#else
+        (void)osMessageQueuePut(phost->os_event, &phost->os_msg, 0U, NULL);
+#endif
 #endif
       }
     }
@@ -720,10 +707,14 @@ static USBH_StatusTypeDef USBH_HandleControl (USBH_HandleTypeDef *phost)
     if  (URB_Status == USBH_URB_DONE)
     {
       phost->Control.state = CTRL_STATUS_OUT;
+
 #if (USBH_USE_OS == 1U)
-    //osMessagePut ( phost->os_event, USBH_CONTROL_EVENT, 0);
-    OS_ERR os_err;
-    OSTaskQPost((OS_TCB*)&TaskUsbHostTCB,(void*)USBH_CONTROL_EVENT,1,OS_OPT_POST_FIFO,&os_err);  
+      phost->os_msg = (uint32_t)USBH_CONTROL_EVENT;
+#if (osCMSIS < 0x20000U)
+      (void)osMessagePut(phost->os_event, phost->os_msg, 0U);
+#else
+      (void)osMessageQueuePut(phost->os_event, &phost->os_msg, 0U, NULL);
+#endif
 #endif
     }
 
@@ -732,10 +723,14 @@ static USBH_StatusTypeDef USBH_HandleControl (USBH_HandleTypeDef *phost)
     {
       /* In stall case, return to previous machine state*/
       status = USBH_NOT_SUPPORTED;
+
 #if (USBH_USE_OS == 1U)
-    //osMessagePut ( phost->os_event, USBH_CONTROL_EVENT, 0);
-    OS_ERR os_err;
-    OSTaskQPost((OS_TCB*)&TaskUsbHostTCB,(void*)USBH_CONTROL_EVENT,1,OS_OPT_POST_FIFO,&os_err);  
+      phost->os_msg = (uint32_t)USBH_CONTROL_EVENT;
+#if (osCMSIS < 0x20000U)
+      (void)osMessagePut(phost->os_event, phost->os_msg, 0U);
+#else
+      (void)osMessageQueuePut(phost->os_event, &phost->os_msg, 0U, NULL);
+#endif
 #endif
     }
     else
@@ -744,10 +739,14 @@ static USBH_StatusTypeDef USBH_HandleControl (USBH_HandleTypeDef *phost)
       {
         /* Device error */
         phost->Control.state = CTRL_ERROR;
+
 #if (USBH_USE_OS == 1U)
-        //osMessagePut ( phost->os_event, USBH_CONTROL_EVENT, 0);
-        OS_ERR os_err;
-        OSTaskQPost((OS_TCB*)&TaskUsbHostTCB,(void*)USBH_CONTROL_EVENT,1,OS_OPT_POST_FIFO,&os_err);  
+        phost->os_msg = (uint32_t)USBH_CONTROL_EVENT;
+#if (osCMSIS < 0x20000U)
+        (void)osMessagePut(phost->os_event, phost->os_msg, 0U);
+#else
+        (void)osMessageQueuePut(phost->os_event, &phost->os_msg, 0U, NULL);
+#endif
 #endif
       }
     }
@@ -771,10 +770,14 @@ static USBH_StatusTypeDef USBH_HandleControl (USBH_HandleTypeDef *phost)
     if  (URB_Status == USBH_URB_DONE)
     { /* If the Setup Pkt is sent successful, then change the state */
       phost->Control.state = CTRL_STATUS_IN;
+
 #if (USBH_USE_OS == 1U)
-      //osMessagePut ( phost->os_event, USBH_CONTROL_EVENT, 0);
-        OS_ERR os_err;
-        OSTaskQPost((OS_TCB*)&TaskUsbHostTCB,(void*)USBH_CONTROL_EVENT,1,OS_OPT_POST_FIFO,&os_err);  
+      phost->os_msg = (uint32_t)USBH_CONTROL_EVENT;
+#if (osCMSIS < 0x20000U)
+      (void)osMessagePut(phost->os_event, phost->os_msg, 0U);
+#else
+      (void)osMessageQueuePut(phost->os_event, &phost->os_msg, 0U, NULL);
+#endif
 #endif
     }
 
@@ -784,10 +787,14 @@ static USBH_StatusTypeDef USBH_HandleControl (USBH_HandleTypeDef *phost)
       /* In stall case, return to previous machine state*/
       phost->Control.state = CTRL_STALLED;
       status = USBH_NOT_SUPPORTED;
+
 #if (USBH_USE_OS == 1U)
-    //osMessagePut ( phost->os_event, USBH_CONTROL_EVENT, 0);
-    OS_ERR os_err;
-    OSTaskQPost((OS_TCB*)&TaskUsbHostTCB,(void*)USBH_CONTROL_EVENT,1,OS_OPT_POST_FIFO,&os_err);  
+      phost->os_msg = (uint32_t)USBH_CONTROL_EVENT;
+#if (osCMSIS < 0x20000U)
+      (void)osMessagePut(phost->os_event, phost->os_msg, 0U);
+#else
+      (void)osMessageQueuePut(phost->os_event, &phost->os_msg, 0U, NULL);
+#endif
 #endif
     }
     else if  (URB_Status == USBH_URB_NOTREADY)
@@ -796,9 +803,12 @@ static USBH_StatusTypeDef USBH_HandleControl (USBH_HandleTypeDef *phost)
       phost->Control.state = CTRL_DATA_OUT;
 
 #if (USBH_USE_OS == 1U)
-    //osMessagePut ( phost->os_event, USBH_CONTROL_EVENT, 0);
-    OS_ERR os_err;
-    OSTaskQPost((OS_TCB*)&TaskUsbHostTCB,(void*)USBH_CONTROL_EVENT,1,OS_OPT_POST_FIFO,&os_err);  
+      phost->os_msg = (uint32_t)USBH_CONTROL_EVENT;
+#if (osCMSIS < 0x20000U)
+      (void)osMessagePut(phost->os_event, phost->os_msg, 0U);
+#else
+      (void)osMessageQueuePut(phost->os_event, &phost->os_msg, 0U, NULL);
+#endif
 #endif
     }
     else
@@ -810,9 +820,12 @@ static USBH_StatusTypeDef USBH_HandleControl (USBH_HandleTypeDef *phost)
         status = USBH_FAIL;
 
 #if (USBH_USE_OS == 1U)
-        //osMessagePut ( phost->os_event, USBH_CONTROL_EVENT, 0);
-        OS_ERR os_err;
-        OSTaskQPost((OS_TCB*)&TaskUsbHostTCB,(void*)USBH_CONTROL_EVENT,1,OS_OPT_POST_FIFO,&os_err);  
+        phost->os_msg = (uint32_t)USBH_CONTROL_EVENT;
+#if (osCMSIS < 0x20000U)
+        (void)osMessagePut(phost->os_event, phost->os_msg, 0U);
+#else
+        (void)osMessageQueuePut(phost->os_event, &phost->os_msg, 0U, NULL);
+#endif
 #endif
       }
     }
@@ -838,20 +851,27 @@ static USBH_StatusTypeDef USBH_HandleControl (USBH_HandleTypeDef *phost)
     { /* Control transfers completed, Exit the State Machine */
       phost->Control.state = CTRL_COMPLETE;
       status = USBH_OK;
+
 #if (USBH_USE_OS == 1U)
-    //osMessagePut ( phost->os_event, USBH_CONTROL_EVENT, 0);
-    OS_ERR os_err;
-    OSTaskQPost((OS_TCB*)&TaskUsbHostTCB,(void*)USBH_CONTROL_EVENT,1,OS_OPT_POST_FIFO,&os_err);  
+      phost->os_msg = (uint32_t)USBH_CONTROL_EVENT;
+#if (osCMSIS < 0x20000U)
+      (void)osMessagePut(phost->os_event, phost->os_msg, 0U);
+#else
+      (void)osMessageQueuePut(phost->os_event, &phost->os_msg, 0U, NULL);
+#endif
 #endif
     }
-
     else if (URB_Status == USBH_URB_ERROR)
     {
       phost->Control.state = CTRL_ERROR;
+
 #if (USBH_USE_OS == 1U)
-    //osMessagePut ( phost->os_event, USBH_CONTROL_EVENT, 0);
-    OS_ERR os_err;
-    OSTaskQPost((OS_TCB*)&TaskUsbHostTCB,(void*)USBH_CONTROL_EVENT,1,OS_OPT_POST_FIFO,&os_err);  
+      phost->os_msg = (uint32_t)USBH_CONTROL_EVENT;
+#if (osCMSIS < 0x20000U)
+      (void)osMessagePut(phost->os_event, phost->os_msg, 0U);
+#else
+      (void)osMessageQueuePut(phost->os_event, &phost->os_msg, 0U, NULL);
+#endif
 #endif
     }
     else
@@ -862,9 +882,12 @@ static USBH_StatusTypeDef USBH_HandleControl (USBH_HandleTypeDef *phost)
         status = USBH_NOT_SUPPORTED;
 
 #if (USBH_USE_OS == 1U)
-        //osMessagePut ( phost->os_event, USBH_CONTROL_EVENT, 0);
-        OS_ERR os_err;
-        OSTaskQPost((OS_TCB*)&TaskUsbHostTCB,(void*)USBH_CONTROL_EVENT,1,OS_OPT_POST_FIFO,&os_err);  
+        phost->os_msg = (uint32_t)USBH_CONTROL_EVENT;
+#if (osCMSIS < 0x20000U)
+        (void)osMessagePut(phost->os_event, phost->os_msg, 0U);
+#else
+        (void)osMessageQueuePut(phost->os_event, &phost->os_msg, 0U, NULL);
+#endif
 #endif
       }
     }
@@ -889,9 +912,12 @@ static USBH_StatusTypeDef USBH_HandleControl (USBH_HandleTypeDef *phost)
       phost->Control.state = CTRL_COMPLETE;
 
 #if (USBH_USE_OS == 1U)
-    //osMessagePut ( phost->os_event, USBH_CONTROL_EVENT, 0);
-    OS_ERR os_err;
-    OSTaskQPost((OS_TCB*)&TaskUsbHostTCB,(void*)USBH_CONTROL_EVENT,1,OS_OPT_POST_FIFO,&os_err);  
+      phost->os_msg = (uint32_t)USBH_CONTROL_EVENT;
+#if (osCMSIS < 0x20000U)
+      (void)osMessagePut(phost->os_event, phost->os_msg, 0U);
+#else
+      (void)osMessageQueuePut(phost->os_event, &phost->os_msg, 0U, NULL);
+#endif
 #endif
     }
     else if  (URB_Status == USBH_URB_NOTREADY)
@@ -899,9 +925,12 @@ static USBH_StatusTypeDef USBH_HandleControl (USBH_HandleTypeDef *phost)
       phost->Control.state = CTRL_STATUS_OUT;
 
 #if (USBH_USE_OS == 1U)
-    //osMessagePut ( phost->os_event, USBH_CONTROL_EVENT, 0);
-    OS_ERR os_err;
-    OSTaskQPost((OS_TCB*)&TaskUsbHostTCB,(void*)USBH_CONTROL_EVENT,1,OS_OPT_POST_FIFO,&os_err);   
+      phost->os_msg = (uint32_t)USBH_CONTROL_EVENT;
+#if (osCMSIS < 0x20000U)
+      (void)osMessagePut(phost->os_event, phost->os_msg, 0U);
+#else
+      (void)osMessageQueuePut(phost->os_event, &phost->os_msg, 0U, NULL);
+#endif
 #endif
     }
     else
@@ -911,9 +940,12 @@ static USBH_StatusTypeDef USBH_HandleControl (USBH_HandleTypeDef *phost)
         phost->Control.state = CTRL_ERROR;
 
 #if (USBH_USE_OS == 1U)
-        //osMessagePut ( phost->os_event, USBH_CONTROL_EVENT, 0);
-    OS_ERR os_err;
-    OSTaskQPost((OS_TCB*)&TaskUsbHostTCB,(void*)USBH_CONTROL_EVENT,1,OS_OPT_POST_FIFO,&os_err);  
+        phost->os_msg = (uint32_t)USBH_CONTROL_EVENT;
+#if (osCMSIS < 0x20000U)
+        (void)osMessagePut(phost->os_event, phost->os_msg, 0U);
+#else
+        (void)osMessageQueuePut(phost->os_event, &phost->os_msg, 0U, NULL);
+#endif
 #endif
       }
 

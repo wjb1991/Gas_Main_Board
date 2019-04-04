@@ -24,10 +24,10 @@
     #define SPECTRUM_DBG(...)
 #endif
 
-FP64 alf_AbsSpectrum[3840] = {0.0};
-FP64 alf_BkgSpectrum[3840] = {0.0};
-FP64 alf_DiffSpectrum[3840] = {0.0};
-FP64 alf_Spectrum[3840] = {0.0};
+FP64 alf_AbsSpectrum[384] = {0.0};
+FP64 alf_BkgSpectrum[384] = {0.0};
+FP64 alf_DiffSpectrum[384] = {0.0};
+FP64 alf_Spectrum[384] = {0.0};
 
 GasInfo_t st_GasN0 = {
     "NO",                                       /* ÆøÌåÃû×Ö */

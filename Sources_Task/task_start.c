@@ -80,7 +80,7 @@ void Task_Start (void *p_arg)
 
     Bsp_Init();                                                 /* Initialize BSP functions                             */
 
-    InitParaFromEeprom(INIT_NORMAL);                            //INIT_NORMAL   INIT_DEFAULT
+    //InitParaFromEeprom(INIT_NORMAL);                            //INIT_NORMAL   INIT_DEFAULT
 
 
 #if OS_CFG_STAT_TASK_EN > 0u
@@ -267,7 +267,7 @@ void AppTaskCreate (void)
 #endif
 
 
-#if 1
+#if 0
     /* 紫外处理光谱仪 */
     OSTaskCreate((OS_TCB       *)&TaskGasProcTCB,                               /* 创建任务控制块 */
                  (CPU_CHAR     *)"Gas Process",                                 /* 任务名称 */

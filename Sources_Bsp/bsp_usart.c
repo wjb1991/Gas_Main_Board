@@ -309,7 +309,7 @@ void Bsp_UsartTxDisable(Dev_SerialPort* pst_Dev)
             }
         }
     }
-
+    
     /* 错误中断 */
     if(LL_USART_IsEnabledIT_ERROR(USARTx) && LL_USART_IsActiveFlag_NE(USARTx))
     {
@@ -678,6 +678,10 @@ void DMA2_Stream1_IRQHandler(void)
 //==================================================================================
 BOOL Bsp_UartOpen(Dev_SerialPort* pst_Dev)
 {
+    /* 
+      更换不同的硬件环境时需要对 stm32f7xx_hal_conf.h 中的HSE_VALUE 重新设置
+      否则可能造成波特率不对的情况
+    */
     UART_HandleTypeDef* UartHandle = pst_Dev->pv_UartHandle;
 
     UartHandle->Init.BaudRate   = pst_Dev->ul_BaudRate;
@@ -687,7 +691,12 @@ BOOL Bsp_UartOpen(Dev_SerialPort* pst_Dev)
     UartHandle->Init.HwFlowCtl  = pst_Dev->ul_HwFlowCtl;
     UartHandle->Init.Mode       = pst_Dev->ul_Mode;
 
-
+    /* F723新增 */
+    UartHandle->Init.HwFlowCtl = UART_HWCONTROL_NONE;
+    UartHandle->Init.OverSampling = UART_OVERSAMPLING_16;
+    UartHandle->Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+    UartHandle->AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+    
     if(HAL_UART_Init(UartHandle) != HAL_OK)
     {
         /* 初始化出错 清除对应串口 */
@@ -695,9 +704,12 @@ BOOL Bsp_UartOpen(Dev_SerialPort* pst_Dev)
         return FALSE;
     }
 
-    /* 开启 错误中断 */
+    if(pst_Dev == &COM1)
+        return TRUE;
+    
+    /* 开启 错误中断*/
     LL_USART_EnableIT_ERROR(UartHandle->Instance);
-
+    
     if(UartHandle->Init.Mode  == UART_MODE_TX_RX)
     {
         Bsp_UsartTxEnable(pst_Dev);
@@ -712,7 +724,7 @@ BOOL Bsp_UartOpen(Dev_SerialPort* pst_Dev)
     {
         Bsp_UsartTxDisable(pst_Dev);
         Bsp_UsartRxEnable(pst_Dev);
-    }
+    } 
     return TRUE;
 }
 
@@ -891,8 +903,8 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
         GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
 
         HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-#endif
-
+#endif    
+        
 #if 0
         /*##-1- Enable peripherals and GPIO Clocks #################################*/
         /* Enable GPIO TX/RX clock */
@@ -1302,7 +1314,7 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
 void Bsp_UartPrintf(const char * Format,...)
 {
     static INT8U    auch_PrintfBuff[100] = {0};
-	Dev_SerialPort* p = &COM4;      //打印串口更改此处
+	Dev_SerialPort* p = &COM1;      //打印串口更改此处
 	while(p->uin_TxLen != 0){}      //等待发送完成
 
 	va_list pArgs;
@@ -1318,6 +1330,7 @@ void Bsp_UartPrintf(const char * Format,...)
 
 int fputc(int ch, FILE *f)
 {
+    //HAL_UART_Transmit(COM2.pv_UartHandle, (uint8_t*)&ch, 1, 100);
     while (!LL_USART_IsActiveFlag_TXE(USART1)){}
     LL_USART_TransmitData8(USART1, ch);
 

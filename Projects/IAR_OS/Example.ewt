@@ -2372,7 +2372,7 @@
     <group>
         <name>CMSIS</name>
         <file>
-            <name>$PROJ_DIR$\..\..\Drivers\CMSIS\Device\ST\STM32F7xx\Source\Templates\iar\startup_stm32f767xx.s</name>
+            <name>$PROJ_DIR$\..\..\Drivers\CMSIS\Device\ST\STM32F7xx\Source\Templates\iar\startup_stm32f723xx.s</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\Drivers\CMSIS\Device\ST\STM32F7xx\Source\Templates\system_stm32f7xx.c</name>
@@ -2740,6 +2740,12 @@
                 <name>USB4000</name>
                 <file>
                     <name>$PROJ_DIR$\..\..\USB_Host_Library\Class\USB4000\Src\usbh_template.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\USB_Host_Library\Class\USB4000\Src\usbh_usb4000.c</name>
+                    <configuration>
+                        <name>Debug</name>
+                    </configuration>
                 </file>
             </group>
         </group>

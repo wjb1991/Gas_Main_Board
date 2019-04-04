@@ -10,7 +10,7 @@
   * inserted by the user or by software development tools
   * are owned by their respective copyright owners.
   *
-  * Copyright (c) 2018 STMicroelectronics International N.V. 
+  * Copyright (c) 2019 STMicroelectronics International N.V. 
   * All rights reserved.
   *
   * Redistribution and use in source and binary forms, with or without 
@@ -53,6 +53,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "Bsp.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -96,7 +97,7 @@
 	MiddleWare version : 
 */
 /*----------   -----------*/
-#define USBH_MAX_NUM_ENDPOINTS      5
+#define USBH_MAX_NUM_ENDPOINTS      6
  
 /*----------   -----------*/
 #define USBH_MAX_NUM_INTERFACES      10
@@ -120,7 +121,7 @@
 #define USBH_DEBUG_LEVEL      3
  
 /*----------   -----------*/
-#define USBH_USE_OS      1
+#define USBH_USE_OS      0
  
  
  
@@ -131,10 +132,9 @@
 #define HOST_FS 		1
 
 #if (USBH_USE_OS == 1)
-#include "App_Include.h"
-  //#include "cmsis_os.h"
-  //#define USBH_PROCESS_PRIO          osPriorityNormal
-  //#define USBH_PROCESS_STACK_SIZE    ((uint16_t)0)
+  #include "cmsis_os.h"
+  #define USBH_PROCESS_PRIO          osPriorityNormal
+  #define USBH_PROCESS_STACK_SIZE    ((uint16_t)0)
 #endif /* (USBH_USE_OS == 1) */
 
 /**

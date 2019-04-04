@@ -10,7 +10,7 @@
   * inserted by the user or by software development tools
   * are owned by their respective copyright owners.
   *
-  * Copyright (c) 2018 STMicroelectronics International N.V. 
+  * Copyright (c) 2019 STMicroelectronics International N.V. 
   * All rights reserved.
   *
   * Redistribution and use in source and binary forms, with or without 
@@ -50,13 +50,8 @@
 /* Includes ------------------------------------------------------------------*/
 
 #include "usb_host.h"
-//#include "usbh_core.h"
-//#include "usbh_audio.h"
-//#include "usbh_cdc.h"
-//#include "usbh_msc.h"
-//#include "usbh_hid.h"
-//#include "usbh_mtp.h"
-#include "usbh_template.h"
+#include "usbh_core.h"
+#include "usbh_usb4000.h"
 
 /* USER CODE BEGIN Includes */
 
@@ -73,10 +68,9 @@
 /* USER CODE END PFP */
 
 /* USB Host core handle declaration */
-USBH_HandleTypeDef hUsbHostFS;
+USBH_HandleTypeDef hUsbHostHS;
 ApplicationTypeDef Appli_state = APPLICATION_IDLE;
 
-extern HCD_HandleTypeDef hhcd_USB_OTG_FS;
 /*
  * -- Insert your variables declaration here --
  */
@@ -93,35 +87,7 @@ static void USBH_UserProcess(USBH_HandleTypeDef *phost, uint8_t id);
  * -- Insert your external function declaration here --
  */
 /* USER CODE BEGIN 1 */
-static void USBH_TimeOutIrq (void* pv_Timer);
-static SoftTimer_t  UsbConnectTimer = {
-    TRUE,                       //单次模式
-    10000,                      //第一次的定时时间    
-    0,                          //周期定时时间
-    USBH_TimeOutIrq,            //回调函数
 
-};
-                             
-void USBH_TimeOutIrq (void* pv_Timer)
-{
-    USBH_ReEnumerate(&hUsbHostFS);
-}
-
-
-void USBH_TimeOutStart(void)
-{
-    Bsp_TimerStart(&UsbConnectTimer);
-}
-
-void USBH_TimeOutStop(void)
-{
-    Bsp_TimerStop(&UsbConnectTimer);
-}
-
-void USBH_TimeOutInit(void)
-{
-    Bsp_TimerReg(&UsbConnectTimer);
-}
 /* USER CODE END 1 */
 
 /**
@@ -135,22 +101,21 @@ void USB_HOST_Init(void)
   /* USER CODE END USB_HOST_Init_PreTreatment */
   
   /* Init host Library, add supported class and start the library. */
-  USBH_Init(&hUsbHostFS, USBH_UserProcess, HOST_FS);
-  USBH_TimeOutInit();
-//  USBH_RegisterClass(&hUsbHostFS, USBH_AUDIO_CLASS);
+  USBH_Init(&hUsbHostHS, USBH_UserProcess, HOST_HS);
+/*
+  USBH_RegisterClass(&hUsbHostHS, USBH_AUDIO_CLASS);
 
-//  USBH_RegisterClass(&hUsbHostFS, USBH_CDC_CLASS);
+  USBH_RegisterClass(&hUsbHostHS, USBH_CDC_CLASS);
 
-//  USBH_RegisterClass(&hUsbHostFS, USBH_MSC_CLASS);
+  USBH_RegisterClass(&hUsbHostHS, USBH_MSC_CLASS);
 
-//  USBH_RegisterClass(&hUsbHostFS, USBH_HID_CLASS);
+  USBH_RegisterClass(&hUsbHostHS, USBH_HID_CLASS);
 
-//  USBH_RegisterClass(&hUsbHostFS, USBH_MTP_CLASS);
-    
-  USBH_RegisterClass(&hUsbHostFS, USBH_USB4000_CLASS);
-    
-  USBH_Start(&hUsbHostFS);
+  USBH_RegisterClass(&hUsbHostHS, USBH_MTP_CLASS);
+*/
+  USBH_RegisterClass(&hUsbHostHS, USBH_USB4000_CLASS);
   
+  USBH_Start(&hUsbHostHS);
 
   /* USER CODE BEGIN USB_HOST_Init_PostTreatment */
   
@@ -163,60 +128,55 @@ void USB_HOST_Init(void)
 void USB_HOST_Process(void)
 {
   /* USB Host Background task */
-  USBH_Process(&hUsbHostFS);
+  USBH_Process(&hUsbHostHS);
 }
-
-
-
 /*
  * user callback definition
  */
 static void USBH_UserProcess  (USBH_HandleTypeDef *phost, uint8_t id)
 {
   /* USER CODE BEGIN CALL_BACK_1 */
-    switch(id)
-    {
-    case HOST_USER_SELECT_CONFIGURATION:
-        break;
+  switch(id)
+  {
+  case HOST_USER_SELECT_CONFIGURATION:
+  break;
 
-    case HOST_USER_DISCONNECTION:
-        Appli_state = APPLICATION_DISCONNECT;
-        break;
+  case HOST_USER_DISCONNECTION:
+  Appli_state = APPLICATION_DISCONNECT;
+  break;
 
-    case HOST_USER_CLASS_ACTIVE:
-        Appli_state = APPLICATION_READY;
-        break;
+  case HOST_USER_CLASS_ACTIVE:
+  Appli_state = APPLICATION_READY;
+  break;
 
-    case HOST_USER_CONNECTION:
-        printf("HOST_USER_CONNECTION\r\n");
-        HAL_Delay(4000);
-        Appli_state = APPLICATION_START;
-        USBH_TimeOutStart();
-        break;
+  case HOST_USER_CONNECTION:
+  Appli_state = APPLICATION_START;
+  Bsp_DelayMs(3000);
+  break;
 
-    default:
-        break;
-    }
+  default:
+  break;
+  }
   /* USER CODE END CALL_BACK_1 */
 }
 
-void OTG_FS_IRQHandler(void)
+extern HCD_HandleTypeDef hhcd_USB_OTG_HS;
+
+void OTG_HS_IRQHandler(void)
 {
 #ifdef  OS_SUPPORT
-    CPU_SR_ALLOC();
-
-    CPU_CRITICAL_ENTER();
-    OSIntEnter();
-    CPU_CRITICAL_EXIT();
+    //CPU_SR_ALLOC();
+    
+    //CPU_CRITICAL_ENTER();
+    //OSIntEnter();
+    //CPU_CRITICAL_EXIT();
 #endif
-    
-    HAL_HCD_IRQHandler(&hhcd_USB_OTG_FS);
-    
+    HAL_HCD_IRQHandler(&hhcd_USB_OTG_HS);
+
 #ifdef  OS_SUPPORT
-    OSIntExit();
+    //OSIntExit();
 #endif
 }
-
 /**
   * @}
   */
