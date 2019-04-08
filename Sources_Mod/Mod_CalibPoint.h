@@ -18,6 +18,8 @@ typedef struct {
 extern CalibPoint_t ast_CalibPoint_GasNO[DEF_CALIBPOINT_MAX];
 extern CalibPointList_t st_CPList_GasNO;
 
+extern CalibPoint_t ast_CalibPoint_GasHC[DEF_CALIBPOINT_MAX];
+extern CalibPointList_t st_CPList_GasHC;
 
 BOOL Mod_CalibPointListInit(CalibPointList_t* pst_CpointList);
 

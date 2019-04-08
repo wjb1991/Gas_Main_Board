@@ -15,12 +15,20 @@
 #endif
 
 CalibPoint_t ast_CalibPoint_GasNO[DEF_CALIBPOINT_MAX] = {0};
+CalibPoint_t ast_CalibPoint_GasHC[DEF_CALIBPOINT_MAX] = {0};
 
 CalibPointList_t st_CPList_GasNO = {
     &ast_CalibPoint_GasNO[0],
     DEF_CALIBPOINT_MAX,
     0,
 };
+
+CalibPointList_t st_CPList_GasHC = {
+    &ast_CalibPoint_GasNO[0],
+    DEF_CALIBPOINT_MAX,
+    0,
+};
+
 
 BOOL Mod_CalibPointListInit(CalibPointList_t* pst_CpointList)
 {

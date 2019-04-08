@@ -57,13 +57,15 @@ typedef struct {
 
     void*        pst_Dev;                       /* 光谱仪设备 */
 
-    BOOL         b_SaveAbsSpecetrum;            /* 存储调零光谱 */
+    BOOL         b_SaveZeroSpecetrum;            /* 存储调零光谱 */
     
     FP32*        pf_WaveLenth;                  /* 波长数组 */
-    FP64*        plf_AbsSpectrum;               /* 绝对光谱 调零光谱 */
-    FP64*        plf_BkgSpectrum;               /* 背景光谱 差分测量 */
-    FP64*        plf_DiffSpectrum;              /* 差分光谱 */
-    FP64*        plf_Spectrum;                  /* 现在的光谱 */
+    FP32*        plf_Spectrum;                  /* 现在的光谱 */
+    FP32*        pf_ProcSpectrum;               /* 处理光谱 */
+    FP32*        pf_ZeroSpectrum;               /* 绝对光谱 调零光谱 */
+    FP32*        plf_BkgSpectrum;               /* 背景光谱 差分测量 */
+    FP32*        plf_DiffSpectrum;              /* 差分光谱 */
+
 
     INT32U       ul_SpectrumLen;                /* 光谱长度 */
     INT32U       ul_UseLeftDot;                 /* 使用的光谱范围左边界 */
@@ -77,31 +79,30 @@ typedef struct {
 
     FP32         f_FilterCoeff;                 /* 光谱一阶滤波系数 */
     INT32U       ul_Cnt;                        /* 计数值 */
-    INT32U       ul_CalibTransCnt;              /* 透过率标定计数值 */
-    INT32U       ul_AdjZeroCnt;                 /* 调零计数值 */
-    INT32U       ul_CalibCnt;                   /* 校准计数值 */
-
+    INT32U       ul_ScanAvg;                    /* 平均计数值 */
+    
     GasInfo_t*   pst_Gas1;                      /* 气体1 */
     GasInfo_t*   pst_Gas2;                      /* 气体2 */
 }GasMeasure_t;
 
-extern FP64 alf_AbsSpectrum[384];
-extern GasInfo_t st_GasN0;
+extern FP32 af_ZeroSpectrum[3648];
+extern GasInfo_t st_GasNO;
+extern GasInfo_t st_GasHC;
 extern GasMeasure_t st_GasMeasure;
 
-BOOL Mod_GasMeasureGotoAdjZero(GasMeasure_t* pst_Meas);
+BOOL Mod_GasMeasureDoAdjZero(GasMeasure_t* pst_Meas,INT16U uin_Cont);
 
-BOOL Mod_GasMeasureGotoCalib(GasMeasure_t* pst_Meas,GasMeasureState_e e_State,FP64 lf_GasCon1,FP64 lf_GasCon2);
+BOOL Mod_GasMeasureDoCalib(GasMeasure_t* pst_Meas,GasMeasureState_e e_State,INT16U uin_Cont,FP32 lf_GasCon1,FP32 lf_GasCon2);
 
-BOOL Mod_GasMeasureGotoCalibCorrection(GasMeasure_t* pst_Meas,GasMeasureState_e e_State,FP64 lf_GasCon1,FP64 lf_GasCon2);
+BOOL Mod_GasMeasureDoCalibCorrection(GasMeasure_t* pst_Meas,GasMeasureState_e e_State,INT16U uin_Cont,FP32 lf_GasCon1,FP32 lf_GasCon2);
 
-BOOL Mod_GasMeasureGotoDiffMeasure(GasMeasure_t* pst_Meas);
+BOOL Mod_GasMeasureDoDiffMeasure(GasMeasure_t* pst_Meas);
 
-BOOL Mod_GasMeasureGotoAbsMeasure(GasMeasure_t* pst_Meas);
+BOOL Mod_GasMeasureDoAbsMeasure(GasMeasure_t* pst_Meas);
 
-BOOL Mod_GasMeasureGotoCalibTrans(GasMeasure_t* pst_Meas);
+BOOL Mod_GasMeasureDoCalibTrans(GasMeasure_t* pst_Meas);
 
-BOOL Mod_GasMeasureGotoWait(GasMeasure_t* pst_Meas);
+BOOL Mod_GasMeasureDoWait(GasMeasure_t* pst_Meas);
 
 void Mod_GasMeasureInit(GasMeasure_t* pst_Meas);
 

@@ -1,6 +1,6 @@
 #include "Mod_Include.h"
 
-BOOL Mod_FilterBoxCar(FP64* plf_Data , INT16U uin_Len, INT16U uin_Boxcar)
+BOOL Mod_FilterBoxCar(FP32* plf_Data , INT16U uin_Len, INT16U uin_Boxcar)
 {
     FP64 plf_Temp[DEF_BOXCAR_WITH_MAX*2 + 1] = {0};
     FP64 lf_Sum = 0;

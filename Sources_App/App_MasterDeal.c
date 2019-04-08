@@ -1,6 +1,6 @@
 #include "App_Include.h"
 
-static FP64 lf_Buff[3840] = {0};//临时
+static FP32 f_Buff[3840] = {0};//临时
 
 BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
 {
@@ -42,8 +42,7 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
                 if( i > 65000000)
                     i = 65000000;
 
-                USB4000.b_SetFlag = TRUE;
-                USB4000.ul_SetIntegralTime = i;
+                USB4000_SetIntegTime(&USB4000,i);
                 SaveToEeprom((INT32U)&USB4000.ul_SetIntegralTime);
                 res = TRUE;    //应答
             }
@@ -301,7 +300,28 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
             }
         }
         break;
-
+//==================================================================================
+//                              设置/读取透过率系数
+//==================================================================================
+    case 0x26:
+        if(pst_Fram->uch_SubCmd == e_StdbusWriteCmd)
+        {
+            if(pst_Fram->uin_PayLoadLenth == 4)
+            {
+                TRACE_DBG(">>DBG>>      设置透过率系数\n\r");
+                st_GasMeasure.f_TransK = Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[0],FALSE);
+                SaveToEeprom((INT32U)&st_GasMeasure.f_TransK);
+                res = TRUE;    //应答
+            }
+        }
+        else if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
+        {
+            //读命令是返回是否在调零
+            pst_Fram->uin_PayLoadLenth = 4;
+            Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[0], st_GasMeasure.f_TransK,FALSE);
+            res = TRUE;    //应答
+        }
+        break;
 //==================================================================================
 //                                   读取10路绿光电压
 //==================================================================================
@@ -457,7 +477,7 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
                 /* 加载光谱到 缓冲区 确保不会再传输一半中 更新光谱 */
                 OSSchedLock(&os_err);
                 for(i = st_GasMeasure.ul_UseLeftDot; i < st_GasMeasure.ul_UseRightDot; i++)
-                    lf_Buff[len++] = st_GasMeasure.plf_Spectrum[i];
+                    f_Buff[len++] = st_GasMeasure.plf_Spectrum[i];
                 OSSchedUnlock(&os_err);
 
                 //读取第一页返回数组长度
@@ -472,10 +492,10 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
                 INT16U uin_Offset = Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[0], FALSE);
                 INT16U uin_Lenth = Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[2], FALSE);
 
-                pst_Fram->uin_PayLoadLenth = 4 + uin_Lenth * 8;
+                pst_Fram->uin_PayLoadLenth = 4 + uin_Lenth * 4;
                 for(i = 0; i<uin_Lenth;i++)
                 {
-                    Bsp_CnvFP64ToArr(&pst_Fram->puc_PayLoad[i*8+4],lf_Buff[uin_Offset+i],FALSE);
+                    Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[i*4+4],f_Buff[uin_Offset+i],FALSE);
                 }
                 res = TRUE;    //应答
             }
@@ -483,7 +503,7 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
         break;
 
 //==================================================================================
-//                                  读取标定光谱
+//                                  读取调零光谱
 //==================================================================================
     case 0x41:
         if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
@@ -497,7 +517,7 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
                 /* 加载光谱到 缓冲区 确保不会再传输一半中 更新光谱 */
                 OSSchedLock(&os_err);
                 for(i = st_GasMeasure.ul_UseLeftDot; i < st_GasMeasure.ul_UseRightDot; i++)
-                    lf_Buff[len++] = st_GasMeasure.plf_AbsSpectrum[i];
+                    f_Buff[len++] = st_GasMeasure.pf_ZeroSpectrum[i];
                 OSSchedUnlock(&os_err);
 
                 //读取第一页返回数组长度
@@ -512,10 +532,10 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
                 INT16U uin_Offset = Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[0], FALSE);
                 INT16U uin_Lenth = Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[2], FALSE);
 
-                pst_Fram->uin_PayLoadLenth = 4 + uin_Lenth * 8;
+                pst_Fram->uin_PayLoadLenth = 4 + uin_Lenth * 4;
                 for(i = 0; i<uin_Lenth;i++)
                 {
-                    Bsp_CnvFP64ToArr(&pst_Fram->puc_PayLoad[i*8+4],lf_Buff[uin_Offset+i],FALSE);
+                    Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[i*4+4],f_Buff[uin_Offset+i],FALSE);
                 }
                 res = TRUE;    //应答
             }
@@ -537,7 +557,7 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
                 /* 加载光谱到 缓冲区 确保不会再传输一半中 更新光谱 */
                 OSSchedLock(&os_err);
                 for(i = st_GasMeasure.ul_UseLeftDot; i < st_GasMeasure.ul_UseRightDot; i++)
-                    lf_Buff[len++] = st_GasMeasure.plf_BkgSpectrum[i];
+                    f_Buff[len++] = st_GasMeasure.plf_BkgSpectrum[i];
                 OSSchedUnlock(&os_err);
 
                 //读取第一页返回数组长度
@@ -552,10 +572,10 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
                 INT16U uin_Offset = Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[0], FALSE);
                 INT16U uin_Lenth = Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[2], FALSE);
 
-                pst_Fram->uin_PayLoadLenth = 4 + uin_Lenth * 8;
+                pst_Fram->uin_PayLoadLenth = 4 + uin_Lenth * 4;
                 for(i = 0; i<uin_Lenth;i++)
                 {
-                    Bsp_CnvFP64ToArr(&pst_Fram->puc_PayLoad[i*8+4],lf_Buff[uin_Offset+i],FALSE);
+                    Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[i*4+4],f_Buff[uin_Offset+i],FALSE);
                 }
                 res = TRUE;    //应答
             }
@@ -576,7 +596,7 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
                 /* 加载光谱到 缓冲区 确保不会再传输一半中 更新光谱 */
                 OSSchedLock(&os_err);
                 for(i = st_GasMeasure.ul_UseLeftDot; i < st_GasMeasure.ul_UseRightDot; i++)
-                    lf_Buff[len++] = st_GasMeasure.plf_DiffSpectrum[i];
+                    f_Buff[len++] = st_GasMeasure.plf_DiffSpectrum[i];
                 OSSchedUnlock(&os_err);
 
                 //读取第一页返回数组长度
@@ -591,15 +611,152 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
                 INT16U uin_Offset = Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[0], FALSE);
                 INT16U uin_Lenth = Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[2], FALSE);
 
-                pst_Fram->uin_PayLoadLenth = 4 + uin_Lenth * 8;
+                pst_Fram->uin_PayLoadLenth = 4 + uin_Lenth * 4;
                 for(i = 0; i<uin_Lenth;i++)
                 {
-                    Bsp_CnvFP64ToArr(&pst_Fram->puc_PayLoad[i*8+4],lf_Buff[uin_Offset+i],FALSE);
+                    Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[i*4+4],f_Buff[uin_Offset+i],FALSE);
                 }
                 res = TRUE;    //应答
             }
         }
         break;
+        
+//==================================================================================
+//                                  读取处理光谱
+//==================================================================================
+    case 0x44:
+        if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
+        {
+            if(pst_Fram->uin_PayLoadLenth == 0)
+            {
+                INT16U i = 0;
+                INT16U len = 0;
+                OS_ERR os_err;
+
+                /* 加载光谱到 缓冲区 确保不会再传输一半中 更新光谱 */
+                OSSchedLock(&os_err);
+                for(i = st_GasMeasure.ul_UseLeftDot; i < st_GasMeasure.ul_UseRightDot; i++)
+                    f_Buff[len++] = st_GasMeasure.pf_ProcSpectrum[i];
+                OSSchedUnlock(&os_err);
+
+                //读取第一页返回数组长度
+                Bsp_CnvINT16UToArr(&pst_Fram->puc_PayLoad[0], len, FALSE);
+                pst_Fram->uin_PayLoadLenth = 2;
+                res = TRUE;    //应答
+            }
+            else if(pst_Fram->uin_PayLoadLenth == 4)
+            {
+                //第一二个字节是ReadAddress 第二三个字节是ReadLenth
+                INT16U i = 0;
+                INT16U uin_Offset = Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[0], FALSE);
+                INT16U uin_Lenth = Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[2], FALSE);
+
+                pst_Fram->uin_PayLoadLenth = 4 + uin_Lenth * 4;
+                for(i = 0; i<uin_Lenth;i++)
+                {
+                    Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[i*4+4],f_Buff[uin_Offset+i],FALSE);
+                }
+                res = TRUE;    //应答
+            }
+        }
+        break;
+//==================================================================================
+//                                  切换工作模式
+//==================================================================================
+    case 0x4a:
+        if(pst_Fram->uch_SubCmd == e_StdbusWriteCmd)
+        {
+            switch(pst_Fram->puc_PayLoad[0])
+            {
+            case eGasAdjZero:
+                if(pst_Fram->uin_PayLoadLenth == 3)
+                {
+                    Mod_GasMeasureDoAdjZero(&st_GasMeasure,Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[1],FALSE));
+                    res = TRUE;    //应答
+                }
+                break;
+            case eGasCalibGas1:
+            case eGasCalibGas2:
+            case eGasCalibAll:
+                if(pst_Fram->uin_PayLoadLenth == 11)
+                {
+                    Mod_GasMeasureDoCalib(&st_GasMeasure,
+                                       (GasMeasureState_e)pst_Fram->puc_PayLoad[0],
+                                       Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[1],FALSE),
+                                       Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[3],FALSE),
+                                       Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[7],FALSE));
+                    res = TRUE;    //应答
+                }
+                break;
+                
+            case eGasCalibCorrectionGas1:
+            case eGasCalibCorrectionGas2:
+            case eGasCalibCorrectionGasAll:
+                if(pst_Fram->uin_PayLoadLenth == 11)
+                {
+                    Mod_GasMeasureDoCalibCorrection(&st_GasMeasure,
+                                       (GasMeasureState_e)pst_Fram->puc_PayLoad[0],
+                                       Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[1],FALSE),
+                                       Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[3],FALSE),
+                                       Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[7],FALSE));
+                    res = TRUE;    //应答
+                }
+                break;
+/*
+            case eGasAbsMeasure:
+                if(pst_Fram->uin_PayLoadLenth == 1)
+                {
+                    if(st_GasMeasure.b_DiffMeasrue != FALSE)
+                    {
+                        st_GasMeasure.b_DiffMeasrue = FALSE;
+                        res = (BOOL)SaveToEeprom((INT32U)&st_GasMeasForIr.b_DiffMeasrue);
+                    }
+                    else
+                        res = TRUE;
+
+                    Mod_GasMeasDoAbsMeasure(&st_GasMeasure);
+                }
+                break;
+            case eGasDiffBackground:
+                if(pst_Fram->uin_PayLoadLenth == 1)
+                {
+                    if(st_GasMeasure.b_DiffMeasrue != TRUE)
+                    {
+                        st_GasMeasure.b_DiffMeasrue = TRUE;
+                        res = (BOOL)SaveToEeprom((INT32U)&st_GasMeasForIr.b_DiffMeasrue);
+                    }
+                    else
+                        res = TRUE;
+
+                    Mod_GasMeasDoDiffBackground(&st_GasMeasForIr);
+                }
+                break;
+            case eGasDiffMeasure:
+                if(pst_Fram->uin_PayLoadLenth == 1)
+                {
+                    if(st_GasMeasure.b_DiffMeasrue != TRUE)
+                    {
+                        st_GasMeasure.b_DiffMeasrue = TRUE;
+                        res = (BOOL)SaveToEeprom((INT32U)&st_GasMeasure.b_DiffMeasrue);
+                    }
+                    else
+                        res = TRUE;
+
+                    Mod_GasMeasDoDiffMeasure(&st_GasMeasure);
+                }
+                break;
+*/
+            default:
+                break;
+
+            }
+        }
+        else if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
+        {  
+            res = TRUE;    //应答
+        }
+        break;
+#if 0
 //==================================================================================
 //                                  切换工作模式
 //==================================================================================
@@ -616,23 +773,23 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
                 switch(pst_Fram->puc_PayLoad[0])
                 {
                 case eGasAdjZero:
-                    Mod_GasMeasureGotoAdjZero(&st_GasMeasure);           //切换到调0状态
+                    Mod_GasMeasureDoAdjZero(&st_GasMeasure);           //切换到调0状态
                     res = TRUE;    //应答
                     break;
                 case eGasAbsMeasure:
-                    Mod_GasMeasureGotoAbsMeasure(&st_GasMeasure);        //切换到工作状态
+                    Mod_GasMeasureDoAbsMeasure(&st_GasMeasure);        //切换到工作状态
                     res = TRUE;    //应答
                     break;
                 case eGasDiffMeasure:
-                    Mod_GasMeasureGotoDiffMeasure(&st_GasMeasure);        //切换到工作状态
+                    Mod_GasMeasureDoDiffMeasure(&st_GasMeasure);        //切换到工作状态
                     res = TRUE;    //应答
                     break;
                 case eGasWait:
-                    Mod_GasMeasureGotoWait(&st_GasMeasure);               //切换到等待状态
+                    Mod_GasMeasureDoWait(&st_GasMeasure);               //切换到等待状态
                     res = TRUE;    //应答
                     break;
                 case eGasCalibTrans:
-                    Mod_GasMeasureGotoCalibTrans(&st_GasMeasure);         //切换到透过率标定（能量标定）        
+                    Mod_GasMeasureDoCalibTrans(&st_GasMeasure);         //切换到透过率标定（能量标定）        
                     res = TRUE;    //应答
                     break;
                 default:
@@ -677,6 +834,7 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
             res = TRUE;    //应答
         }
         break;  
+#endif
 //==================================================================================
 //                                  读取紫外状态
 //==================================================================================

@@ -191,14 +191,14 @@ void Mod_MeasureInit(Measure_t* pst_Meas)
 void Mod_MeasureDoStaticMeasure(Measure_t* pst_Meas)
 {
     Mod_GreyGotoMeas(&st_Grey);                             //绿光等待开始测量
-    Mod_GasMeasureGotoDiffMeasure(&st_GasMeasure);          //紫外开始差分测量 开始绝对测量
-	PostMsg((void*)e_MeasureStaticSample);	//直接开始采样
+    Mod_GasMeasureDoDiffMeasure(&st_GasMeasure);            //紫外开始差分测量 开始绝对测量
+	PostMsg((void*)e_MeasureStaticSample);	                //直接开始采样
 }
 
 void Mod_MeasureDoDynamicMeasure(Measure_t* pst_Meas)
 {
     Mod_GreyGotoIdle(&st_Grey);                             //绿光结束测量  
-    Mod_GasMeasureGotoAbsMeasure(&st_GasMeasure);           //紫外结束差分测量 开始绝对测量
+    Mod_GasMeasureDoAbsMeasure(&st_GasMeasure);             //紫外结束差分测量 开始绝对测量
 	PostMsg((void*)e_MeasureIdle);		                    //切换到空闲模式
 }
 
@@ -222,7 +222,7 @@ void Mod_MeasurePoll(Measure_t* pst_Meas)
         
         pst_Meas->e_State = e_MeasureWait;
         Mod_GreyGotoMeas(&st_Grey);                             //绿光等待开始测量
-        Mod_GasMeasureGotoDiffMeasure(&st_GasMeasure);          //紫外开始差分测量 开始绝对测量
+        Mod_GasMeasureDoDiffMeasure(&st_GasMeasure);            //紫外开始差分测量 开始绝对测量
 
         break;
     case e_MeasureDead: 
@@ -281,7 +281,7 @@ void Mod_MeasurePoll(Measure_t* pst_Meas)
         pst_Meas->e_State = e_MeasureCal;
         
         Mod_GreyGotoIdle(&st_Grey);                             //绿光结束测量  
-        Mod_GasMeasureGotoAbsMeasure(&st_GasMeasure);           //紫外结束差分测量 开始绝对测量
+        Mod_GasMeasureDoAbsMeasure(&st_GasMeasure);             //紫外结束差分测量 开始绝对测量
 
         
         MEASURE_DBG(">>MEASURE DBG:================================================\r\n"); 
@@ -289,14 +289,14 @@ void Mod_MeasurePoll(Measure_t* pst_Meas)
         MEASURE_DBG(">>MEASURE DBG:   读取测速版数据\r\n");
         do
         {
-            Mod_MeasSpeedRequest(&st_MeasSpeed);                    //读取测速版的数据 车辆加速度 车辆速度
+            Mod_MeasSpeedRequest(&st_MeasSpeed);                //读取测速版的数据 车辆加速度 车辆速度
         }while(PendSem(100) != TRUE);
         MEASURE_DBG(">>MEASURE DBG:   测速版读取完成\r\n"); 
         
         MEASURE_DBG(">>MEASURE DBG:   读取CO2CO平均浓度\r\n");
         do
         {
-            Mod_LaserRequestGasAvg(&st_Laser);                    //激光版的平均CO2CO浓度
+            Mod_LaserRequestGasAvg(&st_Laser);                  //激光版的平均CO2CO浓度
         }while(PendSem(100) != TRUE);
         MEASURE_DBG(">>MEASURE DBG:   读取CO2CO平均浓度完成\r\n");
         
@@ -408,7 +408,7 @@ void Mod_MeasurePoll(Measure_t* pst_Meas)
         
         StopTimeOutCheck();                                     //停止超时检测 
         Mod_GreyGotoIdle(&st_Grey);                             //绿光结束测量  
-        Mod_GasMeasureGotoAbsMeasure(&st_GasMeasure);           //紫外结束差分测量 开始绝对测量
+        Mod_GasMeasureDoAbsMeasure(&st_GasMeasure);           //紫外结束差分测量 开始绝对测量
         
         pst_Meas->e_State = e_MeasureIdle;
         break;

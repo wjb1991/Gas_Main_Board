@@ -73,10 +73,10 @@ static int16_t spa_buff[3840]={0};
 static int32_t  sum_spa[3840] = {0};
 
 //#pragma location = (0x68006000)
-static double   wavelenth_buff[3840]={0};
+static float   wavelenth_buff[3840]={0};
 
 //#pragma location = (0x6800E000 + 0x8000)    //0x6800A000
-static double   process_spa[3840] = {0};
+static float   process_spa[3840] = {0};
     
 USB4000_HandleTypeDef   USB4000 = {
 
@@ -874,7 +874,7 @@ static USBH_StatusTypeDef USBH_USB4000_GetSpectrum(USBH_HandleTypeDef *phost)
         while(URB_Status != USBH_URB_DONE);
         for(j = 0; j < 512;j++)
         {
-            puc_buff[i*512 + j] = auc_Buff[i];
+            puc_buff[i*512 + j] = auc_Buff[j];
         }
         //USBH_UsrLog ("R %u",i);
     }
@@ -915,7 +915,7 @@ static USBH_StatusTypeDef USBH_USB4000_GetSpectrum(USBH_HandleTypeDef *phost)
         {
             for(j = 0; j < 512;j++)
             {
-                puc_buff[i*512 + j] = auc_Buff[i];
+                puc_buff[i*512 + j] = auc_Buff[j];
             } 
         }
         //USBH_UsrLog ("R %u",i);
@@ -990,6 +990,7 @@ static USBH_StatusTypeDef USBH_USB4000_ProcessSpectrum(USBH_HandleTypeDef *phost
     
     if( ready != 0 )
     {
+        /* 暗噪声矫正 参考C#Demo 502行*/
         if(USB4000_Handle->b_EdcEnable == TRUE)
         {
             double value = 0.0;
@@ -1013,11 +1014,32 @@ static USBH_StatusTypeDef USBH_USB4000_ProcessSpectrum(USBH_HandleTypeDef *phost
             }
         }
         
-        /* 非线性校正 */
+        /* 非线性校正 参考C#Demo 531行 */
         if(USB4000_Handle->b_EdcEnable == TRUE && USB4000_Handle->b_NlcEnable == TRUE)
         {
-            
+            for (int i = 0; i < USB4000_Handle->uin_Pixels; i++) 
+            {   
+                FP64 pixel = USB4000_Handle->plf_ProcessSpectrum[i];
+                FP64 factor = USB4000_Handle->alf_NlcCoeff[0];
+                FP64 pixelToTheN = pixel;
+
+                // factor is already initialized with x^0...start at x^1
+                for (int j = 1; j < USB4000_Handle->uch_NlcOrder; j++) 
+                {   
+                    factor += pixelToTheN * USB4000_Handle->alf_NlcCoeff[j];
+                    pixelToTheN *= pixel;
+                }   
+
+                if (factor != 0.0) 
+                    USB4000_Handle->plf_ProcessSpectrum[i] = pixel / factor;
+            }  
         }
+        
+        for(int i = 0; i < 3840; i++)
+        {
+            printf("SPE[%04d] = %f\r\n",i,USB4000_Handle->plf_ProcessSpectrum[i]);
+        }
+        
         
         if (USB4000_Handle->uch_Boxcar > 0)
         {

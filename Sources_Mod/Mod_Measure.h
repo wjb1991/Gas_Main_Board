@@ -67,4 +67,7 @@ extern  Measure_t st_Measure;
 void Mod_MeasureInit(Measure_t* pst_Meas);
 void Mod_MeasurePoll(Measure_t* pst_Meas);
 
+void Mod_MeasureDoStaticMeasure(Measure_t* pst_Meas);
+void Mod_MeasureDoDynamicMeasure(Measure_t* pst_Meas);
+
 #endif
