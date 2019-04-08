@@ -14,13 +14,13 @@
     <StLinkDriver>
         <stlinkserialNo>21482467</stlinkserialNo>
         <stlinkfoundProbes />
-        <CStepIntDis>_ 0</CStepIntDis>
-        <LeaveTargetRunning>_ 0</LeaveTargetRunning>
         <stlinkResetStyle>0</stlinkResetStyle>
         <stlinkResetStrategy>0</stlinkResetStrategy>
+        <CStepIntDis>_ 0</CStepIntDis>
+        <LeaveTargetRunning>_ 0</LeaveTargetRunning>
     </StLinkDriver>
     <DebugChecksum>
-        <Checksum>1564619115</Checksum>
+        <Checksum>1004000276</Checksum>
     </DebugChecksum>
     <Exceptions>
         <StopOnUncaught>_ 0</StopOnUncaught>
@@ -30,8 +30,8 @@
         <Enabled>_ 0</Enabled>
     </CodeCoverage>
     <Disassembly>
-        <InstrCount>0</InstrCount>
         <MixedMode>1</MixedMode>
+        <InstrCount>0</InstrCount>
     </Disassembly>
     <CallStack>
         <ShowArgs>0</ShowArgs>
@@ -54,11 +54,6 @@
         <ITMportsLogFile>0</ITMportsLogFile>
         <ITMlogFile>$PROJ_DIR$\ITM.log</ITMlogFile>
     </SWOTraceHWSettings>
-    <watch_formats>
-        <Fmt0>{W}1:i	4	0</Fmt0>
-        <Fmt1>{W}1:stacked_lr	4	0</Fmt1>
-        <Fmt2>{W}1:stacked_pc	4	0</Fmt2>
-    </watch_formats>
     <Trace2>
         <Enabled>0</Enabled>
         <ShowSource>0</ShowSource>
@@ -104,12 +99,6 @@
         <ShowTimeSum>1</ShowTimeSum>
         <SumSortOrder>0</SumSortOrder>
     </EventLog>
-    <DisassembleMode>
-        <mode>0</mode>
-    </DisassembleMode>
-    <Breakpoints2>
-        <Count>0</Count>
-    </Breakpoints2>
     <TermIOLog>
         <LoggingEnabled>_ 0</LoggingEnabled>
         <LogFile>_ ""</LogFile>
@@ -119,17 +108,6 @@
         <LogFile>_ ""</LogFile>
         <Category>_ 0</Category>
     </LogFile>
-    <Aliases>
-        <A0>_ "D:\Wangjiangbo\Desktop\Gas_Main_Board\Drivers\CMSIS\Device\ST\STM32F7xx\Source\Templates\system_stm32f7xx.c" ""</A0>
-        <A1>_ "D:\Wangjiangbo\Desktop\Gas_Main_Board\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal.c" ""</A1>
-        <A2>_ "D:\Wangjiangbo\Desktop\Gas_Main_Board\Sources_App\app_main.c" ""</A2>
-        <A3>_ "D:\Wangjiangbo\Desktop\Gas_Main_Board\Sources_App\usb_host.c" ""</A3>
-        <A4>_ "D:\Wangjiangbo\Desktop\Gas_Main_Board\Sources_Bsp\stm32f7xx_hal_msp.c" ""</A4>
-        <A5>_ "D:\Wangjiangbo\Desktop\Gas_Main_Board\uCOSIII\uC-CONFIG\os_app_hooks.c" ""</A5>
-        <A6>_ "D:\Wangjiangbo\Desktop\Gas_Main_Board\uCOSIII\uC-LIB\lib_math.c" ""</A6>
-        <Count>7</Count>
-        <SuppressDialog>0</SuppressDialog>
-    </Aliases>
     <DriverProfiling>
         <Enabled>0</Enabled>
         <Mode>3</Mode>
@@ -143,4 +121,14 @@
     <CallStackStripe>
         <ShowTiming>1</ShowTiming>
     </CallStackStripe>
+    <DisassembleMode>
+        <mode>0</mode>
+    </DisassembleMode>
+    <Breakpoints2>
+        <Count>0</Count>
+    </Breakpoints2>
+    <Aliases>
+        <Count>0</Count>
+        <SuppressDialog>0</SuppressDialog>
+    </Aliases>
 </settings>

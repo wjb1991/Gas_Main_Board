@@ -446,7 +446,13 @@ static USBH_StatusTypeDef USBH_USB4000_Process (USBH_HandleTypeDef *phost)
                 break;
             //»ñÈ¡¹âÆ×
             case USB4000_CONNECT:
+                //BSP_Led1Toggle();
                 USBH_USB4000_GetSpectrum(phost);
+                //BSP_Led1Toggle();
+                //OSTimeDlyHMSM(0u, 0u, 0u, 01u,
+                //          OS_OPT_TIME_HMSM_STRICT ,
+                //          &os_err); 
+                
                 break;
             
         }
@@ -840,7 +846,7 @@ static USBH_StatusTypeDef USBH_USB4000_GetSpectrum(USBH_HandleTypeDef *phost)
     }
     
     //USBH_USB4000_ProcessSpectrum(phost);
-    i = USB4000_Handle->ul_SetIntegralTime /1000 - 3;
+    i = USB4000_Handle->ul_SetIntegralTime /1000 - 2;
     OSTimeDlyHMSM(0u, 0u, 0u,i,
                   OS_OPT_TIME_HMSM_STRICT ,
                   &os_err);
@@ -1035,10 +1041,10 @@ static USBH_StatusTypeDef USBH_USB4000_ProcessSpectrum(USBH_HandleTypeDef *phost
             }  
         }
         
-        for(int i = 0; i < 3840; i++)
-        {
-            printf("SPE[%04d] = %f\r\n",i,USB4000_Handle->plf_ProcessSpectrum[i]);
-        }
+        //for(int i = 0; i < 3840; i++)
+        //{
+        //    printf("SPE[%04d] = %f\r\n",i,USB4000_Handle->plf_ProcessSpectrum[i]);
+        //}
         
         
         if (USB4000_Handle->uch_Boxcar > 0)

@@ -183,6 +183,9 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
                 point.f_Y = Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[7],FALSE);
                 if( pst_Fram->puc_PayLoad[0] == 0 )
                     Mod_CalibPointListEditOnePoint(&st_CPList_GasNO,pst_Fram->puc_PayLoad[1],&point);
+                else if( pst_Fram->puc_PayLoad[0] == 1 )
+                    Mod_CalibPointListEditOnePoint(&st_CPList_GasHC,pst_Fram->puc_PayLoad[1],&point);
+                    
                 res = TRUE;    //Ó¦´ð
             }
         }
@@ -208,14 +211,17 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
                 if( pst_Fram->puc_PayLoad[0] == 0 )
                 {   
                     Mod_CalibPointListReadOnePoint(&st_CPList_GasNO,pst_Fram->puc_PayLoad[1],&point);
-                    pst_Fram->puc_PayLoad[2] = point.b_Use;
-                    Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[3],point.f_X,FALSE);
-                    Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[7],point.f_Y,FALSE);                
-                    pst_Fram->uin_PayLoadLenth = 11;        
-                    res = TRUE;    //Ó¦´ð
                 }
+                else
+                {
+                    Mod_CalibPointListReadOnePoint(&st_CPList_GasHC,pst_Fram->puc_PayLoad[1],&point);
+                }
+                pst_Fram->puc_PayLoad[2] = point.b_Use;
+                Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[3],point.f_X,FALSE);
+                Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[7],point.f_Y,FALSE);                
+                pst_Fram->uin_PayLoadLenth = 11;        
+                res = TRUE;    //Ó¦´ð
             }
-
         }
         break;
 

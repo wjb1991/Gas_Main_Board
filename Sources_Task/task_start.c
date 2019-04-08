@@ -267,7 +267,7 @@ void AppTaskCreate (void)
 #endif
 
 
-#if 0
+#if 1
     /* 紫外处理光谱仪 */
     OSTaskCreate((OS_TCB       *)&TaskGasProcTCB,                               /* 创建任务控制块 */
                  (CPU_CHAR     *)"Gas Process",                                 /* 任务名称 */

@@ -94,7 +94,7 @@ GasMeasure_t st_GasMeasure = {
     10,                             /* 平均计数值 */
                                     
     &st_GasNO,                      /* 气体1 */
-    NULL,                           /* 气体2 */
+    &st_GasHC,                      /* 气体2 */
     
 };
 
@@ -165,6 +165,17 @@ void Mod_GasMeasureInit(GasMeasure_t* pst_Meas)
            
     st_GasNO.st_PeakRef.ul_RightBackgroundLeftDot = 670;
     st_GasNO.st_PeakRef.ul_RightBackgroundRightDot = 690;
+    
+    
+    st_GasHC.st_PeakRef.ul_PeakLeftDot = 799;
+    st_GasHC.st_PeakRef.ul_PeakCenterDot = 919;
+    st_GasHC.st_PeakRef.ul_PeakRightDot = 939;
+
+    st_GasHC.st_PeakRef.ul_LeftBackgroundLeftDot = 185;
+    st_GasHC.st_PeakRef.ul_LeftBackgroundRightDot = 224;
+
+    st_GasHC.st_PeakRef.ul_RightBackgroundLeftDot = 2096;
+    st_GasHC.st_PeakRef.ul_RightBackgroundRightDot = 2143;
 
     if(pst_Meas->pst_Gas1 != NULL)
         Mod_CalibPointListInit(pst_Meas->pst_Gas1->pst_CalibPointList);

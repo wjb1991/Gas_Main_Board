@@ -4,8 +4,9 @@
 #include  "bsp.h"
 
 #include  "usbh_def.h"
-#include  "usbh_template.h"
 #include  "usb_host.h"
+#include  "usbh_usb4000.h"
+
 
 #include  "task_cml.h"
 
