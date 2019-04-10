@@ -697,6 +697,9 @@ void Mod_GasMeasurePoll(GasMeasure_t* pst_Meas)
         return;
     pst_Meas->pst_Dev = pv_Msg;
     USB4000_HandleTypeDef* USB4000_Handle = (USB4000_HandleTypeDef *) pst_Meas->pst_Dev;
+    
+    USBH_USB4000_ProcessSpectrum(USB4000_Handle);
+    
     pst_Meas->ul_SpectrumLen = USB4000_Handle->uin_Pixels;
 
     /* 拷贝光谱到当前光谱并修正积分时间 */

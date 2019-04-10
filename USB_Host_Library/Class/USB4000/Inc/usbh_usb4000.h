@@ -120,7 +120,7 @@ extern USB4000_HandleTypeDef   USB4000;
 
 void USB4000_SetIntegTime(USB4000_HandleTypeDef *USB4000_Handle, INT32U IntegTime);
 
-
+USBH_StatusTypeDef USBH_USB4000_ProcessSpectrum(USB4000_HandleTypeDef *USB4000_Handle);
 __weak void USB4000_EvnetHandle(USB4000_HandleTypeDef *USB4000_Handle);
 
 /**

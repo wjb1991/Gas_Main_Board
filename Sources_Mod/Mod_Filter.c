@@ -2,8 +2,8 @@
 
 BOOL Mod_FilterBoxCar(FP32* plf_Data , INT16U uin_Len, INT16U uin_Boxcar)
 {
-    FP64 plf_Temp[DEF_BOXCAR_WITH_MAX*2 + 1] = {0};
-    FP64 lf_Sum = 0;
+    FP32 plf_Temp[DEF_BOXCAR_WITH_MAX*2 + 1] = {0};
+    FP32 lf_Sum = 0;
     INT16U uin_BoxcarRange = uin_Boxcar * 2 + 1;
     INT16U uin_BoxcarEnd = uin_Len - uin_Boxcar;
     INT16U i,j,k;

@@ -52,7 +52,7 @@ static USBH_StatusTypeDef USBH_USB4000_GetInformation(USBH_HandleTypeDef *phost,
 
 static USBH_StatusTypeDef USBH_USB4000_QueryInformation(USBH_HandleTypeDef *phost);
 
-static USBH_StatusTypeDef USBH_USB4000_ProcessSpectrum(USBH_HandleTypeDef *phost);
+
 
 USBH_ClassTypeDef  USB4000_Class = 
 {
@@ -838,7 +838,8 @@ static USBH_StatusTypeDef USBH_USB4000_GetSpectrum(USBH_HandleTypeDef *phost)
     }
 
     //USBH_USB4000_ProcessSpectrum(phost);
-    i = USB4000_Handle->ul_SetIntegralTime /1000 - 4;
+    USB4000_EvnetHandle(USB4000_Handle);
+    i = USB4000_Handle->ul_SetIntegralTime /1000 - 2;
     OSTimeDlyHMSM(0u, 0u, 0u,i,
                   OS_OPT_TIME_HMSM_STRICT ,
                   &os_err);
@@ -938,9 +939,9 @@ static USBH_StatusTypeDef USBH_USB4000_GetSpectrum(USBH_HandleTypeDef *phost)
 //|----------|----------------------------------------------------------------------
 //| 函数设计 | wjb
 //==================================================================================
-static USBH_StatusTypeDef USBH_USB4000_ProcessSpectrum(USBH_HandleTypeDef *phost)
+USBH_StatusTypeDef USBH_USB4000_ProcessSpectrum(USB4000_HandleTypeDef *USB4000_Handle)//USBH_HandleTypeDef *phost)
 {
-    USB4000_HandleTypeDef *USB4000_Handle =  (USB4000_HandleTypeDef *) phost->pActiveClass->pData;
+    //USB4000_HandleTypeDef *USB4000_Handle =  (USB4000_HandleTypeDef *) phost->pActiveClass->pData;
     uint16_t i = 0;
     uint8_t ready = 0;
     
@@ -961,7 +962,7 @@ static USBH_StatusTypeDef USBH_USB4000_ProcessSpectrum(USBH_HandleTypeDef *phost
             /* 算平均 */
             for(i = 0; i < USB4000_Handle->uin_Pixels; i++)
             {
-                USB4000_Handle->plf_ProcessSpectrum[i] = ((double)USB4000_Handle->pl_SumSpectrum[i]) / 
+                USB4000_Handle->plf_ProcessSpectrum[i] = ((float)USB4000_Handle->pl_SumSpectrum[i]) / 
                                                           USB4000_Handle->uch_ScansToAverage;
             }
             
@@ -992,7 +993,7 @@ static USBH_StatusTypeDef USBH_USB4000_ProcessSpectrum(USBH_HandleTypeDef *phost
         /* 暗噪声矫正 参考C#Demo 502行*/
         if(USB4000_Handle->b_EdcEnable == TRUE)
         {
-            double value = 0.0;
+            float value = 0.0;
             int usableDarkCount = 0;
             
             for (int i = 0; i < 11; i++)
@@ -1045,7 +1046,7 @@ static USBH_StatusTypeDef USBH_USB4000_ProcessSpectrum(USBH_HandleTypeDef *phost
             Mod_FilterBoxCar(USB4000_Handle->plf_ProcessSpectrum , USB4000_Handle->uin_Pixels, USB4000_Handle->uch_Boxcar);
         }
         
-        USB4000_EvnetHandle(USB4000_Handle);
+        //USB4000_EvnetHandle(USB4000_Handle);
     }
     
     return USBH_OK;
