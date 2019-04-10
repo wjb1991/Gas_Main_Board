@@ -319,13 +319,13 @@ void Mod_GasMeasureAdjZero(GasMeasure_t* pst_Meas)
         }
 
         CalibPoint_t st_CalibPoint = {TRUE,0.0,0.0};
-        Mod_CalibPointListEditOnePoint(pst_Meas->pst_Gas1->pst_CalibPointList,0,&st_CalibPoint);
-        
+        Mod_CalibPointListEditOnePoint(pst_Meas->pst_Gas1->pst_CalibPointList,0,&st_CalibPoint);    //添加零点
+        Mod_CalibPointListEditOnePoint(pst_Meas->pst_Gas2->pst_CalibPointList,0,&st_CalibPoint);    //添加零点
         if(pst_Meas->b_SaveZeroSpecetrum == TRUE)
         {
             OS_ERR os_err;
             OSTaskSuspend(&TaskUsbHostTCB,&os_err);     //挂起光谱采集
-            SaveToEepromExt((INT32U)pst_Meas->pf_ZeroSpectrum,pst_Meas->ul_SpectrumLen);        //存储背景谱
+            SaveToEepromExt((INT32U)pst_Meas->pf_ZeroSpectrum,pst_Meas->ul_SpectrumLen);            //存储背景谱
             OSTaskResume(&TaskUsbHostTCB,&os_err);      //恢复光谱采集
         }
         Mod_GasMeasureDoAbsMeasure(pst_Meas);     
@@ -618,6 +618,24 @@ void Mod_GasMeasureAbsMeasure(GasMeasure_t* pst_Meas)
     }
 }
 
+void Mod_GasMeasureDiffBackground(GasMeasure_t* pst_Meas)
+{
+    INT16U  i;
+    
+    if(pst_Meas == NULL)
+        return;
+
+    /* 更新背景光谱 */
+    if(pst_Meas->f_Trans >= pst_Meas->f_TransThreshold)
+    {
+        for(i = 0; i < pst_Meas->ul_SpectrumLen; i++)
+        {
+            pst_Meas->plf_BkgSpectrum[i] = pst_Meas->pf_ProcSpectrum[i] * (1 - pst_Meas->f_FilterCoeff) +
+                                           pst_Meas->plf_BkgSpectrum[i] * pst_Meas->f_FilterCoeff;  //更新背景光谱
+        }
+    }
+}
+
 void Mod_GasMeasureDiffMeasure(GasMeasure_t* pst_Meas)
 {
     INT16U  i;
@@ -707,7 +725,7 @@ void Mod_GasMeasurePoll(GasMeasure_t* pst_Meas)
     case eGasCalibGas2:
         Mod_GasMeasureCalibGas2(pst_Meas);
         break;
-    case eGasCalibAll:
+    case eGasCalibGasAll:
         Mod_GasMeasureCalibGasAll(pst_Meas);
         break;
     case eGasCalibCorrectionGas1:
@@ -721,6 +739,9 @@ void Mod_GasMeasurePoll(GasMeasure_t* pst_Meas)
         break;
     case eGasAbsMeasure:
         Mod_GasMeasureAbsMeasure(pst_Meas);
+        break;
+    case eGasDiffBackground:
+        Mod_GasMeasureDiffBackground(pst_Meas);
         break;
     case eGasDiffMeasure:
         Mod_GasMeasureDiffMeasure(pst_Meas);
@@ -764,14 +785,14 @@ BOOL Mod_GasMeasureDoCalib(GasMeasure_t* pst_Meas,GasMeasureState_e e_State,INT1
         pst_Meas->pst_Gas2->lf_PeakHight = 0.0;
         pst_Meas->e_State = eGasCalibGas2; 
         return TRUE;
-    case eGasCalibAll:
+    case eGasCalibGasAll:
         if( pst_Meas->pst_Gas1 == NULL || pst_Meas->pst_Gas2 == NULL )
             return FALSE;
         pst_Meas->pst_Gas1->lf_Concentration = lf_GasCon1;
         pst_Meas->pst_Gas1->lf_PeakHight = 0.0;
         pst_Meas->pst_Gas2->lf_Concentration = lf_GasCon2;
         pst_Meas->pst_Gas2->lf_PeakHight = 0.0;
-        pst_Meas->e_State = eGasCalibAll; 
+        pst_Meas->e_State = eGasCalibGasAll; 
         return TRUE;
     default:
         return FALSE;
@@ -817,6 +838,13 @@ BOOL Mod_GasMeasureDoCalibCorrection(GasMeasure_t* pst_Meas,GasMeasureState_e e_
     }
 }
 
+BOOL Mod_GasMeasureDoDiffBackground(GasMeasure_t* pst_Meas)
+{
+    if(pst_Meas == NULL)
+        return FALSE;
+    pst_Meas->e_State = eGasDiffBackground;
+    return TRUE;
+}
 
 BOOL Mod_GasMeasureDoDiffMeasure(GasMeasure_t* pst_Meas)
 {
@@ -833,14 +861,14 @@ BOOL Mod_GasMeasureDoAbsMeasure(GasMeasure_t* pst_Meas)
     pst_Meas->e_State = eGasAbsMeasure;
     return TRUE;
 }
-
+/*
 BOOL Mod_GasMeasureDoWait(GasMeasure_t* pst_Meas)
 {
     if(pst_Meas == NULL)
         return FALSE;
     pst_Meas->e_State = eGasWait;
     return TRUE;
-}
+}*/
 
 BOOL Mod_GasMarkWorkLine(GasMeasure_t* pst_Meas,GasMeasureState_e e_Ops)
 {

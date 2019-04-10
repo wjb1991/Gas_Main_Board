@@ -14,18 +14,18 @@ void Task_UsbHost (void  *p_arg)
     OS_ERR  os_err;
     (void)p_arg;
 
-    CPU_IntDis();
+    //CPU_IntDis();
     
     USB_HOST_Init();
     OSTaskQFlush(&TaskUsbHostTCB, &os_err);
 
-    CPU_IntEn();
+    //CPU_IntEn();
 
     while(TRUE)
     {
         INT16U uin_Len;
         //OSTaskQPend(0,OS_OPT_PEND_BLOCKING,&uin_Len,NULL,&os_err);
-        OSTimeDlyHMSM(0u, 0u, 0u, 5u,
+        OSTimeDlyHMSM(0u, 0u, 0u, 10u,
                       OS_OPT_TIME_HMSM_STRICT | OS_OPT_TIME_PERIODIC,/* 周期模式 */
                       &os_err);  
         USB_HOST_Process();

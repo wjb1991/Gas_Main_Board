@@ -67,10 +67,8 @@ typedef struct _USB4000_Process
    
     /* 控制状态 */
     __IO uint8_t         sof_signal;
-    uint32_t             rx_count;
 
     /* 控制参数-积分时间 us */
-    uint8_t              b_SetFlag;
     uint32_t             ul_SetIntegralTime;
     
     
@@ -103,9 +101,10 @@ typedef struct _USB4000_Process
     uint8_t              b_NlcEnable;               //是否开启NLC 非线性补偿
     
     uint8_t              b_First;                   //第一次标记
-    uint8_t              b_Open;
-    uint8_t              b_IsConnect;
-    uint8_t              b_HighSpeed;               
+    uint8_t              b_HighSpeed;               //是否高速USB
+    
+    uint8_t              b_WaitSync;                //等待同步
+            
     USB4000_StateTypeDef e_State;   
 }
 USB4000_HandleTypeDef;

@@ -24,7 +24,7 @@ CalibPointList_t st_CPList_GasNO = {
 };
 
 CalibPointList_t st_CPList_GasHC = {
-    &ast_CalibPoint_GasNO[0],
+    &ast_CalibPoint_GasHC[0],
     DEF_CALIBPOINT_MAX,
     0,
 };

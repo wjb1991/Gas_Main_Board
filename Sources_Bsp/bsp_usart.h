@@ -17,7 +17,7 @@
 
 #include "bsp.h"
 
-#define  DEF_USART_RX_DMA  (TRUE)
+#define  DEF_USART_RX_DMA  (FALSE)  //开启L1缓冲对DMA传输有影响 会影响串口接收
 
 #define DEF_USE_COM1   (TRUE)
 #define DEF_USE_COM2   (TRUE)
@@ -53,7 +53,7 @@ struct _DEV_SERIALPORT{
     /* 接受缓冲区相关设置 */
     INT8U*              puch_RxBuff;
     INT16U              uin_RxLen;
-    INT16U              uin_RxCount;
+    volatile INT16U              uin_RxCount;
     
     
     /*  硬件回调函数  */

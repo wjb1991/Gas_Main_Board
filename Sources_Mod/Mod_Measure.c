@@ -223,7 +223,8 @@ void Mod_MeasurePoll(Measure_t* pst_Meas)
         pst_Meas->e_State = e_MeasureWait;
         Mod_GreyGotoMeas(&st_Grey);                             //绿光等待开始测量
         Mod_GasMeasureDoDiffMeasure(&st_GasMeasure);            //紫外开始差分测量 开始绝对测量
-
+        
+        USB4000.b_WaitSync = TRUE;                              //等待同步
         break;
     case e_MeasureDead: 
         MEASURE_DBG(">>MEASURE DBG:   车辆离去 死区延时\r\n");
@@ -235,8 +236,7 @@ void Mod_MeasurePoll(Measure_t* pst_Meas)
         s = pst_Meas->ul_DeadTime / 1000;
         ms = pst_Meas->ul_DeadTime % 1000; 
         
-        MEASURE_DBG(">>MEASURE DBG:   s:     %d\r\n",s);
-        MEASURE_DBG(">>MEASURE DBG:   ms:     %d\r\n",ms);
+        MEASURE_DBG(">>MEASURE DBG:   死区时间(Ms):%d\r\n", pst_Meas->ul_DeadTime);
         OSTimeDlyHMSM(0u, 0u, s, ms,
                       OS_OPT_TIME_HMSM_STRICT,
                       &os_err);  
@@ -267,12 +267,16 @@ void Mod_MeasurePoll(Measure_t* pst_Meas)
         
         s = pst_Meas->ul_MesureTime / 1000;
         ms = pst_Meas->ul_MesureTime % 1000; 
-        MEASURE_DBG(">>MEASURE DBG:   s:     %d\r\n",s);
-        MEASURE_DBG(">>MEASURE DBG:   ms:     %d\r\n",ms);
+
+        MEASURE_DBG(">>MEASURE DBG:   测量时间(Ms):%d\r\n", pst_Meas->ul_MesureTime);
+        
+        USB4000.b_WaitSync = FALSE;                              //开始测量
+        OSTaskResume(&TaskUsbHostTCB,&os_err);                   //恢复光谱采集 
+        
         OSTimeDlyHMSM(0u, 0u, s, ms,
                       OS_OPT_TIME_HMSM_STRICT,
                       &os_err);   
-        
+
         PostMsg((void*)e_MeasureCal);
         break;
     case e_MeasureCal:
@@ -294,10 +298,10 @@ void Mod_MeasurePoll(Measure_t* pst_Meas)
         MEASURE_DBG(">>MEASURE DBG:   测速版读取完成\r\n"); 
         
         MEASURE_DBG(">>MEASURE DBG:   读取CO2CO平均浓度\r\n");
-        do
-        {
-            Mod_LaserRequestGasAvg(&st_Laser);                  //激光版的平均CO2CO浓度
-        }while(PendSem(100) != TRUE);
+        //do
+        //{
+        //    Mod_LaserRequestGasAvg(&st_Laser);                  //激光版的平均CO2CO浓度
+        //}while(PendSem(100) != TRUE);
         MEASURE_DBG(">>MEASURE DBG:   读取CO2CO平均浓度完成\r\n");
         
         pst_Meas->lf_NO = WindowFilter (pst_Meas->st_SampleNO.af_Buff,
@@ -362,7 +366,7 @@ void Mod_MeasurePoll(Measure_t* pst_Meas)
         fNO = fCO2 * q2;
 
         
-        /**/
+        
         INT16U i;
         MEASURE_DBG(">>MEASURE DBG:================================================\r\n");  
         MEASURE_DBG(">>MEASURE DBG:   NO->%d个采样点\r\n",pst_Meas->st_SampleNO.ul_Len);
@@ -372,15 +376,14 @@ void Mod_MeasurePoll(Measure_t* pst_Meas)
         MEASURE_DBG(">>MEASURE DBG:   HC->%d个采样点\r\n",pst_Meas->st_SampleHC.ul_Len);
         for(i = 0; i < pst_Meas->st_SampleHC.ul_Len; i++)
             MEASURE_DBG(">>MEASURE DBG:     HC[%d]: %f\r\n", i, pst_Meas->st_SampleHC.af_Buff[i]);
-        
+/*        
         for (int j = 0; j < 10; j++)
         {
             MEASURE_DBG(">>MEASURE DBG:   Grey[%d]->%d个采样点\r\n", j, pst_Meas->st_SampleGrey[j].ul_Len);
             for(i = 0; i < pst_Meas->st_SampleGrey[j].ul_Len; i++)
                 MEASURE_DBG(">>MEASURE DBG:     Grey[%d][%d]: %f\r\n", j, i, pst_Meas->st_SampleGrey[j].af_Buff[i]);        
-        }
-        
-
+        }    
+*/
         
         MEASURE_DBG(">>MEASURE DBG:================================================\r\n"); 
         MEASURE_DBG(">>MEASURE DBG:   一次动态测量完成\r\n");

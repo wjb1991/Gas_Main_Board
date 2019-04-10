@@ -12,27 +12,27 @@ typedef enum {
 }GasType_e;
 
 typedef enum {
-    eGasAdjZero = 0,        /* 调零 */
-    eGasCalibGas1,          /* 标定 气体1 */
-    eGasCalibGas2,          /* 标定 气体2 */
-    eGasCalibAll,           /* 标定 所有气体 */
-    eGasAbsMeasure,         /* 绝对浓度测量 */
-    eGasDiffMeasure,        /* 差分浓度测量 */
-    eGasWait,               /* 等待测量 */
-    eGasCalibTrans,         /* 标定透过率 */   
-    eGasCalibCorrectionGas1,/* 现场矫正 */
-    eGasCalibCorrectionGas2,/* 现场矫正 */
-    eGasCalibCorrectionGasAll,/* 现场矫正 */
+    eGasIdle = 0,                               /* 空闲啥都不干 */
+    eGasAdjZero,                                /* 调零 */
+    eGasCalibGas1,                              /* 标定 气体1 */
+    eGasCalibGas2,                              /* 标定 气体2 */
+    eGasCalibGasAll,                            /* 标定 所有气体 */
+    eGasAbsMeasure,                             /* 绝对浓度测量 */
+    eGasDiffBackground,                         /* 差分测量采集背景 */
+    eGasDiffMeasure,                            /* 差分浓度测量 */
+    eGasCalibCorrectionGas1,                    /* 现场矫正 */
+    eGasCalibCorrectionGas2,                    /* 现场矫正 */
+    eGasCalibCorrectionGasAll,                  /* 现场矫正 */
 }GasMeasureState_e;
 
 typedef struct {
-    INT32U  ul_PeakCenterDot;                   /* 波峰中心点 */
-    INT32U  ul_PeakLeftDot;                     /* 波峰左边界点 */
-    INT32U  ul_PeakRightDot;                    /* 波峰右边界点 */
-    INT32U  ul_LeftBackgroundLeftDot;           /* 左背景左边界点 */
-    INT32U  ul_LeftBackgroundRightDot;          /* 左背景右边界点 */
-    INT32U  ul_RightBackgroundLeftDot;          /* 右背景左边界点 */
-    INT32U  ul_RightBackgroundRightDot;         /* 右背景右边界点 */
+    INT16U  ul_PeakCenterDot;                   /* 波峰中心点 */
+    INT16U  ul_PeakLeftDot;                     /* 波峰左边界点 */
+    INT16U  ul_PeakRightDot;                    /* 波峰右边界点 */
+    INT16U  ul_LeftBackgroundLeftDot;           /* 左背景左边界点 */
+    INT16U  ul_LeftBackgroundRightDot;          /* 左背景右边界点 */
+    INT16U  ul_RightBackgroundLeftDot;          /* 右背景左边界点 */
+    INT16U  ul_RightBackgroundRightDot;         /* 右背景右边界点 */
 }Peak_t;
 
 typedef struct {
@@ -95,6 +95,8 @@ BOOL Mod_GasMeasureDoAdjZero(GasMeasure_t* pst_Meas,INT16U uin_Cont);
 BOOL Mod_GasMeasureDoCalib(GasMeasure_t* pst_Meas,GasMeasureState_e e_State,INT16U uin_Cont,FP32 lf_GasCon1,FP32 lf_GasCon2);
 
 BOOL Mod_GasMeasureDoCalibCorrection(GasMeasure_t* pst_Meas,GasMeasureState_e e_State,INT16U uin_Cont,FP32 lf_GasCon1,FP32 lf_GasCon2);
+
+BOOL Mod_GasMeasureDoDiffBackground(GasMeasure_t* pst_Meas);
 
 BOOL Mod_GasMeasureDoDiffMeasure(GasMeasure_t* pst_Meas);
 

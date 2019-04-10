@@ -230,6 +230,6 @@ INT32U Bsp_GetInterval(TimeSample_t* pst_TsOld,TimeSample_t * pst_TsNew)
 
 void HAL_Delay(INT32U Delay)
 {
-    Bsp_DelayMs(Delay);
+    Bsp_DelayMs(Delay); 
 }
 

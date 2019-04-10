@@ -20,7 +20,7 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
         {
             //读命令
             pst_Fram->uin_PayLoadLenth = 1;
-            pst_Fram->puc_PayLoad[0] = USB4000.b_IsConnect;
+            //pst_Fram->puc_PayLoad[0] = USB4000.b_IsConnect;
             res = TRUE;    //应答
         }
         break;
@@ -100,7 +100,7 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
         }
         break;
 //==================================================================================
-//                              设置光谱仪是否开启EDC(暗噪声补偿)
+//                        设置光谱仪是否开启EDC(暗噪声补偿)
 //==================================================================================
     case 0x14:
         if(pst_Fram->uch_SubCmd == e_StdbusWriteCmd)
@@ -121,7 +121,7 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
         }
         break;
 //==================================================================================
-//                              设置光谱仪是否开启NLC(非线性补偿)
+//                       设置光谱仪是否开启NLC(非线性补偿)
 //==================================================================================
     case 0x15:
         if(pst_Fram->uch_SubCmd == e_StdbusWriteCmd)
@@ -197,13 +197,12 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
             if(pst_Fram->uin_PayLoadLenth == 1)
             {
                 //读取第一页返回数组长度
-                if( pst_Fram->puc_PayLoad[0] == 0 )
-                {
+                //if( pst_Fram->puc_PayLoad[0] == 0 )
+                //{
                     pst_Fram->puc_PayLoad[1] = DEF_CALIBPOINT_MAX;
                     pst_Fram->uin_PayLoadLenth = 2;
                     res = TRUE;    //应答
-                }
- 
+                //}
             }
             else if(pst_Fram->uin_PayLoadLenth == 2)
             {
@@ -243,6 +242,13 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
                     pst_Fram->uin_PayLoadLenth = 2;
                     res = TRUE;    //应答
                 }
+                else
+                {
+                    st_GasMeasure.pst_Gas2->uch_NiheOrder = pst_Fram->puc_PayLoad[1];
+                    SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas2->uch_NiheOrder));
+                    pst_Fram->uin_PayLoadLenth = 2;
+                    res = TRUE;    //应答
+                }
             }
         }
         else if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
@@ -252,6 +258,12 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
                 if( pst_Fram->puc_PayLoad[0] == 0 )
                 {
                     pst_Fram->puc_PayLoad[1] = st_GasMeasure.pst_Gas1->uch_NiheOrder;
+                    pst_Fram->uin_PayLoadLenth = 2;
+                    res = TRUE;    //应答
+                }
+                else
+                {
+                    pst_Fram->puc_PayLoad[1] = st_GasMeasure.pst_Gas2->uch_NiheOrder;
                     pst_Fram->uin_PayLoadLenth = 2;
                     res = TRUE;    //应答
                 }
@@ -325,6 +337,132 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
             //读命令是返回是否在调零
             pst_Fram->uin_PayLoadLenth = 4;
             Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[0], st_GasMeasure.f_TransK,FALSE);
+            res = TRUE;    //应答
+        }
+        break;
+        
+//==================================================================================
+//                              设置/读取吸收峰位置参数
+//==================================================================================
+    case 0x27:
+        if(pst_Fram->uch_SubCmd == e_StdbusWriteCmd)
+        {
+            if(pst_Fram->uin_PayLoadLenth == 28)
+            {
+                ///吸收峰参数  
+                st_GasMeasure.pst_Gas1->st_PeakRef.ul_LeftBackgroundLeftDot     = Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[0],FALSE);
+                st_GasMeasure.pst_Gas1->st_PeakRef.ul_LeftBackgroundRightDot    = Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[2],FALSE);
+                st_GasMeasure.pst_Gas1->st_PeakRef.ul_PeakLeftDot               = Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[4],FALSE);
+                st_GasMeasure.pst_Gas1->st_PeakRef.ul_PeakCenterDot             = Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[6],FALSE);
+                st_GasMeasure.pst_Gas1->st_PeakRef.ul_PeakRightDot              = Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[8],FALSE);
+                st_GasMeasure.pst_Gas1->st_PeakRef.ul_RightBackgroundLeftDot    = Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[10],FALSE);        
+                st_GasMeasure.pst_Gas1->st_PeakRef.ul_RightBackgroundRightDot   = Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[12],FALSE);
+                
+                st_GasMeasure.pst_Gas2->st_PeakRef.ul_LeftBackgroundLeftDot     = Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[14],FALSE);
+                st_GasMeasure.pst_Gas2->st_PeakRef.ul_LeftBackgroundRightDot    = Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[16],FALSE);
+                st_GasMeasure.pst_Gas2->st_PeakRef.ul_PeakLeftDot               = Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[18],FALSE);
+                st_GasMeasure.pst_Gas2->st_PeakRef.ul_PeakCenterDot             = Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[20],FALSE);
+                st_GasMeasure.pst_Gas2->st_PeakRef.ul_PeakRightDot              = Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[22],FALSE);
+                st_GasMeasure.pst_Gas2->st_PeakRef.ul_RightBackgroundLeftDot    = Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[24],FALSE);        
+                st_GasMeasure.pst_Gas2->st_PeakRef.ul_RightBackgroundRightDot   = Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[26],FALSE);
+                
+                ///综合测量参数
+				st_Measure.uin_InvalidDots = Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[28],FALSE);
+				st_Measure.uin_ActiveDots  = Bsp_CnvArrToINT16U(&pst_Fram->puc_PayLoad[30],FALSE);
+                st_Measure.ul_DeadTime     = Bsp_CnvArrToINT32U(&pst_Fram->puc_PayLoad[32],FALSE);
+                st_Measure.ul_MesureTime   = Bsp_CnvArrToINT32U(&pst_Fram->puc_PayLoad[36],FALSE); 
+                
+                ///吸收峰参数
+                SaveToEeprom((INT32U)&st_GasMeasure.pst_Gas1->st_PeakRef.ul_LeftBackgroundLeftDot);
+                SaveToEeprom((INT32U)&st_GasMeasure.pst_Gas1->st_PeakRef.ul_LeftBackgroundRightDot);
+                SaveToEeprom((INT32U)&st_GasMeasure.pst_Gas1->st_PeakRef.ul_PeakLeftDot);
+                SaveToEeprom((INT32U)&st_GasMeasure.pst_Gas1->st_PeakRef.ul_PeakCenterDot);
+                SaveToEeprom((INT32U)&st_GasMeasure.pst_Gas1->st_PeakRef.ul_PeakRightDot);
+                SaveToEeprom((INT32U)&st_GasMeasure.pst_Gas1->st_PeakRef.ul_RightBackgroundLeftDot);
+                SaveToEeprom((INT32U)&st_GasMeasure.pst_Gas1->st_PeakRef.ul_RightBackgroundRightDot);
+                
+                SaveToEeprom((INT32U)&st_GasMeasure.pst_Gas2->st_PeakRef.ul_LeftBackgroundLeftDot);
+                SaveToEeprom((INT32U)&st_GasMeasure.pst_Gas2->st_PeakRef.ul_LeftBackgroundRightDot);
+                SaveToEeprom((INT32U)&st_GasMeasure.pst_Gas2->st_PeakRef.ul_PeakLeftDot);
+                SaveToEeprom((INT32U)&st_GasMeasure.pst_Gas2->st_PeakRef.ul_PeakCenterDot);
+                SaveToEeprom((INT32U)&st_GasMeasure.pst_Gas2->st_PeakRef.ul_PeakRightDot);
+                SaveToEeprom((INT32U)&st_GasMeasure.pst_Gas2->st_PeakRef.ul_RightBackgroundLeftDot);
+                SaveToEeprom((INT32U)&st_GasMeasure.pst_Gas2->st_PeakRef.ul_RightBackgroundRightDot); 
+                
+                ///综合测量参数
+                SaveToEeprom((INT32U)(&st_Measure.uin_InvalidDots));
+                SaveToEeprom((INT32U)(&st_Measure.uin_ActiveDots));
+                SaveToEeprom((INT32U)(&st_Measure.ul_DeadTime));
+                SaveToEeprom((INT32U)(&st_Measure.ul_MesureTime));   
+                
+                res = TRUE;    //应答
+            }
+        }
+        else if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
+        {
+            //读命令是返回是否在调零
+            pst_Fram->uin_PayLoadLenth = 28;
+            
+            ///吸收峰参数
+            Bsp_CnvINT16UToArr(&pst_Fram->puc_PayLoad[0], st_GasMeasure.pst_Gas1->st_PeakRef.ul_LeftBackgroundLeftDot,FALSE);
+            Bsp_CnvINT16UToArr(&pst_Fram->puc_PayLoad[2], st_GasMeasure.pst_Gas1->st_PeakRef.ul_LeftBackgroundRightDot,FALSE);
+            Bsp_CnvINT16UToArr(&pst_Fram->puc_PayLoad[4], st_GasMeasure.pst_Gas1->st_PeakRef.ul_PeakLeftDot,FALSE);
+            Bsp_CnvINT16UToArr(&pst_Fram->puc_PayLoad[6], st_GasMeasure.pst_Gas1->st_PeakRef.ul_PeakCenterDot,FALSE);         
+            Bsp_CnvINT16UToArr(&pst_Fram->puc_PayLoad[8], st_GasMeasure.pst_Gas1->st_PeakRef.ul_PeakRightDot,FALSE);  
+            Bsp_CnvINT16UToArr(&pst_Fram->puc_PayLoad[10],st_GasMeasure.pst_Gas1->st_PeakRef.ul_RightBackgroundLeftDot,FALSE);
+            Bsp_CnvINT16UToArr(&pst_Fram->puc_PayLoad[12],st_GasMeasure.pst_Gas1->st_PeakRef.ul_RightBackgroundRightDot,FALSE);
+            
+            Bsp_CnvINT16UToArr(&pst_Fram->puc_PayLoad[14],st_GasMeasure.pst_Gas2->st_PeakRef.ul_LeftBackgroundLeftDot,FALSE);
+            Bsp_CnvINT16UToArr(&pst_Fram->puc_PayLoad[16],st_GasMeasure.pst_Gas2->st_PeakRef.ul_LeftBackgroundRightDot,FALSE);
+            Bsp_CnvINT16UToArr(&pst_Fram->puc_PayLoad[18],st_GasMeasure.pst_Gas2->st_PeakRef.ul_PeakLeftDot,FALSE);
+            Bsp_CnvINT16UToArr(&pst_Fram->puc_PayLoad[20],st_GasMeasure.pst_Gas2->st_PeakRef.ul_PeakCenterDot,FALSE);         
+            Bsp_CnvINT16UToArr(&pst_Fram->puc_PayLoad[22],st_GasMeasure.pst_Gas2->st_PeakRef.ul_PeakRightDot,FALSE);  
+            Bsp_CnvINT16UToArr(&pst_Fram->puc_PayLoad[24],st_GasMeasure.pst_Gas2->st_PeakRef.ul_RightBackgroundLeftDot,FALSE);
+            Bsp_CnvINT16UToArr(&pst_Fram->puc_PayLoad[26],st_GasMeasure.pst_Gas2->st_PeakRef.ul_RightBackgroundRightDot,FALSE);
+            
+            ///综合测量参数
+            Bsp_CnvINT16UToArr(&pst_Fram->puc_PayLoad[28],st_Measure.uin_InvalidDots,FALSE);     
+            Bsp_CnvINT16UToArr(&pst_Fram->puc_PayLoad[30],st_Measure.uin_ActiveDots,FALSE);
+            Bsp_CnvINT32UToArr(&pst_Fram->puc_PayLoad[32],st_Measure.ul_DeadTime,FALSE);
+            Bsp_CnvINT32UToArr(&pst_Fram->puc_PayLoad[36],st_Measure.ul_MesureTime,FALSE);
+            
+            res = TRUE;    //应答
+        }
+        break;
+        
+//==================================================================================
+//                                  设置/读取参数
+//==================================================================================
+    case 0x28:
+        if(pst_Fram->uch_SubCmd == e_StdbusWriteCmd)
+        {
+            if(pst_Fram->uin_PayLoadLenth == 16)
+            {
+                ///综合测量参数
+				st_Measure.uin_InvalidDots = Bsp_CnvArrToINT32U(&pst_Fram->puc_PayLoad[0],FALSE);
+				st_Measure.uin_ActiveDots  = Bsp_CnvArrToINT32U(&pst_Fram->puc_PayLoad[4],FALSE);
+                st_Measure.ul_DeadTime     = Bsp_CnvArrToINT32U(&pst_Fram->puc_PayLoad[8],FALSE);
+                st_Measure.ul_MesureTime   = Bsp_CnvArrToINT32U(&pst_Fram->puc_PayLoad[12],FALSE); 
+                
+                ///综合测量参数
+                SaveToEeprom((INT32U)(&st_Measure.uin_InvalidDots));
+                SaveToEeprom((INT32U)(&st_Measure.uin_ActiveDots));
+                SaveToEeprom((INT32U)(&st_Measure.ul_DeadTime));
+                SaveToEeprom((INT32U)(&st_Measure.ul_MesureTime));
+                res = TRUE;    //应答
+            }
+        }
+        else if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
+        {
+            //读命令是返回是否在调零
+            pst_Fram->uin_PayLoadLenth = 16;
+            
+            ///综合测量参数
+            Bsp_CnvINT32UToArr(&pst_Fram->puc_PayLoad[0],st_Measure.uin_InvalidDots,FALSE);     
+            Bsp_CnvINT32UToArr(&pst_Fram->puc_PayLoad[4],st_Measure.uin_ActiveDots,FALSE);
+            Bsp_CnvINT32UToArr(&pst_Fram->puc_PayLoad[8],st_Measure.ul_DeadTime,FALSE);
+            Bsp_CnvINT32UToArr(&pst_Fram->puc_PayLoad[12],st_Measure.ul_MesureTime,FALSE);
+            
             res = TRUE;    //应答
         }
         break;
@@ -683,7 +821,7 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
                 break;
             case eGasCalibGas1:
             case eGasCalibGas2:
-            case eGasCalibAll:
+            case eGasCalibGasAll:
                 if(pst_Fram->uin_PayLoadLenth == 11)
                 {
                     Mod_GasMeasureDoCalib(&st_GasMeasure,
@@ -708,6 +846,19 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
                     res = TRUE;    //应答
                 }
                 break;
+            case eGasAbsMeasure:
+                Mod_GasMeasureDoAbsMeasure(&st_GasMeasure);         //切换到绝对工作状态
+                res = TRUE;    //应答
+                break;
+            case eGasDiffBackground:
+                Mod_GasMeasureDoDiffBackground(&st_GasMeasure);     //切换到差分背景工作状态
+                res = TRUE;
+                break;
+            case eGasDiffMeasure:
+                Mod_GasMeasureDoDiffMeasure(&st_GasMeasure);        //切换到差分测量工作状态
+                res = TRUE;    //应答
+                break;
+                
 /*
             case eGasAbsMeasure:
                 if(pst_Fram->uin_PayLoadLenth == 1)
@@ -759,6 +910,8 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
         }
         else if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
         {  
+            pst_Fram->uin_PayLoadLenth = 1;
+            pst_Fram->puc_PayLoad[0] = st_GasMeasure.e_State;
             res = TRUE;    //应答
         }
         break;
@@ -769,10 +922,7 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
     case 0x4a:
         if(pst_Fram->uch_SubCmd == e_StdbusWriteCmd)
         {
-            //byte0: 0:切换到调零状态
-            //       1:切换到标定状态
-            //       2:切换到工作状态
-            //       3:切换到差分测量状态
+
             //byte1-5 float :切换到标定状态是时下发的标定浓度
             if(pst_Fram->uin_PayLoadLenth == 1)
             {

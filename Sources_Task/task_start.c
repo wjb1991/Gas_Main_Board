@@ -80,7 +80,7 @@ void Task_Start (void *p_arg)
 
     Bsp_Init();                                                 /* Initialize BSP functions                             */
 
-    //InitParaFromEeprom(INIT_NORMAL);                            //INIT_NORMAL   INIT_DEFAULT
+    InitParaFromEeprom(INIT_NORMAL);                            //INIT_NORMAL   INIT_DEFAULT
 
 
 #if OS_CFG_STAT_TASK_EN > 0u
@@ -102,7 +102,7 @@ void Task_Start (void *p_arg)
                       &os_err);   
         TRACE_DBG(">>DBG:   CPU使用率:%f%\r\n",OSStatTaskCPUUsage/100.0);
         
-        BSP_Led1Toggle();
+        //BSP_Led1Toggle();
     }
 }
 
@@ -232,7 +232,7 @@ void AppTaskCreate (void)
                  (OS_OPT        )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_SAVE_FP),
                  (OS_ERR       *)&os_err);                                      /* 存放错误值 */
 #endif
-#if 1
+#if 0
      /* 轮询激光板任务 */
      OSTaskCreate((OS_TCB       *)&TaskLaserTCB,                                /* 创建任务控制块 */
                   (CPU_CHAR     *)"Laser Task",                                 /* 任务名称 */

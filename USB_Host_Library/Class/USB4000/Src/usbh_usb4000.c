@@ -10,6 +10,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usbh_usb4000.h"
+#include "App_Include.h"
 
 
 #define     DEF_USB4000_DBG_EN           TRUE
@@ -89,8 +90,6 @@ USB4000_HandleTypeDef   USB4000 = {
     0,//              InPipe6; 
     0,//              InEp6;
     FALSE,//          sof_signal;
-    0,//              rx_count;
-    FALSE,//          b_SetFlag;
     10000,//              ul_SetIntegralTime;
     auc_SerialNumber,
     {0,0,0,0,0,0,0,0,0,0,0},//auin_EdcIndexs[11];             
@@ -109,9 +108,10 @@ USB4000_HandleTypeDef   USB4000 = {
     FALSE,//          b_EdcEnable;            
     FALSE,//          b_NlcEnable;            
          
-    FALSE,//          b_Open;
-    FALSE,//          b_IsConnect;
-    FALSE,//          b_HighSpeed;  
+    FALSE,//          b_First;
+    FALSE,//          b_HighSpeed;
+    FALSE,//          b_WaitSync;
+    USB4000_DISCONNECT,
 };
 
 //==================================================================================
@@ -324,8 +324,6 @@ static USBH_StatusTypeDef USBH_USB4000_Process (USBH_HandleTypeDef *phost)
     USB4000_DBG (">>USBH_DBG:   光谱仪初始化");
     USB4000_Handle->e_State = USB4000_INIT;
     
-    
-
     while(phost->gState == HOST_CLASS)
     {  
         switch(USB4000_Handle->e_State)
@@ -372,17 +370,7 @@ static USBH_StatusTypeDef USBH_USB4000_Process (USBH_HandleTypeDef *phost)
                                   OS_OPT_TIME_HMSM_STRICT ,
                                   &os_err);   
                 }            
-/*        
-                for(INT16U i = 0; i < 16; i++)
-                {
-                    while(USBH_USB4000_GetInformation(phost,i,NULL) != USBH_OK)
-                    {
-                        OSTimeDlyHMSM(0u, 0u, 0u, 10u,
-                                      OS_OPT_TIME_HMSM_STRICT ,
-                                      &os_err);   
-                    }
-                }
-*/   
+
                 USB4000_Handle->e_State = USB4000_CONFIGURE;
                 break;
             //初始化光谱仪 配置光谱仪参数
@@ -446,15 +434,19 @@ static USBH_StatusTypeDef USBH_USB4000_Process (USBH_HandleTypeDef *phost)
                 break;
             //获取光谱
             case USB4000_CONNECT:
-                //BSP_Led1Toggle();
+
                 USBH_USB4000_GetSpectrum(phost);
-                //BSP_Led1Toggle();
-                //OSTimeDlyHMSM(0u, 0u, 0u, 01u,
-                //          OS_OPT_TIME_HMSM_STRICT ,
-                //          &os_err); 
                 
+                /* 等待同步信号 
+                if(USB4000_Handle->b_WaitSync == TRUE)
+                {
+                    //if(phost->gState != HOST_CLASS)
+                    //    break;
+                    USB4000_DBG (">>USBH_DBG:   等待同步"); 
+                    OSTaskSuspend(&TaskUsbHostTCB,&os_err);     //挂起光谱采集
+                }*/
+
                 break;
-            
         }
 
     }
@@ -844,9 +836,9 @@ static USBH_StatusTypeDef USBH_USB4000_GetSpectrum(USBH_HandleTypeDef *phost)
             uc_ErrCnt = 0;
         }
     }
-    
+
     //USBH_USB4000_ProcessSpectrum(phost);
-    i = USB4000_Handle->ul_SetIntegralTime /1000 - 2;
+    i = USB4000_Handle->ul_SetIntegralTime /1000 - 4;
     OSTimeDlyHMSM(0u, 0u, 0u,i,
                   OS_OPT_TIME_HMSM_STRICT ,
                   &os_err);
@@ -856,7 +848,7 @@ static USBH_StatusTypeDef USBH_USB4000_GetSpectrum(USBH_HandleTypeDef *phost)
                   OS_OPT_TIME_HMSM_STRICT ,
                   &os_err);  
 */ 
-    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, (GPIO_PinState)1);
+    BSP_Led1Toggle();
 
     
     for(i = 0 ; i < 4; i++)
@@ -909,9 +901,10 @@ static USBH_StatusTypeDef USBH_USB4000_GetSpectrum(USBH_HandleTypeDef *phost)
         {
             USB4000_Handle->b_First = FALSE;
             USBH_UsrLog ("光谱接受成功");
-            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, (GPIO_PinState)0);
             
-            USBH_USB4000_ProcessSpectrum(phost);
+            BSP_Led1Toggle();
+            
+
             //OSTimeDlyHMSM(0u, 0u, 0u,6u,
             //              OS_OPT_TIME_HMSM_STRICT ,
             //              &os_err); 
@@ -1052,10 +1045,7 @@ static USBH_StatusTypeDef USBH_USB4000_ProcessSpectrum(USBH_HandleTypeDef *phost
             Mod_FilterBoxCar(USB4000_Handle->plf_ProcessSpectrum , USB4000_Handle->uin_Pixels, USB4000_Handle->uch_Boxcar);
         }
         
-        
         USB4000_EvnetHandle(USB4000_Handle);
-          
-
     }
     
     return USBH_OK;
@@ -1063,7 +1053,7 @@ static USBH_StatusTypeDef USBH_USB4000_ProcessSpectrum(USBH_HandleTypeDef *phost
 
 void USB4000_SetIntegTime(USB4000_HandleTypeDef *USB4000_Handle, INT32U IntegTime)
 {
-    USB4000_Handle->b_SetFlag = TRUE;
+    USB4000_Handle->e_State = USB4000_CONFIGURE;
     USB4000_Handle->ul_SetIntegralTime = IntegTime;
 }
 

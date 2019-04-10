@@ -331,12 +331,11 @@ void Mod_StdbusPortSendOneByte(StdbusPort_t * pst_Port)
             if( pst_Port->pv_Handle == (void *)&COM4)
                 Bsp_Rs485de(eRs485Recv);
             pst_Port->e_State = e_StdbusSended;
-            
-            if(PostMsg(pst_Port) == FALSE)
-            {
-                Mod_StdbusRscPack(pst_Port);                  //释放本端口的数据
-                UnLockPort(pst_Port);
-            }
+            PostMsg(pst_Port);
+
+            Mod_StdbusRscPack(pst_Port);                  //释放本端口的数据
+            UnLockPort(pst_Port);
+
         }
     }
 }
@@ -808,8 +807,8 @@ void Mod_StdbusPortPoll(StdbusPort_t * pst_Port)
             }
             break;
         case e_StdbusSended:
-            Mod_StdbusRscPack(pst_Port);                  // 释放本端口的数据
-            UnLockPort(pst_Port);                         // 释放总线 
+        //    Mod_StdbusRscPack(pst_Port);                  // 释放本端口的数据
+        //    UnLockPort(pst_Port);                         // 释放总线 
             STDBUS_DBG(">>STDBUS DBG:   %s 发送完成\r\n",pst_Port->pch_Name);
             break;
         default:
