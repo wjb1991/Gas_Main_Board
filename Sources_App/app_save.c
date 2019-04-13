@@ -99,7 +99,10 @@ START_ADD+0x7400 + 0x7C, (uint32_t)(&st_GasHC.st_PeakRef.ul_PeakCenterDot),     
 START_ADD+0x7400 + 0x80, (uint32_t)(&st_GasHC.st_PeakRef.ul_PeakRightDot),              KIND_INT16U,      1,     LIMIT_RANGE,      0,          3648,        0,
 START_ADD+0x7400 + 0x84, (uint32_t)(&st_GasHC.st_PeakRef.ul_RightBackgroundLeftDot),    KIND_INT16U,      1,     LIMIT_RANGE,      0,          3648,        0,
 START_ADD+0x7400 + 0x88, (uint32_t)(&st_GasHC.st_PeakRef.ul_RightBackgroundRightDot),   KIND_INT16U,      1,     LIMIT_RANGE,      0,          3648,        0,
-                                                                                                         
+
+START_ADD+0x7400 + 0x84, (uint32_t)(&st_GasMeasure.ul_TransLeftDot),                    KIND_INT32U,      1,     LIMIT_RANGE,      0,          3648,        0,
+START_ADD+0x7400 + 0x88, (uint32_t)(&st_GasMeasure.ul_TransRightDot),                   KIND_INT32U,      1,     LIMIT_RANGE,      0,          3648,        0,
+
 
 //存储地址|-----------------变量地址---------------|-----类型------|-长度-|-----限定方-----|---最小值--|---最大值---|--默认值---//
 /*  4096 + 512  128个字节预留  */
@@ -117,6 +120,15 @@ START_ADD+0x7600 + 0x30, (uint32_t)(&st_Measure.ul_DeadTime),       KIND_INT32U,
 START_ADD+0x7600 + 0x34, (uint32_t)(&st_Measure.ul_MesureTime),     KIND_INT32U,  1,     LIMIT_RANGE,        0,      10000,    1000, 
 START_ADD+0x7600 + 0x38, (uint32_t)(&st_Measure.uin_InvalidDots),   KIND_INT16U,  1,     LIMIT_RANGE,        0,      DEF_SAMPLE_DOT_MAX,    0,       
 START_ADD+0x7600 + 0x3c, (uint32_t)(&st_Measure.uin_ActiveDots),    KIND_INT16U,  1,     LIMIT_RANGE,        0,      DEF_SAMPLE_DOT_MAX,    DEF_SAMPLE_DOT_MAX, 
+                     
+START_ADD+0x7600 + 0x40, (uint32_t)(&st_Measure.st_CalibCO2.f_X),    KIND_FP32,    1,     LIMIT_NULL,         0,      10000,    10,       
+START_ADD+0x7600 + 0x44, (uint32_t)(&st_Measure.st_CalibCO2.f_Y),    KIND_FP32,    1,     LIMIT_NULL,         0,      10000,    10,       
+START_ADD+0x7600 + 0x48, (uint32_t)(&st_Measure.st_CalibCO.f_X),     KIND_FP32,    1,     LIMIT_NULL,         0,      10000,    10,      
+START_ADD+0x7600 + 0x4C, (uint32_t)(&st_Measure.st_CalibCO.f_Y),     KIND_FP32,    1,     LIMIT_NULL,         0,      10000,    10,
+START_ADD+0x7600 + 0x50, (uint32_t)(&st_Measure.st_CalibNO.f_X),     KIND_FP32,    1,     LIMIT_NULL,         0,      10000,    10,       
+START_ADD+0x7600 + 0x54, (uint32_t)(&st_Measure.st_CalibNO.f_Y),     KIND_FP32,    1,     LIMIT_NULL,         0,      10000,    10,       
+START_ADD+0x7600 + 0x58, (uint32_t)(&st_Measure.st_CalibHC.f_X),     KIND_FP32,    1,     LIMIT_NULL,         0,      10000,    10,      
+START_ADD+0x7600 + 0x5C, (uint32_t)(&st_Measure.st_CalibHC.f_Y),     KIND_FP32,    1,     LIMIT_NULL,         0,      10000,    10,
 
 START_ADD+0x7800 + 0x00, (uint32_t)(&ast_GreyChannle[0].f_AbsTransVolt),   KIND_FP32,  1,     LIMIT_RANGE,       0.0,      4.1f,    4.1f,
 START_ADD+0x7800 + 0x04, (uint32_t)(&ast_GreyChannle[1].f_AbsTransVolt),   KIND_FP32,  1,     LIMIT_RANGE,       0.0,      4.1f,    4.1f,

@@ -437,14 +437,14 @@ static USBH_StatusTypeDef USBH_USB4000_Process (USBH_HandleTypeDef *phost)
 
                 USBH_USB4000_GetSpectrum(phost);
                 
-                /* 等待同步信号 
+                /* 等待同步信号 */
                 if(USB4000_Handle->b_WaitSync == TRUE)
                 {
                     //if(phost->gState != HOST_CLASS)
                     //    break;
                     USB4000_DBG (">>USBH_DBG:   等待同步"); 
                     OSTaskSuspend(&TaskUsbHostTCB,&os_err);     //挂起光谱采集
-                }*/
+                }
 
                 break;
         }
@@ -901,7 +901,7 @@ static USBH_StatusTypeDef USBH_USB4000_GetSpectrum(USBH_HandleTypeDef *phost)
         if(((i == 15) || (USB4000_Handle->b_First == TRUE && i == 14)) && auc_Buff[0] == 0x69)
         {
             USB4000_Handle->b_First = FALSE;
-            USBH_UsrLog ("光谱接受成功");
+            //USBH_UsrLog ("光谱接受成功");
             
             BSP_Led1Toggle();
             
