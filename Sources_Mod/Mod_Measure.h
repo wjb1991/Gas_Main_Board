@@ -81,9 +81,6 @@ extern  Measure_t st_Measure;
 void Mod_MeasureInit(Measure_t* pst_Meas);
 void Mod_MeasurePoll(Measure_t* pst_Meas);
 
-void Mod_MeasureDoStaticMeasure(Measure_t* pst_Meas);
-void Mod_MeasureDoDynamicMeasure(Measure_t* pst_Meas);
-
 void Mod_MeasureDoStaticMeas(Measure_t* pst_Meas);
 void Mod_MeasureDoStaticCalib(Measure_t* pst_Meas,FP32 f_CO2,FP32 f_CO,FP32 f_NO,FP32 f_HC);
 void Mod_MeasureDoDynamicMeas(Measure_t* pst_Meas);

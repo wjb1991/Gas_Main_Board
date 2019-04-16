@@ -513,7 +513,7 @@ void Mod_MeasurePoll(Measure_t* pst_Meas)
         
         StopTimeOutCheck();                                     //停止超时检测 
         Mod_GreyGotoIdle(&st_Grey);                             //绿光结束测量  
-        Mod_GasMeasureDoAbsMeasure(&st_GasMeasure);           //紫外结束差分测量 开始绝对测量
+        Mod_GasMeasureDoAbsMeasure(&st_GasMeasure);             //紫外结束差分测量 开始绝对测量
         
         pst_Meas->e_State = e_MeasureIdle;
         break;

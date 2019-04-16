@@ -100,8 +100,8 @@ START_ADD+0x7400 + 0x80, (uint32_t)(&st_GasHC.st_PeakRef.ul_PeakRightDot),      
 START_ADD+0x7400 + 0x84, (uint32_t)(&st_GasHC.st_PeakRef.ul_RightBackgroundLeftDot),    KIND_INT16U,      1,     LIMIT_RANGE,      0,          3648,        0,
 START_ADD+0x7400 + 0x88, (uint32_t)(&st_GasHC.st_PeakRef.ul_RightBackgroundRightDot),   KIND_INT16U,      1,     LIMIT_RANGE,      0,          3648,        0,
 
-START_ADD+0x7400 + 0x84, (uint32_t)(&st_GasMeasure.ul_TransLeftDot),                    KIND_INT32U,      1,     LIMIT_RANGE,      0,          3648,        0,
-START_ADD+0x7400 + 0x88, (uint32_t)(&st_GasMeasure.ul_TransRightDot),                   KIND_INT32U,      1,     LIMIT_RANGE,      0,          3648,        0,
+START_ADD+0x7400 + 0x8C, (uint32_t)(&st_GasMeasure.ul_TransLeftDot),                    KIND_INT32U,      1,     LIMIT_RANGE,      0,          3648,        0,
+START_ADD+0x7400 + 0x90, (uint32_t)(&st_GasMeasure.ul_TransRightDot),                   KIND_INT32U,      1,     LIMIT_RANGE,      0,          3648,        0,
 
 
 //存储地址|-----------------变量地址---------------|-----类型------|-长度-|-----限定方-----|---最小值--|---最大值---|--默认值---//

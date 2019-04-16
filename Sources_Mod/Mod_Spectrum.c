@@ -231,7 +231,7 @@ FP64 Mod_GasMeasureUpdataTrans(GasMeasure_t* pst_Meas)
     INT32U  i;
     for(i = pst_Meas->ul_TransLeftDot; i < pst_Meas->ul_TransRightDot; i++)
     {
-        lf_Sum += pst_Meas->plf_Spectrum[i];
+        lf_Sum += pst_Meas->pf_ProcSpectrum[i];
     }
     lf_Sum /= (pst_Meas->ul_TransRightDot - pst_Meas->ul_TransLeftDot);
     pst_Meas->f_Trans = pst_Meas->f_TransK * lf_Sum;
@@ -702,7 +702,7 @@ void Mod_GasMeasurePoll(GasMeasure_t* pst_Meas)
     
     pst_Meas->ul_SpectrumLen = USB4000_Handle->uin_Pixels;
 
-    /* 拷贝光谱到当前光谱并修正积分时间 */
+    /* 拷贝光谱到当前光谱 */
     for(i = 0; i < pst_Meas->ul_SpectrumLen; i++)
     {
         pst_Meas->plf_Spectrum[i] = USB4000_Handle->plf_ProcessSpectrum[i];
@@ -710,11 +710,13 @@ void Mod_GasMeasurePoll(GasMeasure_t* pst_Meas)
     }
     
     k = Mod_GasMeasureUpdataTrans(pst_Meas);
+    k /= 1000;
     
-    /* 修正透过率 */
+    /* 修正积分时间与修正透过率 */
     for(i = 0; i < pst_Meas->ul_SpectrumLen; i++)
     {
         pst_Meas->pf_ProcSpectrum[i] /= k;
+        //pst_Meas->pf_ProcSpectrum[i] /= k;
     }
     
     switch (pst_Meas->e_State)

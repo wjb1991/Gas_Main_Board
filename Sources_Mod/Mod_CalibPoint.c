@@ -1,7 +1,7 @@
 
 #include "App_Include.h"
 
-#define DEF_CALIBPOINT_DBG_EN           FALSE
+#define DEF_CALIBPOINT_DBG_EN           TRUE
 
 #if (DEF_CALIBPOINT_DBG_EN == TRUE)
     #define CALIBPOINT_DBG(...)         do {                                \

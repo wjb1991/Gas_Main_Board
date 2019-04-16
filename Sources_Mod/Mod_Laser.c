@@ -1,6 +1,6 @@
 #include "App_Include.h"
 
-#define DEF_LASER_DBG_EN    TRUE
+#define DEF_LASER_DBG_EN    FALSE
 
 #if (DEF_LASER_DBG_EN == TRUE)
     #define LASER_DBG(...)             do {                                \

@@ -1019,9 +1019,9 @@ USBH_StatusTypeDef USBH_USB4000_ProcessSpectrum(USB4000_HandleTypeDef *USB4000_H
         {
             for (int i = 0; i < USB4000_Handle->uin_Pixels; i++) 
             {   
-                FP64 pixel = USB4000_Handle->plf_ProcessSpectrum[i];
-                FP64 factor = USB4000_Handle->alf_NlcCoeff[0];
-                FP64 pixelToTheN = pixel;
+                float pixel = USB4000_Handle->plf_ProcessSpectrum[i];
+                float factor = USB4000_Handle->alf_NlcCoeff[0];
+                float pixelToTheN = pixel;
 
                 // factor is already initialized with x^0...start at x^1
                 for (int j = 1; j < USB4000_Handle->uch_NlcOrder; j++) 
