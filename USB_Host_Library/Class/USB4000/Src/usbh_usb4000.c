@@ -68,7 +68,7 @@ USBH_ClassTypeDef  USB4000_Class =
 static uint8_t auc_SerialNumber[30]={0};
 
 //#pragma location = (0x68000000)        
-static int16_t spa_buff[3840]={0};
+static uint16_t spa_buff[3840]={0};
 
 //#pragma location = (0x68002000)
 static int32_t  sum_spa[3840] = {0};
@@ -95,22 +95,23 @@ USB4000_HandleTypeDef   USB4000 = {
     {0,0,0,0,0,0,0,0,0,0,0},//auin_EdcIndexs[11];             
     {0,0,0,0},              //alf_WlcCoeff[4];
     {0,0,0,0,0,0,0,0},      //alf_NlcCoeff[8];  
-    0,//              uch_NlcOrder;
-    spa_buff,//       pin_Spectrum;           
-    sum_spa,//        pl_SumSpectrum;             
-    process_spa,//    plf_ProcessSpectrum;    
-    wavelenth_buff,// plf_WaveLenth;          
-    0,//              uin_Pixels;             
-    0,//              uch_ScansToAverage;     
-    0,//              uch_ScansConut;         
-    0,//              uch_Boxcar;             
-    0,//              ul_IntegralTime;               
-    FALSE,//          b_EdcEnable;            
-    FALSE,//          b_NlcEnable;            
-         
-    FALSE,//          b_First;
-    FALSE,//          b_HighSpeed;
-    FALSE,//          b_WaitSync;
+    0,                      //uch_NlcOrder;
+    0.0,                    //f_Autonulling
+    spa_buff,               //pin_Spectrum;           
+    sum_spa,                //pl_SumSpectrum;             
+    process_spa,            //plf_ProcessSpectrum;    
+    wavelenth_buff,         //plf_WaveLenth;          
+    0,                      //uin_Pixels;             
+    0,                      //uch_ScansToAverage;     
+    0,                      //uch_ScansConut;         
+    0,                      //uch_Boxcar;             
+    0,                      //ul_IntegralTime;               
+    FALSE,                  //b_EdcEnable;            
+    FALSE,                  //b_NlcEnable;            
+                            
+    FALSE,                  //b_First;
+    FALSE,                  //b_HighSpeed;
+    FALSE,                  //b_WaitSync;
     USB4000_DISCONNECT,
 };
 
@@ -437,6 +438,10 @@ static USBH_StatusTypeDef USBH_USB4000_Process (USBH_HandleTypeDef *phost)
 
                 USBH_USB4000_GetSpectrum(phost);
                 
+                //OSTimeDlyHMSM(0u, 0u, 0u, 100u,
+                //              OS_OPT_TIME_HMSM_STRICT ,
+                //              &os_err); 
+                
                 /* 等待同步信号 */
                 if(USB4000_Handle->b_WaitSync == TRUE)
                 {
@@ -723,6 +728,10 @@ static USBH_StatusTypeDef USBH_USB4000_GetInformation(USBH_HandleTypeDef *phost,
             memcpy(string,&auc_Buff[2],62);
         }
         USBH_UsrLog ("请求信息完成 %u %s",Cmd,&auc_Buff[2]);
+        for(int ii = 0; ii < 64; ii++)
+        {
+            USBH_UsrLog ("[%u]=0x%x",ii,auc_Buff[ii]);
+        }
         return USBH_OK;
     }
     else
@@ -746,7 +755,7 @@ static USBH_StatusTypeDef USBH_USB4000_QueryInformation(USBH_HandleTypeDef *phos
     USB4000_HandleTypeDef *USB4000_Handle =  (USB4000_HandleTypeDef *) phost->pActiveClass->pData; 
     static INT8U   aauc_Str[64] = {0};
       
-    for(int i = 0; i < 16; )
+    for(int i = 0; i < 18; )
     {
         if(USBH_OK == USBH_USB4000_GetInformation(phost,i,&aauc_Str[0]))
         {
@@ -776,7 +785,10 @@ static USBH_StatusTypeDef USBH_USB4000_QueryInformation(USBH_HandleTypeDef *phos
                   
             case 14: //非线性补阶数 Polynomial order of non-linearity calibration
                   USB4000_Handle->uch_NlcOrder = atoi((char const*)&aauc_Str[0]);
-                  break;          
+                  break;
+            case 17:
+                  USB4000_Handle->uin_Autonulling = (uint16_t)(aauc_Str[5] * 0x100) + aauc_Str[4];
+                  break;
             }
           
             //printf("信息%u = ",i);
@@ -962,8 +974,8 @@ USBH_StatusTypeDef USBH_USB4000_ProcessSpectrum(USB4000_HandleTypeDef *USB4000_H
             /* 算平均 */
             for(i = 0; i < USB4000_Handle->uin_Pixels; i++)
             {
-                USB4000_Handle->plf_ProcessSpectrum[i] = ((float)USB4000_Handle->pl_SumSpectrum[i]) / 
-                                                          USB4000_Handle->uch_ScansToAverage;
+                USB4000_Handle->plf_ProcessSpectrum[i] = ((float)USB4000_Handle->pl_SumSpectrum[i]) / USB4000_Handle->uch_ScansToAverage
+                                                          / 65535 * USB4000_Handle->uin_Autonulling;
             }
             
             /* 清除光谱 */
@@ -982,7 +994,7 @@ USBH_StatusTypeDef USBH_USB4000_ProcessSpectrum(USB4000_HandleTypeDef *USB4000_H
         for(i = 0; i < USB4000_Handle->uin_Pixels; i++)
         {
             USB4000_Handle->pl_SumSpectrum[i] = 0;
-            USB4000_Handle->plf_ProcessSpectrum[i] = USB4000_Handle->pin_Spectrum[i];
+            USB4000_Handle->plf_ProcessSpectrum[i] = (float)USB4000_Handle->pin_Spectrum[i] * 65535.0 / USB4000_Handle->uin_Autonulling;
         }
         
         ready = 1;
@@ -1024,7 +1036,7 @@ USBH_StatusTypeDef USBH_USB4000_ProcessSpectrum(USB4000_HandleTypeDef *USB4000_H
                 float pixelToTheN = pixel;
 
                 // factor is already initialized with x^0...start at x^1
-                for (int j = 1; j < USB4000_Handle->uch_NlcOrder; j++) 
+                for (int j = 1; j < USB4000_Handle->uch_NlcOrder+1; j++) 
                 {   
                     factor += pixelToTheN * USB4000_Handle->alf_NlcCoeff[j];
                     pixelToTheN *= pixel;

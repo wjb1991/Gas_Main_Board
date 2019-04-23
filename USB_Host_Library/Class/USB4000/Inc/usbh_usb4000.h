@@ -77,18 +77,20 @@ typedef struct _USB4000_Process
     /* 5-15像素*/
     uint16_t             auin_EdcIndexs[11];        
     /* Wavelength Calibration Coefficient */
-    double               alf_WlcCoeff[4];
+    float                alf_WlcCoeff[4];
     /* non-linearity correction coefficient */
-    double               alf_NlcCoeff[8];
+    float                alf_NlcCoeff[8];
     
     uint8_t              uch_NlcOrder;
     
+    uint16_t             uin_Autonulling;
+    
     /* 光谱数据 */
-    int16_t*             pin_Spectrum;              //光谱数组
+    uint16_t*            pin_Spectrum;              //光谱数组
     int32_t*             pl_SumSpectrum;            //求和光谱
     
-    float*              plf_ProcessSpectrum;       //处理后的光谱
-    float*              plf_WaveLenth;             //波长数组
+    float*               plf_ProcessSpectrum;       //处理后的光谱
+    float*               plf_WaveLenth;             //波长数组
     uint16_t             uin_Pixels;                //像素个数
     
     uint8_t              uch_ScansToAverage;        //多次扫描平均

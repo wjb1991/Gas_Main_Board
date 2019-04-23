@@ -32,8 +32,7 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
                 SaveToEeprom((INT32U)&USB4000.b_EdcEnable);
                 SaveToEeprom((INT32U)&USB4000.b_NlcEnable);     
                 SaveToEeprom((INT32U)&USB4000.uch_Boxcar);
-                SaveToEeprom((INT32U)&USB4000.uch_ScansToAverage);  
-                
+                SaveToEeprom((INT32U)&USB4000.uch_ScansToAverage);
                 
                 //Ó¦´ðÊý¾Ý
                 pst_Fram->uin_PayLoadLenth = 146;

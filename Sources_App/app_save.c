@@ -107,7 +107,7 @@ START_ADD+0x7400 + 0x90, (uint32_t)(&st_GasMeasure.ul_TransRightDot),           
 //存储地址|-----------------变量地址---------------|-----类型------|-长度-|-----限定方-----|---最小值--|---最大值---|--默认值---//
 /*  4096 + 512  128个字节预留  */
 START_ADD+0x7600 + 0x00, (uint32_t)(&USB4000.uch_ScansToAverage),   KIND_INT8U,   1,     LIMIT_RANGE,       1,          99,        10,
-START_ADD+0x7600 + 0x04, (uint32_t)(&USB4000.uch_Boxcar),           KIND_INT8U,   1,     LIMIT_RANGE,       1,          99,        32,
+START_ADD+0x7600 + 0x04, (uint32_t)(&USB4000.uch_Boxcar),           KIND_INT8U,   1,     LIMIT_RANGE,       0,          99,        32,
 START_ADD+0x7600 + 0x08, (uint32_t)(&USB4000.b_EdcEnable),          KIND_INT8U,   1,     LIMIT_RANGE,       0,          1,          1,
 START_ADD+0x7600 + 0x0C, (uint32_t)(&USB4000.b_NlcEnable),          KIND_INT8U,   1,     LIMIT_RANGE,       0,          1,          0,
 START_ADD+0x7600 + 0x10, (uint32_t)(&USB4000.ul_SetIntegralTime),   KIND_INT32U,  1,     LIMIT_RANGE,       1,      65000000,    50000,
