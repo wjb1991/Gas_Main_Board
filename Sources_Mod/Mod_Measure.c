@@ -14,8 +14,9 @@
 #endif
 
 Measure_t st_Measure = {
-    e_MeasIdle,                     /* 空闲模式 */
-    e_MeasureIdle,                  /* 测试状态 */
+    e_MeasureIdle,                  /* 空闲模式 */
+    e_MeasIdle,                     /* 测试状态 */
+    
     10,                             /* 死区时间 */
     1000,                           /* 测试时间 */
     0,		                        /* 无效点 */
@@ -193,6 +194,7 @@ void Mod_MeasureInit(Measure_t* pst_Meas)
 {
     InitSem();
     InitTimeOutCheck();  
+
 }
 /*
 void Mod_MeasureDoStaticMeasure(Measure_t* pst_Meas)
@@ -300,18 +302,18 @@ void Mod_MeasurePoll(Measure_t* pst_Meas)
         
         pst_Meas->e_State = e_MeasureWait;
         Mod_GreyGotoMeas(&st_Grey);                             //绿光等待开始测量
-        Mod_GasMeasureDoDiffMeasure(&st_GasMeasure);            //紫外开始差分测量 开始绝对测量
+
+        Mod_GasMeasureDoDiffMeasure(&st_GasMeasure);            //紫外开始差分测量
         
         USB4000.b_WaitSync = TRUE;                              //等待同步
         break;
     case e_MeasureDead: 
+      
+        StopTimeOutCheck();                                     //停止超时检测
         
         if(pst_Meas->ul_DeadTime != 0 )
         {
             MEASURE_DBG(">>MEASURE DBG:   车辆离去 死区延时\r\n");
-
-            StopTimeOutCheck();                                     //停止超时检测
-            
             pst_Meas->e_State = e_MeasureDead; 
         
 
@@ -366,8 +368,9 @@ void Mod_MeasurePoll(Measure_t* pst_Meas)
         
         pst_Meas->e_State = e_MeasureCal;
         
-        Mod_GreyGotoIdle(&st_Grey);                             //绿光结束测量  
-        Mod_GasMeasureDoAbsMeasure(&st_GasMeasure);             //紫外结束差分测量 开始绝对测量
+        Mod_GreyGotoIdle(&st_Grey);                             //绿光结束测量
+        
+        Mod_GasMeasureDoDiffBackground(&st_GasMeasure);         //紫外结束差分测量
 
         OSTaskSuspend(&TaskUsbHostTCB,&os_err);                 //挂起光谱采集
         
@@ -513,7 +516,8 @@ void Mod_MeasurePoll(Measure_t* pst_Meas)
         
         StopTimeOutCheck();                                     //停止超时检测 
         Mod_GreyGotoIdle(&st_Grey);                             //绿光结束测量  
-        Mod_GasMeasureDoAbsMeasure(&st_GasMeasure);             //紫外结束差分测量 开始绝对测量
+
+        Mod_GasMeasureDoDiffBackground(&st_GasMeasure);         //紫外结束差分测量
         
         pst_Meas->e_State = e_MeasureIdle;
         break;

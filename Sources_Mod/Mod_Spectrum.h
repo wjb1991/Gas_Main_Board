@@ -1,7 +1,7 @@
 #ifndef __MOD_SPECTRUM_H__
 #define __MOD_SPECTRUM_H__
 
-#define     DEF_CALIB_NIHE_ORDER_MAX    9
+#define     DEF_CALIB_NIHE_ORDER_MAX    5
 
 typedef enum {
     eGasN2 = 0,
@@ -54,10 +54,9 @@ typedef struct {
 
 typedef struct {
     GasMeasureState_e e_State;                  /* 测量状态 */
-
     void*        pst_Dev;                       /* 光谱仪设备 */
-
-    BOOL         b_SaveZeroSpecetrum;            /* 存储调零光谱 */
+    BOOL         b_DiffMeasrue;                 /* 差分测量 */
+    BOOL         b_SaveZeroSpecetrum;           /* 存储调零光谱 */
     
     FP32*        pf_WaveLenth;                  /* 波长数组 */
     FP32*        plf_Spectrum;                  /* 现在的光谱 */

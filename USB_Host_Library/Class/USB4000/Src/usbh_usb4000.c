@@ -728,10 +728,10 @@ static USBH_StatusTypeDef USBH_USB4000_GetInformation(USBH_HandleTypeDef *phost,
             memcpy(string,&auc_Buff[2],62);
         }
         USBH_UsrLog ("请求信息完成 %u %s",Cmd,&auc_Buff[2]);
-        for(int ii = 0; ii < 64; ii++)
-        {
-            USBH_UsrLog ("[%u]=0x%x",ii,auc_Buff[ii]);
-        }
+        //for(int ii = 0; ii < 64; ii++)
+        //{
+        //    USBH_UsrLog ("[%u]=0x%x",ii,auc_Buff[ii]);
+        //}
         return USBH_OK;
     }
     else
@@ -790,7 +790,7 @@ static USBH_StatusTypeDef USBH_USB4000_QueryInformation(USBH_HandleTypeDef *phos
                   USB4000_Handle->uin_Autonulling = (uint16_t)(aauc_Str[5] * 0x100) + aauc_Str[4];
                   break;
             }
-          
+            
             //printf("信息%u = ",i);
             //printf((const char*)&aauc_Str[2]);
             //printf("\r\n");
@@ -975,7 +975,7 @@ USBH_StatusTypeDef USBH_USB4000_ProcessSpectrum(USB4000_HandleTypeDef *USB4000_H
             for(i = 0; i < USB4000_Handle->uin_Pixels; i++)
             {
                 USB4000_Handle->plf_ProcessSpectrum[i] = ((float)USB4000_Handle->pl_SumSpectrum[i]) / USB4000_Handle->uch_ScansToAverage
-                                                          / 65535 * USB4000_Handle->uin_Autonulling;
+                                                          * 65535.0f / USB4000_Handle->uin_Autonulling;
             }
             
             /* 清除光谱 */
@@ -994,7 +994,7 @@ USBH_StatusTypeDef USBH_USB4000_ProcessSpectrum(USB4000_HandleTypeDef *USB4000_H
         for(i = 0; i < USB4000_Handle->uin_Pixels; i++)
         {
             USB4000_Handle->pl_SumSpectrum[i] = 0;
-            USB4000_Handle->plf_ProcessSpectrum[i] = (float)USB4000_Handle->pin_Spectrum[i] * 65535.0 / USB4000_Handle->uin_Autonulling;
+            USB4000_Handle->plf_ProcessSpectrum[i] = (float)USB4000_Handle->pin_Spectrum[i] * 65535.0f / USB4000_Handle->uin_Autonulling;
         }
         
         ready = 1;

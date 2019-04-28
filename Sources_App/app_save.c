@@ -45,43 +45,21 @@ START_ADD+0x7300 + 0xD0, (uint32_t)(&ast_CalibPoint_GasHC[13]),   KIND_INT8U,   
 START_ADD+0x7300 + 0xE0, (uint32_t)(&ast_CalibPoint_GasHC[14]),   KIND_INT8U,   sizeof(CalibPoint_t),     LIMIT_NULL,       0,          0,        0,
 START_ADD+0x7300 + 0xF0, (uint32_t)(&ast_CalibPoint_GasHC[15]),   KIND_INT8U,   sizeof(CalibPoint_t),     LIMIT_NULL,       0,          0,        0,
 
-START_ADD+0x7400 + 0x00, (uint32_t)(&st_GasNO.uch_NiheOrder),    KIND_INT8U,      1,     LIMIT_RANGE,      1,          9,        9,
+START_ADD+0x7400 + 0x00, (uint32_t)(&st_GasNO.uch_NiheOrder),    KIND_INT8U,      1,     LIMIT_RANGE,      1,          5,        4,
 START_ADD+0x7400 + 0x04, (uint32_t)(&st_GasNO.af_NiheCoeff[0]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
 START_ADD+0x7400 + 0x08, (uint32_t)(&st_GasNO.af_NiheCoeff[1]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
 START_ADD+0x7400 + 0x0C, (uint32_t)(&st_GasNO.af_NiheCoeff[2]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
 START_ADD+0x7400 + 0x10, (uint32_t)(&st_GasNO.af_NiheCoeff[3]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
 START_ADD+0x7400 + 0x14, (uint32_t)(&st_GasNO.af_NiheCoeff[4]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
-START_ADD+0x7400 + 0x14, (uint32_t)(&st_GasNO.af_NiheCoeff[5]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
-START_ADD+0x7400 + 0x18, (uint32_t)(&st_GasNO.af_NiheCoeff[6]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
-START_ADD+0x7400 + 0x1C, (uint32_t)(&st_GasNO.af_NiheCoeff[7]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
-START_ADD+0x7400 + 0x20, (uint32_t)(&st_GasNO.af_NiheCoeff[8]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
-START_ADD+0x7400 + 0x24, (uint32_t)(&st_GasNO.af_NiheCoeff[9]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
+START_ADD+0x7400 + 0x18, (uint32_t)(&st_GasNO.af_NiheCoeff[5]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
 
-START_ADD+0x7400 + 0x28, (uint32_t)(&st_GasHC.uch_NiheOrder),    KIND_INT8U,      1,     LIMIT_RANGE,      1,          9,        9,
+START_ADD+0x7400 + 0x28, (uint32_t)(&st_GasHC.uch_NiheOrder),    KIND_INT8U,      1,     LIMIT_RANGE,      1,          5,        4,
 START_ADD+0x7400 + 0x2C, (uint32_t)(&st_GasHC.af_NiheCoeff[0]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
 START_ADD+0x7400 + 0x30, (uint32_t)(&st_GasHC.af_NiheCoeff[1]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
 START_ADD+0x7400 + 0x34, (uint32_t)(&st_GasHC.af_NiheCoeff[2]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
 START_ADD+0x7400 + 0x38, (uint32_t)(&st_GasHC.af_NiheCoeff[3]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
 START_ADD+0x7400 + 0x3C, (uint32_t)(&st_GasHC.af_NiheCoeff[4]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
 START_ADD+0x7400 + 0x40, (uint32_t)(&st_GasHC.af_NiheCoeff[5]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
-START_ADD+0x7400 + 0x44, (uint32_t)(&st_GasHC.af_NiheCoeff[6]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
-START_ADD+0x7400 + 0x48, (uint32_t)(&st_GasHC.af_NiheCoeff[7]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
-START_ADD+0x7400 + 0x4C, (uint32_t)(&st_GasHC.af_NiheCoeff[8]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
-START_ADD+0x7400 + 0x50, (uint32_t)(&st_GasHC.af_NiheCoeff[9]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
-
-
-
-START_ADD+0x7400 + 0x28, (uint32_t)(&st_GasHC.uch_NiheOrder),    KIND_INT8U,      1,     LIMIT_RANGE,      1,          9,        9,
-START_ADD+0x7400 + 0x2C, (uint32_t)(&st_GasHC.af_NiheCoeff[0]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
-START_ADD+0x7400 + 0x30, (uint32_t)(&st_GasHC.af_NiheCoeff[1]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
-START_ADD+0x7400 + 0x34, (uint32_t)(&st_GasHC.af_NiheCoeff[2]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
-START_ADD+0x7400 + 0x38, (uint32_t)(&st_GasHC.af_NiheCoeff[3]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
-START_ADD+0x7400 + 0x3C, (uint32_t)(&st_GasHC.af_NiheCoeff[4]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
-START_ADD+0x7400 + 0x40, (uint32_t)(&st_GasHC.af_NiheCoeff[5]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
-START_ADD+0x7400 + 0x44, (uint32_t)(&st_GasHC.af_NiheCoeff[6]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
-START_ADD+0x7400 + 0x48, (uint32_t)(&st_GasHC.af_NiheCoeff[7]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
-START_ADD+0x7400 + 0x4C, (uint32_t)(&st_GasHC.af_NiheCoeff[8]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
-START_ADD+0x7400 + 0x50, (uint32_t)(&st_GasHC.af_NiheCoeff[9]),  KIND_FP32,       1,     LIMIT_NULL,       0,          0,        0,
 
 
 START_ADD+0x7400 + 0x54, (uint32_t)(&st_GasNO.st_PeakRef.ul_LeftBackgroundLeftDot),     KIND_INT16U,      1,     LIMIT_RANGE,      0,          3648,        0,
@@ -103,6 +81,7 @@ START_ADD+0x7400 + 0x88, (uint32_t)(&st_GasHC.st_PeakRef.ul_RightBackgroundRight
 START_ADD+0x7400 + 0x8C, (uint32_t)(&st_GasMeasure.ul_TransLeftDot),                    KIND_INT32U,      1,     LIMIT_RANGE,      0,          3648,        0,
 START_ADD+0x7400 + 0x90, (uint32_t)(&st_GasMeasure.ul_TransRightDot),                   KIND_INT32U,      1,     LIMIT_RANGE,      0,          3648,        0,
 
+START_ADD+0x7400 + 0x94, (uint32_t)(&st_GasMeasure.b_DiffMeasrue),                      KIND_INT8U,       1,     LIMIT_RANGE,      0,          1,           1,
 
 //存储地址|-----------------变量地址---------------|-----类型------|-长度-|-----限定方-----|---最小值--|---最大值---|--默认值---//
 /*  4096 + 512  128个字节预留  */
@@ -114,8 +93,9 @@ START_ADD+0x7600 + 0x10, (uint32_t)(&USB4000.ul_SetIntegralTime),   KIND_INT32U,
 
 START_ADD+0x7600 + 0x20, (uint32_t)(&st_GasMeasure.b_SaveZeroSpecetrum),   KIND_INT8U,  1,     LIMIT_RANGE,       0,      1,    1,       
 START_ADD+0x7600 + 0x24, (uint32_t)(&st_GasMeasure.f_TransK),              KIND_FP32,  1,     LIMIT_NULL,        0,      1,    1,            
-START_ADD+0x7600 + 0x28, (uint32_t)(&st_GasNO.f_Correction),        KIND_FP32,  1,       LIMIT_RANGE,        0,      1.0,    10,       
- 
+START_ADD+0x7600 + 0x28, (uint32_t)(&st_GasNO.f_Correction),        KIND_FP32,  1,       LIMIT_NULL,        0,      1.0,    10,       
+START_ADD+0x7600 + 0x28, (uint32_t)(&st_GasHC.f_Correction),        KIND_FP32,  1,       LIMIT_NULL,        0,      1.0,    10, 
+
 START_ADD+0x7600 + 0x30, (uint32_t)(&st_Measure.ul_DeadTime),       KIND_INT32U,  1,     LIMIT_RANGE,        0,      10000,    10,       
 START_ADD+0x7600 + 0x34, (uint32_t)(&st_Measure.ul_MesureTime),     KIND_INT32U,  1,     LIMIT_RANGE,        0,      10000,    1000, 
 START_ADD+0x7600 + 0x38, (uint32_t)(&st_Measure.uin_InvalidDots),   KIND_INT16U,  1,     LIMIT_RANGE,        0,      DEF_SAMPLE_DOT_MAX,    0,       

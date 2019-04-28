@@ -162,6 +162,33 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
             }
         }
 		break;
+    case 0x19:
+		if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
+		{
+            pst_Fram->puc_PayLoad[0] = st_GasMeasure.b_DiffMeasrue;
+            pst_Fram->uin_PayLoadLenth = 1;
+            res = TRUE;    //应答
+		}
+		else if(pst_Fram->uch_SubCmd == e_StdbusWriteCmd)
+        {
+            if(pst_Fram->uin_PayLoadLenth == 1)
+            {
+                st_GasMeasure.b_DiffMeasrue = pst_Fram->puc_PayLoad[0];
+                
+                if(st_GasMeasure.b_DiffMeasrue == TRUE)
+                {
+                    Mod_GasMeasureDoDiffBackground(&st_GasMeasure);         //紫外开始差分测量
+                }
+                else
+                {
+                    Mod_GasMeasureDoAbsMeasure(&st_GasMeasure);             //开始绝对测量
+                }
+
+                SaveToEeprom((INT32U)&st_GasMeasure.b_DiffMeasrue);
+				res = TRUE;    //应答
+            }
+        }
+        break;
 //==================================================================================
 //                          修改一个标定点/读取一个标定点
 //==================================================================================
@@ -341,7 +368,7 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
     case 0x28:
         if(pst_Fram->uch_SubCmd == e_StdbusWriteCmd)
         {
-            if(pst_Fram->uin_PayLoadLenth == 36)
+            if(pst_Fram->uin_PayLoadLenth == 96)
             {
                 ///综合测量参数
 				st_Measure.uin_InvalidDots = Bsp_CnvArrToINT32U(&pst_Fram->puc_PayLoad[0],FALSE);
@@ -357,6 +384,25 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
                 st_GasMeasure.pst_Gas1->uch_NiheOrder = Bsp_CnvArrToINT32U(&pst_Fram->puc_PayLoad[28],FALSE); 
                 st_GasMeasure.pst_Gas2->uch_NiheOrder = Bsp_CnvArrToINT32U(&pst_Fram->puc_PayLoad[32],FALSE); 
                 
+                st_GasMeasure.pst_Gas1->f_Correction = Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[36],FALSE); 
+                st_GasMeasure.pst_Gas2->f_Correction = Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[40],FALSE);   
+                
+                st_GasMeasure.b_DiffMeasrue = Bsp_CnvArrToINT32U(&pst_Fram->puc_PayLoad[44],FALSE); 
+                
+                st_GasMeasure.pst_Gas1->af_NiheCoeff[0] = Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[48],FALSE);
+                st_GasMeasure.pst_Gas1->af_NiheCoeff[1] = Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[52],FALSE);
+                st_GasMeasure.pst_Gas1->af_NiheCoeff[2] = Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[56],FALSE);
+                st_GasMeasure.pst_Gas1->af_NiheCoeff[3] = Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[60],FALSE);
+                st_GasMeasure.pst_Gas1->af_NiheCoeff[4] = Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[64],FALSE);
+                st_GasMeasure.pst_Gas1->af_NiheCoeff[5] = Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[68],FALSE); 
+
+                st_GasMeasure.pst_Gas2->af_NiheCoeff[0] = Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[72],FALSE);
+                st_GasMeasure.pst_Gas2->af_NiheCoeff[1] = Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[76],FALSE);
+                st_GasMeasure.pst_Gas2->af_NiheCoeff[2] = Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[80],FALSE);
+                st_GasMeasure.pst_Gas2->af_NiheCoeff[3] = Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[84],FALSE);
+                st_GasMeasure.pst_Gas2->af_NiheCoeff[4] = Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[88],FALSE);
+                st_GasMeasure.pst_Gas2->af_NiheCoeff[5] = Bsp_CnvArrToFP32(&pst_Fram->puc_PayLoad[92],FALSE); 
+                
                 ///综合测量参数
                 SaveToEeprom((INT32U)(&st_Measure.uin_InvalidDots));
                 SaveToEeprom((INT32U)(&st_Measure.uin_ActiveDots));
@@ -369,13 +415,41 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
                 SaveToEeprom((INT32U)(&st_GasMeasure.f_TransK));
                 SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas1->uch_NiheOrder));
                 SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas2->uch_NiheOrder));
+                
+                SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas1->f_Correction));
+                SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas2->f_Correction));
+                SaveToEeprom((INT32U)(&st_GasMeasure.b_DiffMeasrue)); 
+                
+                SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas1->af_NiheCoeff[0]));
+                SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas1->af_NiheCoeff[1]));
+                SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas1->af_NiheCoeff[2]));
+                SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas1->af_NiheCoeff[3]));
+                SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas1->af_NiheCoeff[4]));
+                SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas1->af_NiheCoeff[5]));
+                
+                SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas2->af_NiheCoeff[0]));
+                SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas2->af_NiheCoeff[1]));
+                SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas2->af_NiheCoeff[2]));
+                SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas2->af_NiheCoeff[3]));
+                SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas2->af_NiheCoeff[4]));
+                SaveToEeprom((INT32U)(&st_GasMeasure.pst_Gas2->af_NiheCoeff[5]));
+                 
+                if(st_GasMeasure.b_DiffMeasrue == TRUE)
+                {
+                    Mod_GasMeasureDoDiffBackground(&st_GasMeasure);         //紫外开始差分测量
+                }
+                else
+                {
+                    Mod_GasMeasureDoAbsMeasure(&st_GasMeasure);             //开始绝对测量
+                }
+                
                 res = TRUE;    //应答
             }
         }
         else if(pst_Fram->uch_SubCmd == e_StdbusReadCmd)
         {
             //读命令是返回是否在调零
-            pst_Fram->uin_PayLoadLenth = 36;
+            pst_Fram->uin_PayLoadLenth = 96;
             
             ///综合测量参数
             Bsp_CnvINT32UToArr(&pst_Fram->puc_PayLoad[0],st_Measure.uin_InvalidDots,FALSE);     
@@ -389,7 +463,26 @@ BOOL App_StdbusMasterDealFram(StdbusFram_t* pst_Fram)
             Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[24],st_GasMeasure.f_TransK,FALSE);
             
             Bsp_CnvINT32UToArr(&pst_Fram->puc_PayLoad[28],st_GasMeasure.pst_Gas1->uch_NiheOrder,FALSE); 
-            Bsp_CnvINT32UToArr(&pst_Fram->puc_PayLoad[32],st_GasMeasure.pst_Gas1->uch_NiheOrder,FALSE);
+            Bsp_CnvINT32UToArr(&pst_Fram->puc_PayLoad[32],st_GasMeasure.pst_Gas2->uch_NiheOrder,FALSE);
+            
+            Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[36],st_GasMeasure.pst_Gas1->f_Correction,FALSE);    
+            Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[40],st_GasMeasure.pst_Gas2->f_Correction,FALSE);
+            
+            Bsp_CnvINT32UToArr(&pst_Fram->puc_PayLoad[44],st_GasMeasure.b_DiffMeasrue,FALSE);
+            
+            Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[48],st_GasMeasure.pst_Gas1->af_NiheCoeff[0],FALSE);    
+            Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[52],st_GasMeasure.pst_Gas1->af_NiheCoeff[1],FALSE);
+            Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[56],st_GasMeasure.pst_Gas1->af_NiheCoeff[2],FALSE);    
+            Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[60],st_GasMeasure.pst_Gas1->af_NiheCoeff[3],FALSE);
+            Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[64],st_GasMeasure.pst_Gas1->af_NiheCoeff[4],FALSE);    
+            Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[68],st_GasMeasure.pst_Gas1->af_NiheCoeff[5],FALSE);
+            
+            Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[72],st_GasMeasure.pst_Gas2->af_NiheCoeff[0],FALSE);    
+            Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[76],st_GasMeasure.pst_Gas2->af_NiheCoeff[1],FALSE);
+            Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[80],st_GasMeasure.pst_Gas2->af_NiheCoeff[2],FALSE);    
+            Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[84],st_GasMeasure.pst_Gas2->af_NiheCoeff[3],FALSE);
+            Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[88],st_GasMeasure.pst_Gas2->af_NiheCoeff[4],FALSE);    
+            Bsp_CnvFP32ToArr(&pst_Fram->puc_PayLoad[92],st_GasMeasure.pst_Gas2->af_NiheCoeff[5],FALSE);
             
             res = TRUE;    //应答
         }

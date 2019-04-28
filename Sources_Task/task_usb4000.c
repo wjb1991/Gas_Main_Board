@@ -23,7 +23,6 @@ void Task_UsbHost (void  *p_arg)
 
     while(TRUE)
     {
-        INT16U uin_Len;
         //OSTaskQPend(0,OS_OPT_PEND_BLOCKING,&uin_Len,NULL,&os_err);
         OSTimeDlyHMSM(0u, 0u, 0u, 10u,
                       OS_OPT_TIME_HMSM_STRICT | OS_OPT_TIME_PERIODIC,/* 周期模式 */

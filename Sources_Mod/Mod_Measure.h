@@ -48,6 +48,7 @@ typedef enum {
 typedef struct {
     MeasureState_e  e_State;        /* 测试状态 */
     MeaureMode_e    e_Mode;         /* 测试模式 */
+    
     INT32U  ul_DeadTime;            /* 死区时间 */
     INT32U  ul_MesureTime;          /* 测试时间 */
     INT16U	uin_InvalidDots;		/* 无效点 */
