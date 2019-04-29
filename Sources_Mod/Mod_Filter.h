@@ -4,7 +4,7 @@
 #include "bsp.h"
 
 
-#define DEF_BOXCAR_WITH_MAX     100
+#define DEF_BOXCAR_WITH_MAX     50
 
 BOOL Mod_FilterBoxCar(FP32* plf_Data , INT16U uin_Len, INT16U uin_Boxcar);
 

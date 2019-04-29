@@ -25,13 +25,13 @@
 
 /*  硬件相关任务   */
 #define  TASK_USB_HOST_PRIO             4u
-#define  TASK_STDBUSLASER_PRIO          5u
-#define  TASK_STDBUSMASTER_PRIO         6u
-#define  TASK_STDBUSSLAVE_PRIO          7u
+#define  TASK_STDBUSLASER_PRIO          7u
+#define  TASK_STDBUSMASTER_PRIO         8u
+#define  TASK_STDBUSSLAVE_PRIO          9u
 
 /* 软件相关任务 */
 
-#define  TASK_MEASURE_PRIO              9u
+#define  TASK_MEASURE_PRIO              6u
 #define  TASK_GASPROC_PRIO              10u
 #define  TASK_GREYPROC_PRIO             11u
 #define  TASK_LASER_PRIO                12u
