@@ -1,7 +1,7 @@
 #include "App_Include.h"
 
 
-#define N_MAX_SAVE   200   //最大变量个数
+#define N_MAX_SAVE   300   //最大变量个数
 //---------------------------------变量地址---------------------------------//
 static const MYSAVEPARA st_Save[N_MAX_SAVE]=
 {
@@ -634,29 +634,34 @@ INT8U ReadCharFromEeprom(INT32U uin_Addr)
 {
     INT8U auch_Data[4]={0};   
     Bsp_At24c512Read(auch_Data,uin_Addr,1);
+    TRACE_DBG("ReadCharFromEeprom(0x%X,0x%X)\r\n",uin_Addr,*(INT8U*)(auch_Data));
     return(*(INT8U*)(auch_Data));
 } 
 INT16U ReadIntFromEeprom(INT32U uin_Addr)
 {
     INT8U auch_Data[4]={0};
     Bsp_At24c512Read(auch_Data,uin_Addr,2);
+    TRACE_DBG("ReadIntFromEeprom(0x%X,0x%X)\r\n",uin_Addr,*(INT16U*)auch_Data);
     return(*(INT16U*)auch_Data);
 } 
 INT32U ReadLongFromEeprom(INT32U uin_Addr)
 {
     INT8U auch_Data[4]={0};
     Bsp_At24c512Read(auch_Data,uin_Addr,4);
+    TRACE_DBG("ReadLongFromEeprom(0x%X,0x%X)\r\n",uin_Addr,*(INT32U*)auch_Data);
     return(*(INT32U*)auch_Data);
 }   
 FP32 ReadFloatFromEeprom(INT32U uin_Addr)
 {
     INT8U auch_Data[4]={0};
     Bsp_At24c512Read(auch_Data,uin_Addr,4);
+    TRACE_DBG("ReadFloatFromEeprom(0x%X,0x%X)\r\n",uin_Addr,*(FP32*)auch_Data);
     return(*(FP32*)auch_Data);
 }
 FP64 ReadDoubleFromEeprom(INT32U uin_Addr)
 {
     INT8U auch_Data[8]={0};
     Bsp_At24c512Read(auch_Data,uin_Addr,8);
+    TRACE_DBG("ReadDoubleFromEeprom(0x%X,0x%X)\r\n",uin_Addr,*(FP64*)auch_Data);
     return(*(FP64*)auch_Data);
 }

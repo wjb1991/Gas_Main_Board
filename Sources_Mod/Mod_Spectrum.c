@@ -156,6 +156,7 @@ void Mod_GasMeasureInit(GasMeasure_t* pst_Meas)
 {    
     INT16U i;
     //570 650 730
+/*
     st_GasNO.st_PeakRef.ul_PeakLeftDot = 640;
     st_GasNO.st_PeakRef.ul_PeakCenterDot = 650;
     st_GasNO.st_PeakRef.ul_PeakRightDot = 660;
@@ -176,6 +177,7 @@ void Mod_GasMeasureInit(GasMeasure_t* pst_Meas)
 
     st_GasHC.st_PeakRef.ul_RightBackgroundLeftDot = 2096;
     st_GasHC.st_PeakRef.ul_RightBackgroundRightDot = 2143;
+*/
 
     if(pst_Meas->pst_Gas1 != NULL)
         Mod_CalibPointListInit(pst_Meas->pst_Gas1->pst_CalibPointList);

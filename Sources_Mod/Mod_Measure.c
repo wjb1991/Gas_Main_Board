@@ -239,10 +239,10 @@ void Mod_MeasureDoStaticMeas(Measure_t* pst_Meas)
 void Mod_MeasureDoStaticCalib(Measure_t* pst_Meas,FP32 f_CO2,FP32 f_CO,FP32 f_NO,FP32 f_HC)
 {
     pst_Meas->e_Mode = e_MeasStaticCalib;
-    pst_Meas->st_CalibCO2.f_Y /= pst_Meas->uin_CalibCnt;
-    pst_Meas->st_CalibCO.f_Y  /= pst_Meas->uin_CalibCnt;
-    pst_Meas->st_CalibNO.f_Y  /= pst_Meas->uin_CalibCnt;
-    pst_Meas->st_CalibHC.f_Y  /= pst_Meas->uin_CalibCnt;
+    pst_Meas->st_CalibCO2.f_Y = f_CO2;
+    pst_Meas->st_CalibCO.f_Y  = f_CO;
+    pst_Meas->st_CalibNO.f_Y  = f_NO;
+    pst_Meas->st_CalibHC.f_Y  = f_HC;
     pst_Meas->uin_CalibCnt = 0;
 }
 
