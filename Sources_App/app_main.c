@@ -9,7 +9,10 @@ int main(void)
     SCB_EnableICache();
 
     /* Enable D-Cache---------------------------------------------------------*/
-    SCB_EnableDCache();
+    SCB_EnableDCache();                                         /* 开启数据缓冲会导致 RAM致信性问题 */
+    
+    //SCB->CACR|=1<<2;                                            //透写
+    
 
     HAL_Init();                                                 /* See Note 1.                                          */
   

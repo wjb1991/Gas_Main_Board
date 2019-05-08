@@ -17,7 +17,7 @@
 
 #include "bsp.h"
 
-#define  DEF_USART_RX_DMA  (FALSE)  //开启L1缓冲对DMA传输有影响 会影响串口接收
+#define  DEF_USART_RX_DMA  (TRUE)  //开启L1缓冲对DMA传输有影响 会影响串口接收
 
 #define DEF_USE_COM1   (TRUE)
 #define DEF_USE_COM2   (TRUE)

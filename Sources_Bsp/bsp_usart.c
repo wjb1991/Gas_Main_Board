@@ -219,7 +219,7 @@ void Bsp_UsartTxDisable(Dev_SerialPort* pst_Dev)
     LL_USART_DisableIT_TC(UartHandle->Instance);
 }
 
- __STATIC_INLINE void USARTx_DMA_RX_IRQHandler(Dev_SerialPort* pst_Dev)
+void USARTx_DMA_RX_IRQHandler(Dev_SerialPort* pst_Dev)
 {
     USART_TypeDef *USARTx = ((UART_HandleTypeDef*)pst_Dev->pv_UartHandle)->Instance;
     INT16U uin_Len;
@@ -248,6 +248,8 @@ void Bsp_UsartTxDisable(Dev_SerialPort* pst_Dev)
         HAL_DMA_Start_IT(pst_Dev->pv_RxDma,(INT32U)&(USARTx->RDR),(INT32U)(&pst_Dev->puch_RxBuff[pst_Dev->uin_RxLen/2]),pst_Dev->uin_RxLen/2);
         if(pst_Dev->cb_RecvReady != NULL)
         {
+            //SCB_CleanDCache();
+            SCB_CleanInvalidateDCache();
             pst_Dev->cb_RecvReady(pst_Dev, &pst_Dev->puch_RxBuff[0], uin_Len);
         }
     }
@@ -258,12 +260,14 @@ void Bsp_UsartTxDisable(Dev_SerialPort* pst_Dev)
         HAL_DMA_Start_IT(pst_Dev->pv_RxDma,(INT32U)&(USARTx->RDR),(INT32U)(&pst_Dev->puch_RxBuff[0]),pst_Dev->uin_RxLen/2);
         if(pst_Dev->cb_RecvReady != NULL)
         {
+            //SCB_CleanDCache();
+            SCB_CleanInvalidateDCache();
             pst_Dev->cb_RecvReady(pst_Dev, &pst_Dev->puch_RxBuff[pst_Dev->uin_RxLen/2], uin_Len);
         }
     }
 }
 
- __STATIC_INLINE void USARTx_IRQHandler(Dev_SerialPort* pst_Dev)
+void USARTx_IRQHandler(Dev_SerialPort* pst_Dev)
 {
     USART_TypeDef *USARTx = ((UART_HandleTypeDef*)pst_Dev->pv_UartHandle)->Instance;
 
