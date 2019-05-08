@@ -655,13 +655,13 @@ FP32 ReadFloatFromEeprom(INT32U uin_Addr)
 {
     INT8U auch_Data[4]={0};
     Bsp_At24c512Read(auch_Data,uin_Addr,4);
-    TRACE_DBG("ReadFloatFromEeprom(0x%X,0x%X)\r\n",uin_Addr,*(FP32*)auch_Data);
+    TRACE_DBG("ReadFloatFromEeprom(0x%X,%f)\r\n",uin_Addr,*(FP32*)auch_Data);
     return(*(FP32*)auch_Data);
 }
 FP64 ReadDoubleFromEeprom(INT32U uin_Addr)
 {
     INT8U auch_Data[8]={0};
     Bsp_At24c512Read(auch_Data,uin_Addr,8);
-    TRACE_DBG("ReadDoubleFromEeprom(0x%X,0x%X)\r\n",uin_Addr,*(FP64*)auch_Data);
+    TRACE_DBG("ReadDoubleFromEeprom(0x%X,%f)\r\n",uin_Addr,*(FP64*)auch_Data);
     return(*(FP64*)auch_Data);
 }
