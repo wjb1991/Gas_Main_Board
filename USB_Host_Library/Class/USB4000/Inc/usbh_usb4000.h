@@ -90,7 +90,7 @@ typedef struct _USB4000_Process
     int32_t*             pl_SumSpectrum;            //求和光谱
     
     float*               plf_ProcessSpectrum;       //处理后的光谱
-    float*               plf_WaveLenth;             //波长数组
+    //float*               plf_WaveLenth;             //波长数组
     uint16_t             uin_Pixels;                //像素个数
     
     uint8_t              uch_ScansToAverage;        //多次扫描平均

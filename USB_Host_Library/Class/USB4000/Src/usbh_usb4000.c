@@ -74,7 +74,7 @@ static uint16_t spa_buff[3840]={0};
 static int32_t  sum_spa[3840] = {0};
 
 //#pragma location = (0x68006000)
-static float   wavelenth_buff[3840]={0};
+//static float   wavelenth_buff[3840]={0};
 
 //#pragma location = (0x6800E000 + 0x8000)    //0x6800A000
 static float   process_spa[3840] = {0};
@@ -99,8 +99,7 @@ USB4000_HandleTypeDef   USB4000 = {
     0.0,                    //f_Autonulling
     spa_buff,               //pin_Spectrum;           
     sum_spa,                //pl_SumSpectrum;             
-    process_spa,            //plf_ProcessSpectrum;    
-    wavelenth_buff,         //plf_WaveLenth;          
+    process_spa,            //plf_ProcessSpectrum;     
     0,                      //uin_Pixels;             
     0,                      //uch_ScansToAverage;     
     0,                      //uch_ScansConut;         
