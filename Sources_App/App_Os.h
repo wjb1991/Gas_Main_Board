@@ -46,24 +46,46 @@
 //==================================================================================
 //                                   任务堆栈大小
 //==================================================================================
-#define  TASK_START_STK_SIZE            256u
-#define  TASK_USB_HOST_STK_SIZE         1024u
-#define  TASK_STDBUSLASER_STK_SIZE      256u
-#define  TASK_STDBUSMASTER_STK_SIZE     256u
-#define  TASK_STDBUSSLAVE_STK_SIZE      256u
 
-#define  TASK_MEASURE_STK_SIZE          256u
-#define  TASK_GASPROC_STK_SIZE          256u
-#define  TASK_GREYPROC_STK_SIZE         256u
-#define  TASK_LASER_STK_SIZE            256u
+#define  TASK_START_STK_SIZE            256u
+
+#define  TASK_USB_HOST_STK_SIZE         4096u
+#define  TASK_STDBUSLASER_STK_SIZE      512u
+#define  TASK_STDBUSMASTER_STK_SIZE     512u
+#define  TASK_STDBUSSLAVE_STK_SIZE      512u
+
+#define  TASK_MEASURE_STK_SIZE          512u
+#define  TASK_GASPROC_STK_SIZE          512u
+#define  TASK_GREYPROC_STK_SIZE         512u
+#define  TASK_LASER_STK_SIZE            512u
 #define  TASK_MEASSPEED_STK_SIZE        1024u
 
-#define  TASK_MEASURE_STK_SIZE          256u
 #define  TASK_DISBOARD_STK_SIZE         256u
 
 #define  TASK_CML_SEND_STK_SIZE         256u
 #define  TASK_CML_RECV_STK_SIZE         256u
 
+/*
+//
+#define  TASK_START_STK_SIZE            256u
+
+#define  TASK_USB_HOST_STK_SIZE         1024u
+#define  TASK_STDBUSLASER_STK_SIZE      256u
+#define  TASK_STDBUSMASTER_STK_SIZE     256u
+#define  TASK_STDBUSSLAVE_STK_SIZE      256u
+
+#define  TASK_MEASURE_STK_SIZE          512u
+#define  TASK_GASPROC_STK_SIZE          256u
+#define  TASK_GREYPROC_STK_SIZE         256u
+#define  TASK_LASER_STK_SIZE            256u
+
+#define  TASK_MEASSPEED_STK_SIZE        1024u
+
+#define  TASK_DISBOARD_STK_SIZE         256u
+
+#define  TASK_CML_SEND_STK_SIZE         256u
+#define  TASK_CML_RECV_STK_SIZE         256u
+*/
 
 //==================================================================================
 //                                   任务堆栈声明

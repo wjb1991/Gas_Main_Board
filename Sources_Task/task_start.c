@@ -299,7 +299,7 @@ void AppTaskCreate (void)
                  (OS_OPT        )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_SAVE_FP),
                  (OS_ERR       *)&os_err);                                      /* 存放错误值 */
 
-#endif
+
     /* 光谱仪通信 */
     OSTaskCreate((OS_TCB       *)&TaskUsbHostTCB,                               /* 创建任务控制块 */
                  (CPU_CHAR     *)"USB HOST",                                    /* 任务名称 */
@@ -314,6 +314,7 @@ void AppTaskCreate (void)
                  (void         *)0u,                                            /* 用户补充存储区 */
                  (OS_OPT        )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_SAVE_FP),
                  (OS_ERR       *)&os_err);                                      /* 存放错误值 */
+#endif
 }
 
 //==================================================================================================

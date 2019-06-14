@@ -252,7 +252,7 @@ BOOL Mod_LaserRequestCO2SampleDot(LaserBoard_t* pst_Laser)
     while(i < 3)
     {
         Mod_StdbusReadCmd(&st_LaserBoard,0xA4,NULL,0);
-        if(PendSem(100) == TRUE)
+        if(PendSem(100) == TRUE && st_Measure.st_SampleCO2.ul_Len != 0 )
         {
             LASER_DBG(">>LASER_DBG: 获取CO2采样点成功\r\n");
             return TRUE;
@@ -272,7 +272,7 @@ BOOL Mod_LaserRequestCOSampleDot(LaserBoard_t* pst_Laser)
     while(i < 3)
     {
         Mod_StdbusReadCmd(&st_LaserBoard,0xA5,NULL,0);
-        if(PendSem(100) == TRUE)
+        if(PendSem(100) == TRUE && st_Measure.st_SampleCO.ul_Len != 0)
         {
             LASER_DBG(">>LASER_DBG: 获取CO采样点成功\r\n");
             return TRUE;
